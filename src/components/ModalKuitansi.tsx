@@ -112,9 +112,6 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
               )}
             </div>
             <div className="flex-1 text-center">
-              <h4 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                {pengaturan.kopHeaderLine1 || 'KEMENTERIAN AGAMA REPUBLIK INDONESIA'}
-              </h4>
               <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">
                 {profil.namaMadrasah}
               </h2>

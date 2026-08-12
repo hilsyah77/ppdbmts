@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PengaturanPPDBData, JalurPPDB } from '../types';
+import { PengaturanPPDBData, JalurPPDB, JadwalPiket } from '../types';
 import {
   Settings,
   Calendar,
@@ -21,6 +21,7 @@ import {
 interface PengaturanViewProps {
   pengaturan: PengaturanPPDBData;
   jalurList: JalurPPDB[];
+  jadwalPiketList?: JadwalPiket[];
   onSavePengaturan: (newPengaturan: PengaturanPPDBData) => void;
   onSaveJalurList: (newJalurList: JalurPPDB[]) => void;
   onResetDatabase?: () => void;
@@ -30,6 +31,7 @@ interface PengaturanViewProps {
 export const PengaturanView: React.FC<PengaturanViewProps> = ({
   pengaturan,
   jalurList,
+  jadwalPiketList = [],
   onSavePengaturan,
   onSaveJalurList,
   onResetDatabase,
@@ -207,16 +209,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
               />
             </div>
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Biaya Pendaftaran</label>
-              <input
-                type="text"
-                name="biariaPendaftaran"
-                value={formData.biariaPendaftaran}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-semibold text-emerald-700"
-              />
-            </div>
+
           </div>
         </div>
 
@@ -288,31 +281,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
 
           <div className="space-y-3 text-xs">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Baris Header 1 (Instansi Induk)</label>
-              <input
-                type="text"
-                name="kopHeaderLine1"
-                value={formData.kopHeaderLine1}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-serif"
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Baris Header 2 (Kantor Kemenag Wilayah)</label>
-              <input
-                type="text"
-                name="kopHeaderLine2"
-                value={formData.kopHeaderLine2}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-serif"
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Baris Header 3 (Nama Madrasah Utama)</label>
+              <label className="block font-bold text-slate-700 mb-1">Baris Header Kop Surat (Nama Madrasah Utama)</label>
               <input
                 type="text"
                 name="kopHeaderLine3"
@@ -325,14 +294,42 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Ketua Panitia PPDB (Penandatangan)</label>
-                <input
-                  type="text"
+                <label className="block font-bold text-slate-700 mb-1">
+                  Panitia PPDB (Penandatangan)
+                </label>
+                <select
                   name="panitiaKetua"
                   value={formData.panitiaKetua}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium"
-                />
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium text-slate-800 text-xs bg-white"
+                >
+                  <option value="">-- Pilih Panitia PPDB (Petugas Piket) --</option>
+                  {formData.panitiaKetua &&
+                    !jadwalPiketList.some((j) => j.petugas.includes(formData.panitiaKetua)) && (
+                      <option value={formData.panitiaKetua}>
+                        {formData.panitiaKetua} (Tersimpan)
+                      </option>
+                    )}
+                  {jadwalPiketList && jadwalPiketList.length > 0 ? (
+                    jadwalPiketList.map((j) => (
+                      <optgroup
+                        key={j.id}
+                        label={`${j.hari}, ${j.tanggal} [${j.shift.split(' ')[0]}] - ${j.status}`}
+                      >
+                        {j.petugas.map((pName, idx) => (
+                          <option key={`${j.id}-${idx}`} value={pName}>
+                            {pName} {j.status === 'Piket Hari Ini' ? '⭐ (Piket Hari Ini)' : ''}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))
+                  ) : (
+                    <option value={formData.panitiaKetua}>{formData.panitiaKetua}</option>
+                  )}
+                </select>
+                <p className="text-[10px] text-slate-500 mt-1">
+                  * Data nama penandatangan diambil otomatis dari Jadwal Petugas Piket.
+                </p>
               </div>
 
               <div>
@@ -342,7 +339,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                   name="panitiaSekretaris"
                   value={formData.panitiaSekretaris}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium text-xs"
                 />
               </div>
             </div>

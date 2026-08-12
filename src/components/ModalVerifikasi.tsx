@@ -26,9 +26,9 @@ export const ModalVerifikasi: React.FC<ModalVerifikasiProps> = ({
 
   const statusOptions: { value: StatusPendaftar; label: string; desc: string; icon: any; color: string }[] = [
     {
-      value: 'Terverifikasi',
-      label: 'Setujui (Terverifikasi)',
-      desc: 'Siswa memenuhi syarat, berkas lengkap, dan resmi terdaftar.',
+      value: 'Di Terima',
+      label: 'Setujui (Di Terima)',
+      desc: 'Siswa memenuhi syarat, berkas lengkap, dan resmi di terima.',
       icon: CheckCircle2,
       color: 'bg-emerald-50 text-emerald-800 border-emerald-300 peer-checked:bg-emerald-600 peer-checked:text-white'
     },

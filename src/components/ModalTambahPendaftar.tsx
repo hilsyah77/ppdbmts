@@ -229,7 +229,7 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-xs font-bold text-slate-700 mb-1">Nama Sekolah Asal *</label>
               <input
                 type="text"
@@ -240,22 +240,6 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
                 placeholder="Contoh: MI Negeri 3 Jakarta"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Jenis Sekolah Asal</label>
-              <select
-                name="jenisSekolahAsal"
-                value={formData.jenisSekolahAsal}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              >
-                <option value="MI Negeri">MI Negeri</option>
-                <option value="MI Swasta">MI Swasta</option>
-                <option value="SD Negeri">SD Negeri</option>
-                <option value="SD Swasta">SD Swasta</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
             </div>
 
             <div className="md:col-span-2">

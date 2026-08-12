@@ -63,14 +63,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   // Stats Calculations
   const totalPendaftar = pendaftarList.length;
-  const totalTerverifikasi = pendaftarList.filter((p) => p.status === 'Terverifikasi').length;
+  const totalTerverifikasi = pendaftarList.filter((p) => p.status === 'Di Terima' || p.status === 'Terverifikasi').length;
   const totalPending = pendaftarList.filter((p) => p.status === 'Belum Diverifikasi').length;
   const totalDitolak = pendaftarList.filter((p) => p.status === 'Ditolak').length;
   const totalBerkasKurang = pendaftarList.filter((p) => p.status === 'Berkas Belum Lengkap').length;
 
   // Total Quota
   const totalKuota = jalurList.reduce((acc, curr) => acc + curr.kuota, 0);
-  const totalTerisi = pendaftarList.filter((p) => p.status === 'Terverifikasi').length;
+  const totalTerisi = pendaftarList.filter((p) => p.status === 'Di Terima' || p.status === 'Terverifikasi').length;
   const sisaKuota = Math.max(0, totalKuota - totalTerisi);
 
   // 1. Data Statistik Sekolah Asal
@@ -114,7 +114,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   // 2. Statistik Pendaftar (By Jalur, By Status, By Date)
   const statusPieData = [
-    { name: 'Terverifikasi', value: totalTerverifikasi, color: '#059669' },
+    { name: 'Di Terima', value: totalTerverifikasi, color: '#059669' },
     { name: 'Belum Diverifikasi', value: totalPending, color: '#f59e0b' },
     { name: 'Berkas Belum Lengkap', value: totalBerkasKurang, color: '#0284c7' },
     { name: 'Ditolak', value: totalDitolak, color: '#dc2626' }
@@ -123,12 +123,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const jalurBarData = jalurList.map((j) => {
     const pendaftarJalur = pendaftarList.filter((p) => p.jalur === j.namaJalur).length;
     const verifiedJalur = pendaftarList.filter(
-      (p) => p.jalur === j.namaJalur && p.status === 'Terverifikasi'
+      (p) => p.jalur === j.namaJalur && (p.status === 'Di Terima' || p.status === 'Terverifikasi')
     ).length;
     return {
       name: j.namaJalur,
       Mendaftar: pendaftarJalur,
-      Terverifikasi: verifiedJalur,
+      'Di Terima': verifiedJalur,
       Kuota: j.kuota
     };
   });
@@ -198,19 +198,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <p className="text-[11px] text-emerald-600 mt-1 font-medium">Siswa terdaftar online</p>
         </div>
 
-        {/* Terverifikasi */}
+        {/* Di Terima */}
         <div
-          onClick={() => onNavigateToPendaftar(undefined, 'Terverifikasi')}
+          onClick={() => onNavigateToPendaftar(undefined, 'Di Terima')}
           className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase">Terverifikasi</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase">Di Terima</span>
             <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform">
               <CheckCircle className="w-5 h-5" />
             </div>
           </div>
           <div className="text-2xl font-black text-emerald-600">{totalTerverifikasi}</div>
-          <p className="text-[11px] text-slate-500 mt-1">Lolos verifikasi berkas</p>
+          <p className="text-[11px] text-slate-500 mt-1">Siswa diterima / lolos seleksi</p>
         </div>
 
         {/* Belum Diverifikasi */}
@@ -404,9 +404,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         {i + 1}
                       </span>
                       <span className="font-medium truncate">{sch.nama}</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-semibold shrink-0">
-                        {sch.jenis}
-                      </span>
+                      {sch.jenis && sch.jenis !== 'Lainnya' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-semibold shrink-0">
+                          {sch.jenis}
+                        </span>
+                      )}
                     </div>
                     <div className="font-bold text-slate-900 shrink-0 ml-2">
                       {sch.jumlah} Siswa ({sch.persentase}%)

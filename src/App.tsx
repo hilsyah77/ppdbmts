@@ -112,7 +112,7 @@ export default function App() {
 
   // Derived Counts
   const pendingCount = pendaftarList.filter((p) => p.status === 'Belum Diverifikasi').length;
-  const verifiedCount = pendaftarList.filter((p) => p.status === 'Terverifikasi').length;
+  const verifiedCount = pendaftarList.filter((p) => p.status === 'Di Terima' || p.status === 'Terverifikasi').length;
 
   // Handlers
   const handleNavigateToPendaftar = (jalur?: string, status?: string) => {
@@ -127,6 +127,13 @@ export default function App() {
         p.id === id ? { ...p, status: newStatus, catatanVerifikasi: catatan } : p
       )
     );
+  };
+
+  const handleSavePendaftar = (updatedPendaftar: Pendaftar) => {
+    setPendaftarList((prev) =>
+      prev.map((p) => (p.id === updatedPendaftar.id ? updatedPendaftar : p))
+    );
+    setDetailModalItem(updatedPendaftar);
   };
 
   const handleDeletePendaftar = (id: string, nama: string) => {
@@ -207,7 +214,6 @@ export default function App() {
         totalPendaftar={pendaftarList.length}
         totalTerverifikasi={verifiedCount}
         totalPending={pendingCount}
-        onResetData={handleResetData}
       />
 
       {/* Main Body Layout */}
@@ -283,6 +289,7 @@ export default function App() {
             <PengaturanView
               pengaturan={pengaturan}
               jalurList={jalurList}
+              jadwalPiketList={jadwalPiketList}
               onSavePengaturan={(newP) => setPengaturan(newP)}
               onSaveJalurList={(newJ) => setJalurList(newJ)}
               onResetDatabase={handleResetData}
@@ -296,11 +303,9 @@ export default function App() {
       {/* Global Modals */}
       <ModalDetailPendaftar
         pendaftar={detailModalItem}
+        jalurList={jalurList}
         onClose={() => setDetailModalItem(null)}
-        onOpenCetak={(p) => {
-          setDetailModalItem(null);
-          setCetakModalItem(p);
-        }}
+        onSavePendaftar={handleSavePendaftar}
         onOpenVerifikasi={(p) => {
           setDetailModalItem(null);
           setVerifikasiModalItem(p);
@@ -311,6 +316,7 @@ export default function App() {
         pendaftar={cetakModalItem}
         profil={profilMadrasah}
         pengaturan={pengaturan}
+        jadwalPiketList={jadwalPiketList}
         onClose={() => setCetakModalItem(null)}
       />
 

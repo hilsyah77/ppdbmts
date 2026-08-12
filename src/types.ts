@@ -1,4 +1,4 @@
-export type StatusPendaftar = 'Terverifikasi' | 'Belum Diverifikasi' | 'Ditolak' | 'Berkas Belum Lengkap';
+export type StatusPendaftar = 'Di Terima' | 'Belum Diverifikasi' | 'Ditolak' | 'Berkas Belum Lengkap';
 
 export type JenisKelamin = 'Laki-laki' | 'Perempuan';
 
@@ -15,7 +15,7 @@ export interface Pendaftar {
   noHpWa: string;
   jalur: string; // e.g., 'Reguler', 'Prestasi', 'Afirmasi', 'Tahfizh'
   sekolahAsal: string;
-  jenisSekolahAsal: 'MI Negeri' | 'MI Swasta' | 'SD Negeri' | 'SD Swasta' | 'Lainnya';
+  jenisSekolahAsal?: 'MI Negeri' | 'MI Swasta' | 'SD Negeri' | 'SD Swasta' | 'Lainnya' | string;
   npsnSekolahAsal?: string;
   alamatSekolahAsal?: string;
   status: StatusPendaftar;

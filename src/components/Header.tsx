@@ -1,5 +1,5 @@
 import React from 'react';
-import { School, Calendar, Users, CheckCircle2, Clock, ShieldCheck, RefreshCw } from 'lucide-react';
+import { School, Calendar, Users, CheckCircle2, Clock, ShieldCheck } from 'lucide-react';
 import { ProfilMadrasahData, PengaturanPPDBData } from '../types';
 
 interface HeaderProps {
@@ -8,7 +8,7 @@ interface HeaderProps {
   totalPendaftar: number;
   totalTerverifikasi: number;
   totalPending: number;
-  onResetData: () => void;
+  onResetData?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,8 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   pengaturan,
   totalPendaftar,
   totalTerverifikasi,
-  totalPending,
-  onResetData
+  totalPending
 }) => {
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
@@ -51,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Quick Metrics & Actions */}
+          {/* Quick Metrics */}
           <div className="flex items-center gap-3 text-xs flex-wrap">
             <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
               <Users className="w-4 h-4 text-emerald-400" />
@@ -64,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
               <CheckCircle2 className="w-4 h-4 text-blue-400" />
               <div>
-                <span className="text-slate-400 block text-[10px]">Terverifikasi</span>
+                <span className="text-slate-400 block text-[10px]">Di Terima</span>
                 <span className="font-bold text-emerald-400">{totalTerverifikasi} Siswa</span>
               </div>
             </div>
@@ -76,15 +75,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="font-bold text-amber-400">{totalPending} Siswa</span>
               </div>
             </div>
-
-            <button
-              onClick={onResetData}
-              title="Reset ke Data Bawaan Sistem"
-              className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700 flex items-center gap-1.5"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline text-xs">Reset Data</span>
-            </button>
           </div>
 
         </div>

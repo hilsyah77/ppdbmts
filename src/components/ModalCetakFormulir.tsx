@@ -1,11 +1,12 @@
-import React, { useRef } from 'react';
-import { Pendaftar, ProfilMadrasahData, PengaturanPPDBData } from '../types';
-import { X, Printer, CheckCircle, ShieldCheck } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Pendaftar, ProfilMadrasahData, PengaturanPPDBData, JadwalPiket } from '../types';
+import { X, Printer, CheckCircle, ShieldCheck, UserCheck } from 'lucide-react';
 
 interface ModalCetakProps {
   pendaftar: Pendaftar | null;
   profil: ProfilMadrasahData;
   pengaturan: PengaturanPPDBData;
+  jadwalPiketList?: JadwalPiket[];
   onClose: () => void;
 }
 
@@ -13,9 +14,11 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
   pendaftar,
   profil,
   pengaturan,
+  jadwalPiketList = [],
   onClose
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const [penandatangan, setPenandatangan] = useState<string>(pengaturan.panitiaKetua);
 
   if (!pendaftar) return null;
 
@@ -41,7 +44,37 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Penandatangan Dropdown */}
+            <div className="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1 text-xs">
+              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-slate-300 font-medium whitespace-nowrap">Penandatangan:</span>
+              <select
+                value={penandatangan}
+                onChange={(e) => setPenandatangan(e.target.value)}
+                className="bg-slate-900 text-emerald-300 text-xs font-bold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                {pengaturan.panitiaKetua && (
+                  <option value={pengaturan.panitiaKetua}>
+                    {pengaturan.panitiaKetua} (Default)
+                  </option>
+                )}
+                {jadwalPiketList &&
+                  jadwalPiketList.map((j) => (
+                    <optgroup
+                      key={j.id}
+                      label={`${j.hari}, ${j.tanggal} [${j.shift.split(' ')[0]}] - ${j.status}`}
+                    >
+                      {j.petugas.map((pName, idx) => (
+                        <option key={`${j.id}-${idx}`} value={pName}>
+                          {pName} {j.status === 'Piket Hari Ini' ? '⭐ (Piket Hari Ini)' : ''}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+              </select>
+            </div>
+
             <button
               onClick={handlePrint}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors flex items-center gap-2 shadow-lg"
@@ -66,27 +99,16 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
           {/* 1. Kop Surat Resmi Madrasah */}
           <div className="border-b-4 border-double border-slate-900 pb-3 mb-6 text-center relative">
             
-            {/* Ministry Logo Placeholder */}
-            <div className="absolute left-0 top-1 w-16 h-16 rounded-full border-2 border-emerald-800 flex items-center justify-center font-bold text-[10px] text-emerald-800 uppercase tracking-tighter text-center leading-tight bg-emerald-50">
-              KEMENAG
-            </div>
-
-            {/* School Logo Right Placeholder */}
-            <div className="absolute right-0 top-1 w-16 h-16 rounded-full border-2 border-emerald-800 flex items-center justify-center font-bold text-[10px] text-emerald-800 uppercase tracking-tighter text-center leading-tight bg-emerald-50 overflow-hidden">
+            {/* School Logo Left */}
+            <div className="absolute left-0 top-1 w-16 h-16 flex items-center justify-center font-bold text-[10px] text-emerald-800 uppercase tracking-tighter text-center leading-tight overflow-hidden">
               {profil.logoUrl ? (
-                <img src={profil.logoUrl} alt="Logo Sekolah" className="w-full h-full object-contain p-1" />
+                <img src={profil.logoUrl} alt="Logo Sekolah" className="w-full h-full object-contain" />
               ) : (
                 "MTsN 1"
               )}
             </div>
 
             <div className="px-16 space-y-0.5">
-              <h4 className="text-xs font-bold font-sans uppercase tracking-widest text-slate-800">
-                {pengaturan.kopHeaderLine1}
-              </h4>
-              <h5 className="text-xs font-bold font-sans uppercase tracking-wider text-slate-800">
-                {pengaturan.kopHeaderLine2}
-              </h5>
               <h2 className="text-sm sm:text-base font-black font-sans uppercase tracking-tight text-emerald-900">
                 {pengaturan.kopHeaderLine3}
               </h2>
@@ -171,28 +193,17 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
             {/* B. SEKOLAH ASAL */}
             <div>
               <div className="bg-slate-800 text-white px-3 py-1 text-xs font-bold uppercase rounded-t tracking-wider">
-                B. SEKOLAH ASAL & PRESTASI AKADEMIK
+                B. SEKOLAH ASAL
               </div>
               <table className="w-full border border-slate-300 border-t-0 text-xs">
                 <tbody>
                   <tr className="border-b border-slate-200">
                     <td className="p-2 w-48 font-medium bg-slate-50 border-r border-slate-200">1. Nama Sekolah Asal</td>
-                    <td className="p-2 font-bold">{pendaftar.sekolahAsal} ({pendaftar.jenisSekolahAsal})</td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">2. NPSN Sekolah Asal</td>
-                    <td className="p-2 font-mono">{pendaftar.npsnSekolahAsal || '-'}</td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">3. Rata-rata Rapor (Kls 4-6)</td>
-                    <td className="p-2 font-bold">{pendaftar.rataRapor || '-'}</td>
+                    <td className="p-2 font-bold">{pendaftar.sekolahAsal}</td>
                   </tr>
                   <tr>
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">4. Prestas / Hafalan Qur'an</td>
-                    <td className="p-2">
-                      {pendaftar.jumlahJuzTahfizh ? `Hafal ${pendaftar.jumlahJuzTahfizh} Juz | ` : ''}
-                      {pendaftar.prestasiDetail || 'Tidak Ada Data Prestasi Tambahan'}
-                    </td>
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">2. NPSN Sekolah Asal</td>
+                    <td className="p-2 font-mono">{pendaftar.npsnSekolahAsal || '-'}</td>
                   </tr>
                 </tbody>
               </table>
@@ -206,20 +217,12 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
               <table className="w-full border border-slate-300 border-t-0 text-xs">
                 <tbody>
                   <tr className="border-b border-slate-200">
-                    <td className="p-2 w-48 font-medium bg-slate-50 border-r border-slate-200">1. Nama Ayah & Pekerjaan</td>
-                    <td className="p-2 font-bold">{pendaftar.namaAyah} <span className="font-normal">({pendaftar.pekerjaanAyah})</span></td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">2. Nama Ibu & Pekerjaan</td>
-                    <td className="p-2 font-bold">{pendaftar.namaIbu} <span className="font-normal">({pendaftar.pekerjaanIbu})</span></td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">3. No. HP Orang Tua</td>
-                    <td className="p-2 font-mono">{pendaftar.noHpOrangTua}</td>
+                    <td className="p-2 w-48 font-medium bg-slate-50 border-r border-slate-200">1. Nama Ayah</td>
+                    <td className="p-2 font-bold">{pendaftar.namaAyah}</td>
                   </tr>
                   <tr>
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">4. Penghasilan Orang Tua</td>
-                    <td className="p-2">{pendaftar.penghasilanOrangTua}</td>
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">2. Nama Ibu</td>
+                    <td className="p-2 font-bold">{pendaftar.namaIbu}</td>
                   </tr>
                 </tbody>
               </table>
@@ -293,8 +296,8 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                   <p className="font-bold text-slate-800">Panitia PPDB {profil.namaMadrasah}</p>
                 </div>
                 <div>
-                  <p className="font-bold underline uppercase">{pengaturan.panitiaKetua}</p>
-                  <p className="text-[10px] text-slate-500">Ketua Panitia PPDB</p>
+                  <p className="font-bold underline uppercase">{penandatangan || pengaturan.panitiaKetua}</p>
+                  <p className="text-[10px] text-slate-500">Panitia PPDB (Penandatangan)</p>
                 </div>
               </div>
 

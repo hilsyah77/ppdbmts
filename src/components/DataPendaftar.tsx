@@ -44,8 +44,6 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJalur, setSelectedJalur] = useState<string>(initialFilterJalur);
   const [selectedStatus, setSelectedStatus] = useState<string>(initialFilterStatus);
-  const [selectedJenisSekolah, setSelectedJenisSekolah] = useState<string>('');
-
   // Filtering Logic
   const filteredData = useMemo(() => {
     return pendaftarList.filter((p) => {
@@ -58,12 +56,14 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
         p.nisn.includes(searchTerm);
 
       const matchJalur = !selectedJalur || p.jalur === selectedJalur;
-      const matchStatus = !selectedStatus || p.status === selectedStatus;
-      const matchJenisSekolah = !selectedJenisSekolah || p.jenisSekolahAsal === selectedJenisSekolah;
+      const matchStatus =
+        !selectedStatus ||
+        p.status === selectedStatus ||
+        (selectedStatus === 'Di Terima' && p.status === 'Terverifikasi');
 
-      return matchSearch && matchJalur && matchStatus && matchJenisSekolah;
+      return matchSearch && matchJalur && matchStatus;
     });
-  }, [pendaftarList, searchTerm, selectedJalur, selectedStatus, selectedJenisSekolah]);
+  }, [pendaftarList, searchTerm, selectedJalur, selectedStatus]);
 
   // Export to CSV Functionality
   const exportToCSV = () => {
@@ -84,7 +84,6 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
       'No HP WA',
       'Jalur Pendaftaran',
       'Sekolah Asal',
-      'Jenis Sekolah Asal',
       'Status Verifikasi',
       'Catatan Verifikasi',
       'Nama Ayah',
@@ -108,7 +107,6 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
       `"${p.noHpWa}"`,
       `"${p.jalur}"`,
       `"${p.sekolahAsal}"`,
-      `"${p.jenisSekolahAsal}"`,
       `"${p.status}"`,
       `"${p.catatanVerifikasi || ''}"`,
       `"${p.namaAyah}"`,
@@ -220,24 +218,10 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
             className="px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-700 font-medium"
           >
             <option value="">Semua Status Verifikasi</option>
-            <option value="Terverifikasi">Terverifikasi</option>
+            <option value="Di Terima">Di Terima</option>
             <option value="Belum Diverifikasi">Belum Diverifikasi (Pending)</option>
             <option value="Berkas Belum Lengkap">Berkas Belum Lengkap</option>
             <option value="Ditolak">Ditolak</option>
-          </select>
-
-          {/* Filter Jenis Sekolah Asal */}
-          <select
-            value={selectedJenisSekolah}
-            onChange={(e) => setSelectedJenisSekolah(e.target.value)}
-            className="px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-700 font-medium"
-          >
-            <option value="">Semua Jenis Sekolah Asal</option>
-            <option value="MI Negeri">MI Negeri</option>
-            <option value="MI Swasta">MI Swasta</option>
-            <option value="SD Negeri">SD Negeri</option>
-            <option value="SD Swasta">SD Swasta</option>
-            <option value="Lainnya">Lainnya</option>
           </select>
 
         </div>
@@ -249,12 +233,11 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
             <strong className="text-slate-800">{pendaftarList.length}</strong> total pendaftar
           </div>
 
-          {(selectedJalur || selectedStatus || selectedJenisSekolah || searchTerm) && (
+          {(selectedJalur || selectedStatus || searchTerm) && (
             <button
               onClick={() => {
                 setSelectedJalur('');
                 setSelectedStatus('');
-                setSelectedJenisSekolah('');
                 setSearchTerm('');
               }}
               className="text-xs text-rose-600 hover:underline font-semibold"
@@ -350,16 +333,13 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
                       {/* 7. Sekolah Asal */}
                       <td className="p-3.5">
                         <div className="font-medium text-slate-800">{pendaftar.sekolahAsal}</div>
-                        <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold mt-0.5">
-                          {pendaftar.jenisSekolahAsal}
-                        </span>
                       </td>
 
                       {/* 8. Status */}
                       <td className="p-3.5 text-center whitespace-nowrap">
                         <span
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
-                            pendaftar.status === 'Terverifikasi'
+                            pendaftar.status === 'Di Terima' || pendaftar.status === 'Terverifikasi'
                               ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
                               : pendaftar.status === 'Ditolak'
                               ? 'bg-rose-100 text-rose-800 border-rose-300'
@@ -368,11 +348,11 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
                               : 'bg-amber-100 text-amber-800 border-amber-300'
                           }`}
                         >
-                          {pendaftar.status === 'Terverifikasi' && <CheckCircle2 className="w-3 h-3" />}
+                          {(pendaftar.status === 'Di Terima' || pendaftar.status === 'Terverifikasi') && <CheckCircle2 className="w-3 h-3" />}
                           {pendaftar.status === 'Ditolak' && <XCircle className="w-3 h-3" />}
                           {pendaftar.status === 'Belum Diverifikasi' && <Clock className="w-3 h-3" />}
                           {pendaftar.status === 'Berkas Belum Lengkap' && <AlertTriangle className="w-3 h-3" />}
-                          <span>{pendaftar.status}</span>
+                          <span>{pendaftar.status === 'Terverifikasi' ? 'Di Terima' : pendaftar.status}</span>
                         </span>
                       </td>
 
