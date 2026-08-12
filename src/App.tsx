@@ -1,0 +1,319 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState, useEffect } from 'react';
+import {
+  Pendaftar,
+  JalurPPDB,
+  JadwalPiket,
+  ProfilMadrasahData,
+  PengaturanPPDBData,
+  StatusPendaftar,
+  ItemBiayaPembayaran
+} from './types';
+import {
+  initialPendaftar,
+  initialJalurPPDB,
+  initialJadwalPiket,
+  initialProfilMadrasah,
+  initialPengaturan,
+  initialItemBiayaPembayaran
+} from './data/mockData';
+
+// Layout & Navigation Components
+import { Header } from './components/Header';
+import { Sidebar, ActiveTab } from './components/Sidebar';
+
+// Views
+import { Dashboard } from './components/Dashboard';
+import { ProfilMadrasah } from './components/ProfilMadrasah';
+import { DataPendaftar } from './components/DataPendaftar';
+import { JadwalPiketView } from './components/JadwalPiketView';
+import { PengaturanView } from './components/PengaturanView';
+import { PembayaranView } from './components/PembayaranView';
+
+// Modals
+import { ModalDetailPendaftar } from './components/ModalDetailPendaftar';
+import { ModalCetakFormulir } from './components/ModalCetakFormulir';
+import { ModalVerifikasi } from './components/ModalVerifikasi';
+import { ModalTambahPendaftar } from './components/ModalTambahPendaftar';
+
+export default function App() {
+  // Navigation State
+  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+
+  // Filter Pass-Through State for Navigation from Dashboard to DataPendaftar
+  const [filterJalurParam, setFilterJalurParam] = useState<string>('');
+  const [filterStatusParam, setFilterStatusParam] = useState<string>('');
+
+  // Persistent States
+  const [pendaftarList, setPendaftarList] = useState<Pendaftar[]>(() => {
+    const saved = localStorage.getItem('ppdb_mts_pendaftar');
+    return saved ? JSON.parse(saved) : initialPendaftar;
+  });
+
+  const [jalurList, setJalurList] = useState<JalurPPDB[]>(() => {
+    const saved = localStorage.getItem('ppdb_mts_jalur');
+    return saved ? JSON.parse(saved) : initialJalurPPDB;
+  });
+
+  const [jadwalPiketList, setJadwalPiketList] = useState<JadwalPiket[]>(() => {
+    const saved = localStorage.getItem('ppdb_mts_piket');
+    return saved ? JSON.parse(saved) : initialJadwalPiket;
+  });
+
+  const [profilMadrasah, setProfilMadrasah] = useState<ProfilMadrasahData>(() => {
+    const saved = localStorage.getItem('ppdb_mts_profil');
+    return saved ? JSON.parse(saved) : initialProfilMadrasah;
+  });
+
+  const [pengaturan, setPengaturan] = useState<PengaturanPPDBData>(() => {
+    const saved = localStorage.getItem('ppdb_mts_pengaturan');
+    return saved ? JSON.parse(saved) : initialPengaturan;
+  });
+
+  const [itemBiayaList, setItemBiayaList] = useState<ItemBiayaPembayaran[]>(() => {
+    const saved = localStorage.getItem('ppdb_mts_biaya');
+    return saved ? JSON.parse(saved) : initialItemBiayaPembayaran;
+  });
+
+  // Modal States
+  const [detailModalItem, setDetailModalItem] = useState<Pendaftar | null>(null);
+  const [cetakModalItem, setCetakModalItem] = useState<Pendaftar | null>(null);
+  const [verifikasiModalItem, setVerifikasiModalItem] = useState<Pendaftar | null>(null);
+  const [isTambahModalOpen, setIsTambahModalOpen] = useState<boolean>(false);
+
+  // Sync to LocalStorage
+  useEffect(() => {
+    localStorage.setItem('ppdb_mts_pendaftar', JSON.stringify(pendaftarList));
+  }, [pendaftarList]);
+
+  useEffect(() => {
+    localStorage.setItem('ppdb_mts_jalur', JSON.stringify(jalurList));
+  }, [jalurList]);
+
+  useEffect(() => {
+    localStorage.setItem('ppdb_mts_piket', JSON.stringify(jadwalPiketList));
+  }, [jadwalPiketList]);
+
+  useEffect(() => {
+    localStorage.setItem('ppdb_mts_profil', JSON.stringify(profilMadrasah));
+  }, [profilMadrasah]);
+
+  useEffect(() => {
+    localStorage.setItem('ppdb_mts_pengaturan', JSON.stringify(pengaturan));
+  }, [pengaturan]);
+
+  useEffect(() => {
+    localStorage.setItem('ppdb_mts_biaya', JSON.stringify(itemBiayaList));
+  }, [itemBiayaList]);
+
+  // Derived Counts
+  const pendingCount = pendaftarList.filter((p) => p.status === 'Belum Diverifikasi').length;
+  const verifiedCount = pendaftarList.filter((p) => p.status === 'Terverifikasi').length;
+
+  // Handlers
+  const handleNavigateToPendaftar = (jalur?: string, status?: string) => {
+    setFilterJalurParam(jalur || '');
+    setFilterStatusParam(status || '');
+    setActiveTab('pendaftar');
+  };
+
+  const handleUpdateStatus = (id: string, newStatus: StatusPendaftar, catatan: string) => {
+    setPendaftarList((prev) =>
+      prev.map((p) =>
+        p.id === id ? { ...p, status: newStatus, catatanVerifikasi: catatan } : p
+      )
+    );
+  };
+
+  const handleDeletePendaftar = (id: string, nama: string) => {
+    if (confirm(`Apakah Anda yakin ingin menghapus data pendaftar "${nama}" dari sistem?`)) {
+      setPendaftarList((prev) => {
+        const filtered = prev.filter((p) => p.id !== id);
+        // Recalculate No Urut
+        return filtered.map((p, idx) => ({ ...p, noUrut: idx + 1 }));
+      });
+    }
+  };
+
+  const handleAddPendaftar = (
+    newPendaftarData: Omit<Pendaftar, 'id' | 'noUrut' | 'noRegistrasi' | 'tanggalDaftar'>
+  ) => {
+    const nextUrut = pendaftarList.length + 1;
+    const formattedUrut = String(nextUrut).padStart(3, '0');
+    const year = new Date().getFullYear();
+    const newRegNo = `SPMB-${year}-${formattedUrut}`;
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const fullNewPendaftar: Pendaftar = {
+      ...newPendaftarData,
+      id: `pdf-${Date.now()}`,
+      noUrut: nextUrut,
+      noRegistrasi: newRegNo,
+      tanggalDaftar: formattedDate
+    };
+
+    setPendaftarList((prev) => [fullNewPendaftar, ...prev]);
+
+    // Also update filled seats in Jalur count
+    setJalurList((prev) =>
+      prev.map((j) =>
+        j.namaJalur === newPendaftarData.jalur ? { ...j, terisi: j.terisi + 1 } : j
+      )
+    );
+  };
+
+  const handleResetData = () => {
+    if (
+      confirm(
+        'Apakah Anda ingin mengembalikan seluruh data pendaftar, profil, dan jadwal piket ke data awal sistem?'
+      )
+    ) {
+      localStorage.clear();
+      setPendaftarList(initialPendaftar);
+      setJalurList(initialJalurPPDB);
+      setJadwalPiketList(initialJadwalPiket);
+      setProfilMadrasah(initialProfilMadrasah);
+      setPengaturan(initialPengaturan);
+      setItemBiayaList(initialItemBiayaPembayaran);
+      setActiveTab('dashboard');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-100/90 font-sans text-slate-800 antialiased flex flex-col selection:bg-emerald-500 selection:text-white">
+      
+      {/* App Header */}
+      <Header
+        profil={profilMadrasah}
+        pengaturan={pengaturan}
+        totalPendaftar={pendaftarList.length}
+        totalTerverifikasi={verifiedCount}
+        totalPending={pendingCount}
+        onResetData={handleResetData}
+      />
+
+      {/* Main Body Layout */}
+      <div className="flex-1 max-w-7xl w-full mx-auto flex flex-col lg:flex-row">
+        
+        {/* Navigation Sidebar */}
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={(tab) => {
+            setFilterJalurParam('');
+            setFilterStatusParam('');
+            setActiveTab(tab);
+          }}
+          pendingCount={pendingCount}
+          totalCount={pendaftarList.length}
+        />
+
+        {/* View Content Area */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
+          {activeTab === 'dashboard' && (
+            <Dashboard
+              pendaftarList={pendaftarList}
+              jalurList={jalurList}
+              jadwalPiketList={jadwalPiketList}
+              profil={profilMadrasah}
+              pengaturan={pengaturan}
+              onNavigateToPendaftar={handleNavigateToPendaftar}
+              onNavigateToPiket={() => setActiveTab('piket')}
+              onNavigateToJalurSettings={() => setActiveTab('pengaturan')}
+            />
+          )}
+
+          {activeTab === 'profil' && (
+            <ProfilMadrasah
+              profil={profilMadrasah}
+              onSave={(updated) => setProfilMadrasah(updated)}
+            />
+          )}
+
+          {activeTab === 'pendaftar' && (
+            <DataPendaftar
+              pendaftarList={pendaftarList}
+              jalurList={jalurList}
+              initialFilterJalur={filterJalurParam}
+              initialFilterStatus={filterStatusParam}
+              onOpenDetail={(p) => setDetailModalItem(p)}
+              onOpenCetak={(p) => setCetakModalItem(p)}
+              onOpenVerifikasi={(p) => setVerifikasiModalItem(p)}
+              onDeletePendaftar={handleDeletePendaftar}
+              onOpenTambahModal={() => setIsTambahModalOpen(true)}
+            />
+          )}
+
+          {activeTab === 'pembayaran' && (
+            <PembayaranView
+              pendaftarList={pendaftarList}
+              setPendaftarList={setPendaftarList}
+              itemBiayaList={itemBiayaList}
+              setItemBiayaList={setItemBiayaList}
+              profil={profilMadrasah}
+              pengaturan={pengaturan}
+            />
+          )}
+
+          {activeTab === 'piket' && (
+            <JadwalPiketView
+              jadwalList={jadwalPiketList}
+              onSaveJadwal={(newList) => setJadwalPiketList(newList)}
+            />
+          )}
+
+          {activeTab === 'pengaturan' && (
+            <PengaturanView
+              pengaturan={pengaturan}
+              jalurList={jalurList}
+              onSavePengaturan={(newP) => setPengaturan(newP)}
+              onSaveJalurList={(newJ) => setJalurList(newJ)}
+            />
+          )}
+        </main>
+
+      </div>
+
+      {/* Global Modals */}
+      <ModalDetailPendaftar
+        pendaftar={detailModalItem}
+        onClose={() => setDetailModalItem(null)}
+        onOpenCetak={(p) => {
+          setDetailModalItem(null);
+          setCetakModalItem(p);
+        }}
+        onOpenVerifikasi={(p) => {
+          setDetailModalItem(null);
+          setVerifikasiModalItem(p);
+        }}
+      />
+
+      <ModalCetakFormulir
+        pendaftar={cetakModalItem}
+        profil={profilMadrasah}
+        pengaturan={pengaturan}
+        onClose={() => setCetakModalItem(null)}
+      />
+
+      <ModalVerifikasi
+        pendaftar={verifikasiModalItem}
+        onClose={() => setVerifikasiModalItem(null)}
+        onUpdateStatus={handleUpdateStatus}
+      />
+
+      {isTambahModalOpen && (
+        <ModalTambahPendaftar
+          jalurList={jalurList}
+          onClose={() => setIsTambahModalOpen(false)}
+          onAddPendaftar={handleAddPendaftar}
+        />
+      )}
+
+    </div>
+  );
+}

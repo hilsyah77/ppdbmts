@@ -1,0 +1,6 @@
+{
+  "name": "PPDB MTs Admin Dashboard",
+  "description": "Sistem Informasi Penerimaan Peserta Didik Baru (PPDB) tingkat Madrasah Tsanawiyah (MTs) dengan manajemen pendaftar, cetak formulir, jadwal piket panitia, statistik, dan profil madrasah.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
