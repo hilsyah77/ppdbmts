@@ -171,7 +171,7 @@ export default function App() {
   const handleResetData = () => {
     if (
       confirm(
-        'Apakah Anda ingin mengembalikan seluruh data pendaftar, profil, dan jadwal piket ke data awal sistem?'
+        'PERINGATAN DANGER ZONE:\nApakah Anda yakin ingin MENGHAPUS SELURUH DATABASE dan mengembalikan data pendaftar, profil, biaya, dan jadwal piket ke kondisi awal sistem?'
       )
     ) {
       localStorage.clear();
@@ -182,6 +182,18 @@ export default function App() {
       setPengaturan(initialPengaturan);
       setItemBiayaList(initialItemBiayaPembayaran);
       setActiveTab('dashboard');
+    }
+  };
+
+  const handleClearPendaftarOnly = () => {
+    if (
+      confirm(
+        'MENGOSONGKAN DATA PENDAFTAR:\nApakah Anda yakin ingin MENGHAPUS SEMUA DATA SISWA PENDAFTAR & RIWAYAT PEMBAYARAN?\n\nSemua data pendaftar akan menjadi 0 (kosong) untuk periode pendaftaran baru.'
+      )
+    ) {
+      setPendaftarList([]);
+      localStorage.setItem('ppdb_mts_pendaftar', JSON.stringify([]));
+      alert('Seluruh data pendaftar dan riwayat pembayaran berhasil dikosongkan!');
     }
   };
 
@@ -273,6 +285,8 @@ export default function App() {
               jalurList={jalurList}
               onSavePengaturan={(newP) => setPengaturan(newP)}
               onSaveJalurList={(newJ) => setJalurList(newJ)}
+              onResetDatabase={handleResetData}
+              onClearPendaftarDatabase={handleClearPendaftarOnly}
             />
           )}
         </main>
