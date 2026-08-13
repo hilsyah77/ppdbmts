@@ -85,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   );
 
   return (
-    <aside className="w-full lg:w-64 bg-white border-r border-slate-200 lg:min-h-[calc(100vh-61px)] flex flex-col justify-between p-4 shrink-0">
+    <aside className="w-full lg:w-64 xl:w-72 bg-white border-r border-slate-200 lg:min-h-[calc(100vh-61px)] flex flex-col justify-between p-4 shrink-0">
       <div className="space-y-1">
         
         {/* Role Header Banner */}

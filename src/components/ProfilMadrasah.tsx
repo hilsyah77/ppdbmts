@@ -88,7 +88,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 w-full">
       
       {/* Title */}
       <div className="flex items-center justify-between flex-wrap gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
