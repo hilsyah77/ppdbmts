@@ -144,3 +144,19 @@ export interface PengaturanPPDBData {
   panitiaKetua: string;
   panitiaSekretaris: string;
 }
+
+export type UserRole = 'admin' | 'panitia' | 'bendahara' | 'siswa';
+
+export interface UserAccount {
+  id: string;
+  username: string;
+  namaLengkap: string;
+  email: string;
+  role: UserRole;
+  password?: string;
+  jabatan?: string;
+  avatarUrl?: string;
+  noHp?: string;
+  isAktif: boolean;
+  nisnNik?: string; // Khusus role siswa/orang tua
+}

@@ -11,7 +11,8 @@ import {
   ProfilMadrasahData,
   PengaturanPPDBData,
   StatusPendaftar,
-  ItemBiayaPembayaran
+  ItemBiayaPembayaran,
+  UserAccount
 } from './types';
 import {
   initialPendaftar,
@@ -19,7 +20,8 @@ import {
   initialJadwalPiket,
   initialProfilMadrasah,
   initialPengaturan,
-  initialItemBiayaPembayaran
+  initialItemBiayaPembayaran,
+  initialUsers
 } from './data/mockData';
 
 // Layout & Navigation Components
@@ -39,10 +41,24 @@ import { ModalDetailPendaftar } from './components/ModalDetailPendaftar';
 import { ModalCetakFormulir } from './components/ModalCetakFormulir';
 import { ModalVerifikasi } from './components/ModalVerifikasi';
 import { ModalTambahPendaftar } from './components/ModalTambahPendaftar';
+import { ModalLogin } from './components/ModalLogin';
 
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+
+  // Multi-User Login & Accounts State
+  const [usersList, setUsersList] = useState<UserAccount[]>(() => {
+    const saved = localStorage.getItem('ppdb_mts_users');
+    return saved ? JSON.parse(saved) : initialUsers;
+  });
+
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    const saved = localStorage.getItem('ppdb_mts_current_user');
+    return saved ? JSON.parse(saved) : initialUsers[0]; // Default to Admin
+  });
+
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
 
   // Filter Pass-Through State for Navigation from Dashboard to DataPendaftar
   const [filterJalurParam, setFilterJalurParam] = useState<string>('');
@@ -84,6 +100,19 @@ export default function App() {
   const [cetakModalItem, setCetakModalItem] = useState<Pendaftar | null>(null);
   const [verifikasiModalItem, setVerifikasiModalItem] = useState<Pendaftar | null>(null);
   const [isTambahModalOpen, setIsTambahModalOpen] = useState<boolean>(false);
+
+  // Sync Users to LocalStorage
+  useEffect(() => {
+    localStorage.setItem('ppdb_mts_users', JSON.stringify(usersList));
+  }, [usersList]);
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('ppdb_mts_current_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('ppdb_mts_current_user');
+    }
+  }, [currentUser]);
 
   // Sync to LocalStorage
   useEffect(() => {
@@ -204,6 +233,17 @@ export default function App() {
     }
   };
 
+  const handleLoginSuccess = (user: UserAccount) => {
+    setCurrentUser(user);
+    setIsLoginModalOpen(false);
+    setActiveTab('dashboard');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsLoginModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100/90 font-sans text-slate-800 antialiased flex flex-col selection:bg-emerald-500 selection:text-white">
       
@@ -214,6 +254,9 @@ export default function App() {
         totalPendaftar={pendaftarList.length}
         totalTerverifikasi={verifiedCount}
         totalPending={pendingCount}
+        currentUser={currentUser}
+        onOpenLoginModal={() => setIsLoginModalOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* Main Body Layout */}
@@ -229,6 +272,7 @@ export default function App() {
           }}
           pendingCount={pendingCount}
           totalCount={pendaftarList.length}
+          currentUser={currentUser}
         />
 
         {/* View Content Area */}
@@ -290,8 +334,11 @@ export default function App() {
               pengaturan={pengaturan}
               jalurList={jalurList}
               jadwalPiketList={jadwalPiketList}
+              usersList={usersList}
+              currentUser={currentUser}
               onSavePengaturan={(newP) => setPengaturan(newP)}
               onSaveJalurList={(newJ) => setJalurList(newJ)}
+              onSaveUsersList={(newU) => setUsersList(newU)}
               onResetDatabase={handleResetData}
               onClearPendaftarDatabase={handleClearPendaftarOnly}
             />
@@ -301,6 +348,14 @@ export default function App() {
       </div>
 
       {/* Global Modals */}
+      {(isLoginModalOpen || !currentUser) && (
+        <ModalLogin
+          usersList={usersList}
+          onLoginSuccess={handleLoginSuccess}
+          onClose={() => setIsLoginModalOpen(false)}
+        />
+      )}
+
       <ModalDetailPendaftar
         pendaftar={detailModalItem}
         jalurList={jalurList}

@@ -529,3 +529,51 @@ export const initialItemBiayaPembayaran: ItemBiayaPembayaran[] = [
     sifat: 'Wajib'
   }
 ];
+
+export const initialUsers = [
+  {
+    id: 'user-1',
+    username: 'admin',
+    namaLengkap: 'Drs. H. M. Badruddin, M.Ag.',
+    email: 'badruddin@madrasah.sch.id',
+    role: 'admin' as const,
+    password: '123',
+    jabatan: 'Kepala Madrasah / Administrator Sistem',
+    noHp: '081234567890',
+    isAktif: true
+  },
+  {
+    id: 'user-2',
+    username: 'panitia',
+    namaLengkap: 'Ahmad Syafii, S.Pd.I.',
+    email: 'syafii.ppdb@madrasah.sch.id',
+    role: 'panitia' as const,
+    password: '123',
+    jabatan: 'Ketua Panitia & Verifikator Berkas',
+    noHp: '081398765432',
+    isAktif: true
+  },
+  {
+    id: 'user-3',
+    username: 'bendahara',
+    namaLengkap: 'Siti Aminah, S.E.',
+    email: 'keuangan.ppdb@madrasah.sch.id',
+    role: 'bendahara' as const,
+    password: '123',
+    jabatan: 'Bendahara Keuangan PPDB',
+    noHp: '085712348765',
+    isAktif: true
+  },
+  {
+    id: 'user-4',
+    username: 'siswa',
+    namaLengkap: 'Muhammad Rizky Pratama',
+    email: 'rizky.siswa@gmail.com',
+    role: 'siswa' as const,
+    password: '123',
+    jabatan: 'Calon Peserta Didik Baru',
+    noHp: '081299887766',
+    isAktif: true,
+    nisnNik: '3201123456780001'
+  }
+];

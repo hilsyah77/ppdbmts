@@ -6,10 +6,9 @@ import {
   CalendarCheck,
   Receipt,
   Settings,
-  Sparkles,
-  ChevronRight,
   ShieldCheck
 } from 'lucide-react';
+import { UserAccount, UserRole } from '../types';
 
 export type ActiveTab = 'dashboard' | 'profil' | 'pendaftar' | 'piket' | 'pembayaran' | 'pengaturan';
 
@@ -18,70 +17,95 @@ interface SidebarProps {
   setActiveTab: (tab: ActiveTab) => void;
   pendingCount: number;
   totalCount: number;
+  currentUser: UserAccount | null;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
   pendingCount,
-  totalCount
+  totalCount,
+  currentUser
 }) => {
-  const menuItems = [
+  const role: UserRole = currentUser?.role || 'admin';
+
+  const allMenuItems = [
     {
       id: 'dashboard' as ActiveTab,
-      label: 'Dashboard Utama',
-      sublabel: 'Jalur, Statistik & Jadwal Piket',
+      label: role === 'siswa' ? 'Portal Calon Siswa' : 'Dashboard Utama',
+      sublabel: role === 'siswa' ? 'Status & Ringkasan PPDB' : 'Jalur, Statistik & Piket',
       icon: LayoutDashboard,
-      badge: null
+      badge: null,
+      allowedRoles: ['admin', 'panitia', 'bendahara', 'siswa']
     },
     {
       id: 'profil' as ActiveTab,
       label: 'Profil Madrasah',
       sublabel: 'Informasi MTs & Visi Misi',
       icon: School,
-      badge: null
+      badge: null,
+      allowedRoles: ['admin', 'panitia', 'bendahara', 'siswa']
     },
     {
       id: 'pendaftar' as ActiveTab,
-      label: 'Data Pendaftar',
-      sublabel: 'Daftar, Verifikasi & Cetak',
+      label: role === 'siswa' ? 'Status Pendaftaran' : 'Data Pendaftar',
+      sublabel: role === 'siswa' ? 'Cek NISN & Cetak Form' : 'Daftar, Verifikasi & Cetak',
       icon: Users,
-      badge: pendingCount > 0 ? `${pendingCount} Perlu Verifikasi` : `${totalCount} Siswa`
+      badge: role === 'siswa' ? 'Cek NISN' : pendingCount > 0 ? `${pendingCount} Perlu Verifikasi` : `${totalCount} Siswa`,
+      allowedRoles: ['admin', 'panitia', 'bendahara', 'siswa']
     },
     {
       id: 'pembayaran' as ActiveTab,
       label: 'Pembayaran PPDB',
-      sublabel: 'Rincian Putra/Putri & Kuitansi',
+      sublabel: 'Kasir, Biaya & Kuitansi',
       icon: Receipt,
-      badge: 'Keuangan'
+      badge: 'Keuangan',
+      allowedRoles: ['admin', 'bendahara']
     },
     {
       id: 'piket' as ActiveTab,
       label: 'Jadwal Piket Panitia',
-      sublabel: 'Jadwal Petugas Penginputan',
+      sublabel: 'Petugas Piket & Shift',
       icon: CalendarCheck,
-      badge: 'Aktif'
+      badge: 'Aktif',
+      allowedRoles: ['admin', 'panitia']
     },
     {
       id: 'pengaturan' as ActiveTab,
-      label: 'Pengaturan PPDB',
-      sublabel: 'Tahun Ajaran, Kuota & Kop',
+      label: 'Pengaturan System',
+      sublabel: 'User, Kuota & Tahun Ajaran',
       icon: Settings,
-      badge: null
+      badge: 'Admin',
+      allowedRoles: ['admin']
     }
   ];
+
+  const visibleMenuItems = allMenuItems.filter((item) =>
+    item.allowedRoles.includes(role)
+  );
 
   return (
     <aside className="w-full lg:w-64 bg-white border-r border-slate-200 lg:min-h-[calc(100vh-61px)] flex flex-col justify-between p-4 shrink-0">
       <div className="space-y-1">
-        <div className="px-3 py-2 mb-2">
-          <p className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-            Menu Utama Admin PPDB
-          </p>
+        
+        {/* Role Header Banner */}
+        <div className="px-3 py-2.5 mb-2 bg-slate-900 text-white rounded-xl flex items-center justify-between shadow-sm border border-slate-800">
+          <div>
+            <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase block">
+              Hak Akses Role:
+            </span>
+            <span className="text-xs font-bold text-emerald-400 uppercase">
+              {role === 'admin' && 'Administrator'}
+              {role === 'panitia' && 'Panitia PPDB'}
+              {role === 'bendahara' && 'Bendahara'}
+              {role === 'siswa' && 'Calon Siswa / Wali'}
+            </span>
+          </div>
+          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
         </div>
 
         <nav className="space-y-1">
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
@@ -139,10 +163,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="mt-6 p-3 bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl text-white text-xs border border-slate-700 space-y-2">
         <div className="flex items-center gap-2 text-emerald-400 font-semibold">
           <ShieldCheck className="w-4 h-4" />
-          <span>Sistem Online Panitia</span>
+          <span>Informasi Pengguna</span>
         </div>
         <p className="text-slate-300 text-[11px] leading-relaxed">
-          Hak Akses Admin Panitia PPDB MTs. Pastikan seluruh berkas pendaftar diverifikasi sesuai Juknis Kemenag.
+          Logged as: <strong className="text-emerald-300">@{currentUser?.username || 'admin'}</strong> ({currentUser?.namaLengkap || 'Administrator'}).
         </p>
       </div>
     </aside>

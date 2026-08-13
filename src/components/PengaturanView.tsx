@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PengaturanPPDBData, JalurPPDB, JadwalPiket } from '../types';
+import { PengaturanPPDBData, JalurPPDB, JadwalPiket, UserAccount, UserRole } from '../types';
 import {
   Settings,
   Calendar,
@@ -15,15 +15,25 @@ import {
   ShieldAlert,
   Database,
   X,
-  AlertOctagon
+  AlertOctagon,
+  ShieldCheck,
+  UserPlus,
+  Edit,
+  Key,
+  UserCheck,
+  UserX,
+  Lock
 } from 'lucide-react';
 
 interface PengaturanViewProps {
   pengaturan: PengaturanPPDBData;
   jalurList: JalurPPDB[];
   jadwalPiketList?: JadwalPiket[];
+  usersList?: UserAccount[];
+  currentUser?: UserAccount | null;
   onSavePengaturan: (newPengaturan: PengaturanPPDBData) => void;
   onSaveJalurList: (newJalurList: JalurPPDB[]) => void;
+  onSaveUsersList?: (newUsersList: UserAccount[]) => void;
   onResetDatabase?: () => void;
   onClearPendaftarDatabase?: () => void;
 }
@@ -32,14 +42,41 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
   pengaturan,
   jalurList,
   jadwalPiketList = [],
+  usersList = [],
+  currentUser,
   onSavePengaturan,
   onSaveJalurList,
+  onSaveUsersList,
   onResetDatabase,
   onClearPendaftarDatabase
 }) => {
   const [formData, setFormData] = useState<PengaturanPPDBData>(pengaturan);
   const [jalurs, setJalurs] = useState<JalurPPDB[]>(jalurList);
+  const [users, setUsers] = useState<UserAccount[]>(usersList);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // User Management State
+  const [showUserModal, setShowUserModal] = useState<boolean>(false);
+  const [editingUser, setEditingUser] = useState<UserAccount | null>(null);
+  const [userFormData, setUserFormData] = useState<{
+    username: string;
+    namaLengkap: string;
+    email: string;
+    role: UserRole;
+    password: string;
+    jabatan: string;
+    noHp: string;
+    isAktif: boolean;
+  }>({
+    username: '',
+    namaLengkap: '',
+    email: '',
+    role: 'panitia',
+    password: '123',
+    jabatan: '',
+    noHp: '',
+    isAktif: true
+  });
 
   // Safety confirmation modal state for Database Operations
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -105,8 +142,103 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
     e.preventDefault();
     onSavePengaturan(formData);
     onSaveJalurList(jalurs);
+    if (onSaveUsersList) {
+      onSaveUsersList(users);
+    }
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
+  };
+
+  const handleOpenAddUserModal = () => {
+    setEditingUser(null);
+    setUserFormData({
+      username: '',
+      namaLengkap: '',
+      email: '',
+      role: 'panitia',
+      password: '123',
+      jabatan: 'Petugas Panitia PPDB',
+      noHp: '',
+      isAktif: true
+    });
+    setShowUserModal(true);
+  };
+
+  const handleOpenEditUserModal = (u: UserAccount) => {
+    setEditingUser(u);
+    setUserFormData({
+      username: u.username,
+      namaLengkap: u.namaLengkap,
+      email: u.email,
+      role: u.role,
+      password: u.password || '123',
+      jabatan: u.jabatan || '',
+      noHp: u.noHp || '',
+      isAktif: u.isAktif
+    });
+    setShowUserModal(true);
+  };
+
+  const handleSaveUserSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userFormData.username.trim() || !userFormData.namaLengkap.trim()) {
+      alert('Username dan Nama Lengkap wajib diisi!');
+      return;
+    }
+
+    let updatedList: UserAccount[];
+    if (editingUser) {
+      updatedList = users.map((u) =>
+        u.id === editingUser.id
+          ? {
+              ...u,
+              ...userFormData
+            }
+          : u
+      );
+    } else {
+      // Check duplicate username
+      if (users.some((u) => u.username.toLowerCase() === userFormData.username.trim().toLowerCase())) {
+        alert('Username sudah digunakan! Gunakan username lain.');
+        return;
+      }
+
+      const newUser: UserAccount = {
+        id: `user-${Date.now()}`,
+        ...userFormData
+      };
+      updatedList = [...users, newUser];
+    }
+
+    setUsers(updatedList);
+    if (onSaveUsersList) {
+      onSaveUsersList(updatedList);
+    }
+    setShowUserModal(false);
+  };
+
+  const handleToggleUserStatus = (id: string) => {
+    const updatedList = users.map((u) =>
+      u.id === id ? { ...u, isAktif: !u.isAktif } : u
+    );
+    setUsers(updatedList);
+    if (onSaveUsersList) {
+      onSaveUsersList(updatedList);
+    }
+  };
+
+  const handleDeleteUser = (id: string, username: string) => {
+    if (users.length <= 1) {
+      alert('Sistem harus memiliki minimal 1 pengguna.');
+      return;
+    }
+    if (confirm(`Apakah Anda yakin ingin menghapus akun pengguna "${username}"?`)) {
+      const updatedList = users.filter((u) => u.id !== id);
+      setUsers(updatedList);
+      if (onSaveUsersList) {
+        onSaveUsersList(updatedList);
+      }
+    }
   };
 
   return (
@@ -347,12 +479,133 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
           </div>
         </div>
 
-        {/* Section 4: Hapus & Reset Database PPDB (Danger Zone) */}
+        {/* Section 4: Manajemen Pengguna & Hak Akses (Multi-User Systems) */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>4. Manajemen Akun Pengguna & Hak Akses (Multi-User)</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Kelola akun petugas, panitia, bendahara, administrator, dan sandi pengguna sistem.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleOpenAddUserModal}
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 shadow-md shadow-emerald-600/20"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Tambah Pengguna Baru</span>
+            </button>
+          </div>
+
+          {/* User List Table */}
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                  <th className="p-3">Pengguna & Username</th>
+                  <th className="p-3">Peran / Hak Akses</th>
+                  <th className="p-3">Jabatan & Kontak</th>
+                  <th className="p-3">Status Akun</th>
+                  <th className="p-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {users.map((u) => (
+                  <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="p-3">
+                      <div className="font-bold text-slate-900">{u.namaLengkap}</div>
+                      <div className="text-slate-500 font-mono text-[11px] flex items-center gap-1">
+                        <span>@{u.username}</span>
+                        {u.email && <span className="text-slate-400">• {u.email}</span>}
+                      </div>
+                    </td>
+
+                    <td className="p-3">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
+                          u.role === 'admin'
+                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                            : u.role === 'panitia'
+                            ? 'bg-blue-100 text-blue-800 border-blue-300'
+                            : u.role === 'bendahara'
+                            ? 'bg-amber-100 text-amber-800 border-amber-300'
+                            : 'bg-purple-100 text-purple-800 border-purple-300'
+                        }`}
+                      >
+                        {u.role === 'admin' && 'Administrator'}
+                        {u.role === 'panitia' && 'Panitia PPDB'}
+                        {u.role === 'bendahara' && 'Bendahara'}
+                        {u.role === 'siswa' && 'Calon Siswa / Wali'}
+                      </span>
+                    </td>
+
+                    <td className="p-3 text-slate-700">
+                      <div>{u.jabatan || '-'}</div>
+                      <div className="text-[11px] text-slate-400 font-mono">{u.noHp || '-'}</div>
+                    </td>
+
+                    <td className="p-3">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleUserStatus(u.id)}
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border flex items-center gap-1 transition-colors ${
+                          u.isAktif
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                            : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                        }`}
+                      >
+                        {u.isAktif ? (
+                          <>
+                            <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Aktif</span>
+                          </>
+                        ) : (
+                          <>
+                            <UserX className="w-3.5 h-3.5 text-rose-600" />
+                            <span>Nonaktif</span>
+                          </>
+                        )}
+                      </button>
+                    </td>
+
+                    <td className="p-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditUserModal(u)}
+                          className="p-1.5 text-slate-600 hover:text-emerald-600 hover:bg-slate-100 rounded-lg transition-colors"
+                          title="Edit Pengguna & Password"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteUser(u.id, u.username)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Hapus Akun Pengguna"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Section 5: Hapus & Reset Database PPDB (Danger Zone) */}
         <div className="bg-white rounded-2xl p-6 border-2 border-rose-200 shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-rose-100">
             <h3 className="text-sm font-bold text-rose-800 uppercase tracking-wider flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-rose-600" />
-              <span>4. Manajemen Keamanan & Hapus Database PPDB</span>
+              <span>5. Manajemen Keamanan & Hapus Database PPDB</span>
             </h3>
             <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold border border-rose-200 uppercase tracking-wider">
               Danger Zone
@@ -493,6 +746,152 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
               </div>
 
             </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* USER MANAGEMENT MODAL (ADD / EDIT USER) */}
+      {showUserModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
+            
+            {/* Modal Header */}
+            <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <h3 className="font-bold text-sm">
+                  {editingUser ? `Edit User: ${editingUser.username}` : 'Tambah Pengguna Sistem Baru'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowUserModal(false)}
+                className="p-1 text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSaveUserSubmit} className="p-5 space-y-4 text-xs text-slate-700">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1">Username (ID Login)*</label>
+                  <input
+                    type="text"
+                    value={userFormData.username}
+                    onChange={(e) => setUserFormData({ ...userFormData, username: e.target.value })}
+                    placeholder="misal: petugas1"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1">Kata Sandi (Password)*</label>
+                  <input
+                    type="text"
+                    value={userFormData.password}
+                    onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                    placeholder="misal: 123"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-800 mb-1">Nama Lengkap Pengguna*</label>
+                <input
+                  type="text"
+                  value={userFormData.namaLengkap}
+                  onChange={(e) => setUserFormData({ ...userFormData, namaLengkap: e.target.value })}
+                  placeholder="Nama Lengkap Beserta Gelar"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1">Hak Akses / Peran (Role)*</label>
+                  <select
+                    value={userFormData.role}
+                    onChange={(e) => setUserFormData({ ...userFormData, role: e.target.value as UserRole })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-900 bg-white"
+                  >
+                    <option value="admin">Administrator (Akses Penuh)</option>
+                    <option value="panitia">Panitia & Verifikator PPDB</option>
+                    <option value="bendahara">Bendahara Keuangan</option>
+                    <option value="siswa">Calon Siswa / Wali Murid</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1">Jabatan / Posisi</label>
+                  <input
+                    type="text"
+                    value={userFormData.jabatan}
+                    onChange={(e) => setUserFormData({ ...userFormData, jabatan: e.target.value })}
+                    placeholder="Contoh: Panitia Verifikasi Berkas"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1">Alamat Email</label>
+                  <input
+                    type="email"
+                    value={userFormData.email}
+                    onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
+                    placeholder="email@madrasah.sch.id"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1">No. HP / WA</label>
+                  <input
+                    type="text"
+                    value={userFormData.noHp}
+                    onChange={(e) => setUserFormData({ ...userFormData, noHp: e.target.value })}
+                    placeholder="081234567890"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <label className="flex items-center gap-2 cursor-pointer p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                  <input
+                    type="checkbox"
+                    checked={userFormData.isAktif}
+                    onChange={(e) => setUserFormData({ ...userFormData, isAktif: e.target.checked })}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="font-bold text-slate-800">Status Akun Aktif (Dapat Login ke Sistem)</span>
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowUserModal(false)}
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md"
+                >
+                  Simpan Akun Pengguna
+                </button>
+              </div>
+            </form>
 
           </div>
         </div>
