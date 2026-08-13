@@ -13,6 +13,9 @@ export interface Pendaftar {
   nisn: string;
   nik: string;
   noHpWa: string;
+  jumlahSaudara?: number;
+  anakKe?: number;
+  pembiayaSekolah?: 'Orang Tua' | 'Wali / Orang Tua Asuh' | 'Tanggungan Sendiri' | 'Lainnya' | string;
   jalur: string; // e.g., 'Reguler', 'Prestasi', 'Afirmasi', 'Tahfizh'
   sekolahAsal: string;
   jenisSekolahAsal?: 'MI Negeri' | 'MI Swasta' | 'SD Negeri' | 'SD Swasta' | 'Lainnya' | string;

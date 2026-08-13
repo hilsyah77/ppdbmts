@@ -21,6 +21,9 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
     nisn: '',
     nik: '',
     noHpWa: '',
+    jumlahSaudara: 2,
+    anakKe: 1,
+    pembiayaSekolah: 'Orang Tua',
     jalur: jalurList[0]?.namaJalur || 'Jalur Reguler',
     sekolahAsal: '',
     jenisSekolahAsal: 'MI Negeri' as Pendaftar['jenisSekolahAsal'],
@@ -53,8 +56,11 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'number' ? (value === '' ? undefined : Number(value)) : value
+    }));
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,6 +197,47 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
                 placeholder="3174000000000001"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Jumlah Saudara</label>
+              <input
+                type="number"
+                name="jumlahSaudara"
+                min={0}
+                value={formData.jumlahSaudara ?? ''}
+                onChange={handleChange}
+                placeholder="2"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Anak Ke-</label>
+              <input
+                type="number"
+                name="anakKe"
+                min={1}
+                value={formData.anakKe ?? ''}
+                onChange={handleChange}
+                placeholder="1"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Yang Membiayai Sekolah</label>
+              <select
+                name="pembiayaSekolah"
+                value={formData.pembiayaSekolah || 'Orang Tua'}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium"
+              >
+                <option value="Orang Tua">Orang Tua</option>
+                <option value="Wali / Orang Tua Asuh">Wali / Orang Tua Asuh</option>
+                <option value="Tanggungan Sendiri">Tanggungan Sendiri</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
             </div>
 
             <div>

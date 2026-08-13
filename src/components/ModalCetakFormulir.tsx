@@ -177,11 +177,21 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                     <td className="p-2 font-mono">NISN: {pendaftar.nisn} | NIK: {pendaftar.nik}</td>
                   </tr>
                   <tr className="border-b border-slate-200">
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">5. No. Telepon / WhatsApp</td>
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">5. Jumlah Saudara & Anak Ke-</td>
+                    <td className="p-2 font-medium text-slate-900">
+                      {pendaftar.jumlahSaudara !== undefined ? `${pendaftar.jumlahSaudara} bersaudara` : '-'} | {pendaftar.anakKe !== undefined ? `Anak Ke-${pendaftar.anakKe}` : '-'}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">6. Yang Membiayai Sekolah</td>
+                    <td className="p-2 font-bold text-slate-900">{pendaftar.pembiayaSekolah || 'Orang Tua'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">7. No. Telepon / WhatsApp</td>
                     <td className="p-2 font-mono font-bold">{pendaftar.noHpWa}</td>
                   </tr>
                   <tr>
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">6. Alamat Lengkap Siswa</td>
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">8. Alamat Lengkap Siswa</td>
                     <td className="p-2">
                       {pendaftar.alamatSiswa}, RT/RW {pendaftar.rtRw}, Kel. {pendaftar.kelurahan}, Kec. {pendaftar.kecamatan}, {pendaftar.kabKota}, Prov. {pendaftar.provinsi}
                     </td>

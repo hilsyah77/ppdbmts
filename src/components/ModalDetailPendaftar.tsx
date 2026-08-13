@@ -247,6 +247,18 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                     <span className="font-mono font-medium text-slate-900">{formData.nik}</span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-slate-100">
+                    <span className="text-slate-500">Jumlah Saudara:</span>
+                    <span className="font-medium text-slate-900">{formData.jumlahSaudara !== undefined ? `${formData.jumlahSaudara} bersaudara` : '-'}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100">
+                    <span className="text-slate-500">Anak Ke-:</span>
+                    <span className="font-medium text-slate-900">{formData.anakKe !== undefined ? `Anak Ke-${formData.anakKe}` : '-'}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100">
+                    <span className="text-slate-500">Yang Membiayai Sekolah:</span>
+                    <span className="font-bold text-slate-900">{formData.pembiayaSekolah || 'Orang Tua'}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100">
                     <span className="text-slate-500">No. HP/WhatsApp:</span>
                     <a
                       href={`https://wa.me/${formData.noHpWa.replace(/[^0-9]/g, '')}`}
@@ -344,6 +356,47 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                     onChange={handleInputChange}
                     className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
                   />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Jumlah Saudara</label>
+                  <input
+                    type="number"
+                    name="jumlahSaudara"
+                    min={0}
+                    value={formData.jumlahSaudara ?? ''}
+                    onChange={handleNumberInputChange}
+                    placeholder="2"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Anak Ke-</label>
+                  <input
+                    type="number"
+                    name="anakKe"
+                    min={1}
+                    value={formData.anakKe ?? ''}
+                    onChange={handleNumberInputChange}
+                    placeholder="1"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Yang Membiayai Sekolah</label>
+                  <select
+                    name="pembiayaSekolah"
+                    value={formData.pembiayaSekolah || 'Orang Tua'}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                  >
+                    <option value="Orang Tua">Orang Tua</option>
+                    <option value="Wali / Orang Tua Asuh">Wali / Orang Tua Asuh</option>
+                    <option value="Tanggungan Sendiri">Tanggungan Sendiri</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
                 </div>
 
                 <div>
