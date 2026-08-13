@@ -17,11 +17,12 @@ import {
 } from 'lucide-react';
 
 interface ModalLoginProps {
-  profil: ProfilMadrasahData;
-  pengaturan: PengaturanPPDBData;
+  profil?: ProfilMadrasahData;
+  pengaturan?: PengaturanPPDBData;
   usersList: UserAccount[];
-  currentUser: UserAccount | null;
-  onLogin: (user: UserAccount) => void;
+  currentUser?: UserAccount | null;
+  onLogin?: (user: UserAccount) => void;
+  onLoginSuccess?: (user: UserAccount) => void;
   onLogout?: () => void;
   onClose?: () => void;
   isForceShow?: boolean;
@@ -30,9 +31,10 @@ interface ModalLoginProps {
 export const ModalLogin: React.FC<ModalLoginProps> = ({
   profil,
   pengaturan,
-  usersList,
-  currentUser,
+  usersList = [],
+  currentUser = null,
   onLogin,
+  onLoginSuccess,
   onLogout,
   onClose,
   isForceShow = false
@@ -41,6 +43,15 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
   const [passwordInput, setPasswordInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedRoleTab, setSelectedRoleTab] = useState<UserRole>('admin');
+
+  const namaMadrasah = profil?.namaMadrasah || 'MTs Negeri 1 Model';
+  const logoUrl = profil?.logoUrl || '';
+  const tahunAjaran = pengaturan?.tahunAjaran || '2025/2026';
+
+  const triggerLoginSuccess = (user: UserAccount) => {
+    if (onLogin) onLogin(user);
+    if (onLoginSuccess) onLoginSuccess(user);
+  };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +82,7 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
     }
 
     // Success login
-    onLogin(foundUser);
+    triggerLoginSuccess(foundUser);
     setUsernameInput('');
     setPasswordInput('');
   };
@@ -79,7 +90,7 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
   const handleQuickLogin = (role: UserRole) => {
     const roleUser = usersList.find((u) => u.role === role && u.isAktif);
     if (roleUser) {
-      onLogin(roleUser);
+      triggerLoginSuccess(roleUser);
     } else {
       setErrorMessage(`Akun contoh dengan role ${role.toUpperCase()} tidak ditemukan.`);
     }
@@ -133,18 +144,18 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-600/20 font-bold text-xl border border-emerald-400/30 overflow-hidden shrink-0">
-                {profil.logoUrl ? (
-                  <img src={profil.logoUrl} alt={profil.namaMadrasah} className="w-full h-full object-cover" />
+                {logoUrl ? (
+                  <img src={logoUrl} alt={namaMadrasah} className="w-full h-full object-cover" />
                 ) : (
                   <School className="w-7 h-7" />
                 )}
               </div>
               <div>
                 <h2 className="text-lg font-bold text-slate-100 leading-tight">
-                  {profil.namaMadrasah}
+                  {namaMadrasah}
                 </h2>
                 <p className="text-xs text-emerald-400 font-medium">
-                  Sistem PPDB TA {pengaturan.tahunAjaran}
+                  Sistem PPDB TA {tahunAjaran}
                 </p>
               </div>
             </div>

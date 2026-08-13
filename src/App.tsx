@@ -350,8 +350,13 @@ export default function App() {
       {/* Global Modals */}
       {(isLoginModalOpen || !currentUser) && (
         <ModalLogin
+          profil={profilMadrasah}
+          pengaturan={pengaturan}
           usersList={usersList}
+          currentUser={currentUser}
+          onLogin={handleLoginSuccess}
           onLoginSuccess={handleLoginSuccess}
+          onLogout={handleLogout}
           onClose={() => setIsLoginModalOpen(false)}
         />
       )}
