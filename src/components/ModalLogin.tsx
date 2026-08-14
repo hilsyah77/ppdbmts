@@ -4,7 +4,6 @@ import {
   Lock,
   User,
   ShieldCheck,
-  CheckCircle2,
   AlertCircle,
   School,
   Key,
@@ -42,7 +41,6 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [selectedRoleTab, setSelectedRoleTab] = useState<UserRole>('admin');
 
   const namaMadrasah = profil?.namaMadrasah || 'MTs Negeri 1 Model';
   const logoUrl = profil?.logoUrl || '';
@@ -87,51 +85,42 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
     setPasswordInput('');
   };
 
-  const handleQuickLogin = (role: UserRole) => {
-    const roleUser = usersList.find((u) => u.role === role && u.isAktif);
-    if (roleUser) {
-      triggerLoginSuccess(roleUser);
-    } else {
-      setErrorMessage(`Akun contoh dengan role ${role.toUpperCase()} tidak ditemukan.`);
-    }
-  };
-
   const roleDescriptions = [
     {
       role: 'admin' as UserRole,
-      title: '1. Administrator / Kepala Madrasah',
-      badge: 'Akses Penuh (Full Control)',
+      title: 'Administrator',
+      badge: 'Akses Penuh',
       badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
       icon: ShieldCheck,
       iconColor: 'text-emerald-400',
-      desc: 'Memiliki semua hak akses: Kelola Pendaftar, Verifikasi, Keuangan/Pembayaran, Profil, Pengaturan PPDB & Manajemen User.'
+      desc: 'Kelola pendaftar, verifikasi berkas, keuangan, profil madrasah, pengaturan PPDB & manajemen user.'
     },
     {
       role: 'panitia' as UserRole,
-      title: '2. Panitia & Verifikator PPDB',
-      badge: 'Verifikasi & Data',
+      title: 'Panitia PPDB',
+      badge: 'Verifikasi & Berkas',
       badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
       icon: Users,
       iconColor: 'text-blue-400',
-      desc: 'Dapat menambah & edit pendaftar, memverifikasi berkas fisik, menginput jadwal piket, dan mencetak formulir PPDB.'
+      desc: 'Entri pendaftar, verifikasi berkas fisik, input jadwal piket panitia, dan cetak formulir resmi.'
     },
     {
       role: 'bendahara' as UserRole,
-      title: '3. Bendahara Keuangan',
-      badge: 'Kasir & Keuangan',
+      title: 'Bendahara Keuangan',
+      badge: 'Kasir & Biaya',
       badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
       icon: CreditCard,
       iconColor: 'text-amber-400',
-      desc: 'Khusus mengelola pembayaran pendaftaran, potongan/diskon, penerimaan kasir, serta mencetak kuitansi resmi.'
+      desc: 'Kelola pembayaran pendaftaran, penerimaan kasir, rincian biaya, serta cetak bukti kuitansi.'
     },
     {
       role: 'siswa' as UserRole,
-      title: '4. Calon Siswa / Wali Murid',
+      title: 'Calon Siswa / Wali',
       badge: 'Portal Pendaftar',
       badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
       icon: GraduationCap,
       iconColor: 'text-purple-400',
-      desc: 'Akses publik terbatas untuk mengecek status pendaftaran, melihat jadwal pengumuman, dan mencetak formulir mandiri.'
+      desc: 'Akses pendaftar untuk memantau status seleksi, informasi kelulusan, dan cetak formulir mandiri.'
     }
   ];
 
@@ -139,10 +128,10 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
       <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row my-auto">
         
-        {/* Left Side: Madrasah Branding & Role Selection */}
+        {/* Left Side: Madrasah Branding & Roles Info */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border-b md:border-b-0 md:border-r border-slate-800/80 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-5">
               <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-600/20 font-bold text-xl border border-emerald-400/30 overflow-hidden shrink-0">
                 {logoUrl ? (
                   <img src={logoUrl} alt={namaMadrasah} className="w-full h-full object-cover" />
@@ -160,7 +149,7 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
               </div>
             </div>
 
-            <div className="space-y-3 mb-6">
+            <div className="space-y-2.5 mb-5">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Modul Autentikasi Multi-Pengguna</span>
@@ -170,41 +159,43 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
               </p>
             </div>
 
-            {/* Role Switcher Demo Cards */}
+            {/* Role Descriptions Info */}
             <div className="space-y-2">
               <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Pilih Akun Demo (1-Click Login):
+                Tingkatan Hak Akses Sistem:
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="space-y-1.5">
                 {roleDescriptions.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <button
+                    <div
                       key={item.role}
-                      type="button"
-                      onClick={() => handleQuickLogin(item.role)}
-                      className="p-2.5 rounded-xl border border-slate-800 bg-slate-800/50 hover:bg-emerald-900/30 hover:border-emerald-500/50 text-left transition-all duration-150 group"
+                      className="p-2 rounded-xl border border-slate-800 bg-slate-800/40 flex items-start gap-2.5"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-xs text-slate-200 group-hover:text-emerald-300">
-                          {item.role === 'admin' && 'Administrator'}
-                          {item.role === 'panitia' && 'Panitia PPDB'}
-                          {item.role === 'bendahara' && 'Bendahara'}
-                          {item.role === 'siswa' && 'Siswa / Wali'}
-                        </span>
+                      <div className="p-1 rounded-lg bg-slate-800 text-slate-300 shrink-0 mt-0.5">
                         <Icon className={`w-3.5 h-3.5 ${item.iconColor}`} />
                       </div>
-                      <span className="text-[10px] text-slate-400 block truncate">
-                        Username: <code className="text-emerald-400 font-mono font-bold">{item.role}</code>
-                      </span>
-                    </button>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs text-slate-200">
+                            {item.title}
+                          </span>
+                          <span className={`text-[9px] px-1.5 py-0.2 rounded font-medium border ${item.badgeColor}`}>
+                            {item.badge}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 leading-snug mt-0.5">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-800/60 text-[11px] text-slate-500 flex items-center justify-between">
+          <div className="mt-5 pt-3 border-t border-slate-800/60 text-[11px] text-slate-500 flex items-center justify-between">
             <span>PPDB Online Madrasah</span>
             <span className="text-emerald-500 font-semibold">v2.5 Role-Based</span>
           </div>
@@ -280,7 +271,7 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
                       type="text"
                       value={usernameInput}
                       onChange={(e) => setUsernameInput(e.target.value)}
-                      placeholder="Contoh: admin, panitia, bendahara, siswa"
+                      placeholder="Masukkan nama pengguna"
                       className="w-full pl-9 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-medium"
                       autoFocus
                     />
@@ -297,14 +288,10 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
                       type="password"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
-                      placeholder="Masukkan kata sandi (Default: 123)"
+                      placeholder="Masukkan kata sandi"
                       className="w-full pl-9 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-mono"
                     />
                   </div>
-                </div>
-
-                <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-800 text-[11px] text-slate-400">
-                  💡 <span className="font-semibold text-slate-300">Info Akses Demo:</span> Gunakan password <code className="text-emerald-400 font-mono font-bold">123</code> untuk semua akun contoh di atas.
                 </div>
 
                 <button

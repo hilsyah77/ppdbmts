@@ -2,6 +2,78 @@ export type StatusPendaftar = 'Di Terima' | 'Belum Diverifikasi' | 'Ditolak' | '
 
 export type JenisKelamin = 'Laki-laki' | 'Perempuan';
 
+export type StatusOrangTua = 'Masih Hidup' | 'Sudah Meninggal' | 'Tidak Diketahui';
+
+export type PendidikanOrangTua =
+  | 'SD/Sederajat'
+  | 'SMP/Sederajat'
+  | 'SMA/Sederajat'
+  | 'D1'
+  | 'D2'
+  | 'D3'
+  | 'D4/S1'
+  | 'S2'
+  | 'S3';
+
+export type PekerjaanOrangTua =
+  | 'Tidak Bekerja'
+  | 'Pensiunan'
+  | 'PNS'
+  | 'TNI/Polisi'
+  | 'Guru/Dosen'
+  | 'Pegawai Swasta'
+  | 'Wiraswasta'
+  | 'Pengacara/Hakim/Notaris'
+  | 'Seniman/Pelukis/Artis/Sejenis'
+  | 'Dokter/Bidan/Perawat'
+  | 'Pilot/Pramugara'
+  | 'Pedagang'
+  | 'Petani/Peternak'
+  | 'Nelayan'
+  | 'Buruh (Tani/Pabrik/Bangunan)'
+  | 'Sopir/Masinis/Kondektur'
+  | 'Politikus'
+  | 'Lainnya';
+
+export const OPSI_STATUS_ORANG_TUA: StatusOrangTua[] = [
+  'Masih Hidup',
+  'Sudah Meninggal',
+  'Tidak Diketahui'
+];
+
+export const OPSI_PENDIDIKAN_ORANG_TUA: PendidikanOrangTua[] = [
+  'SD/Sederajat',
+  'SMP/Sederajat',
+  'SMA/Sederajat',
+  'D1',
+  'D2',
+  'D3',
+  'D4/S1',
+  'S2',
+  'S3'
+];
+
+export const OPSI_PEKERJAAN_ORANG_TUA: PekerjaanOrangTua[] = [
+  'Tidak Bekerja',
+  'Pensiunan',
+  'PNS',
+  'TNI/Polisi',
+  'Guru/Dosen',
+  'Pegawai Swasta',
+  'Wiraswasta',
+  'Pengacara/Hakim/Notaris',
+  'Seniman/Pelukis/Artis/Sejenis',
+  'Dokter/Bidan/Perawat',
+  'Pilot/Pramugara',
+  'Pedagang',
+  'Petani/Peternak',
+  'Nelayan',
+  'Buruh (Tani/Pabrik/Bangunan)',
+  'Sopir/Masinis/Kondektur',
+  'Politikus',
+  'Lainnya'
+];
+
 export interface Pendaftar {
   id: string;
   noUrut: number;
@@ -12,10 +84,25 @@ export interface Pendaftar {
   jenisKelamin: JenisKelamin;
   nisn: string;
   nik: string;
+  noKk?: string;
+  namaKepalaKeluarga?: string;
+  noKip?: string;
   noHpWa: string;
   jumlahSaudara?: number;
   anakKe?: number;
   pembiayaSekolah?: 'Orang Tua' | 'Wali / Orang Tua Asuh' | 'Tanggungan Sendiri' | 'Lainnya' | string;
+  praSekolah?: {
+    pernahTkRa?: boolean;
+    pernahPaud?: boolean;
+  };
+  imunisasi?: {
+    hepatitisB?: boolean;
+    bcg?: boolean;
+    dpt?: boolean;
+    polio?: boolean;
+    campak?: boolean;
+    covid?: boolean;
+  };
   jalur: string; // e.g., 'Reguler', 'Prestasi', 'Afirmasi', 'Tahfizh'
   sekolahAsal: string;
   jenisSekolahAsal?: 'MI Negeri' | 'MI Swasta' | 'SD Negeri' | 'SD Swasta' | 'Lainnya' | string;
@@ -32,12 +119,24 @@ export interface Pendaftar {
   kabKota: string;
   provinsi: string;
   // Orang Tua
+  statusAyah?: StatusOrangTua | string;
   namaAyah: string;
-  pekerjaanAyah: string;
+  nikAyah?: string;
+  tempatLahirAyah?: string;
+  tanggalLahirAyah?: string;
+  pendidikanAyah?: PendidikanOrangTua | string;
+  pekerjaanAyah: PekerjaanOrangTua | string;
+
+  statusIbu?: StatusOrangTua | string;
   namaIbu: string;
-  pekerjaanIbu: string;
-  noHpOrangTua: string;
-  penghasilanOrangTua: string;
+  nikIbu?: string;
+  tempatLahirIbu?: string;
+  tanggalLahirIbu?: string;
+  pendidikanIbu?: PendidikanOrangTua | string;
+  pekerjaanIbu: PekerjaanOrangTua | string;
+
+  noHpOrangTua?: string;
+  penghasilanOrangTua?: string;
   // Prestasi / Rapor / Tahfizh (optional)
   rataRapor?: number;
   jumlahJuzTahfizh?: number;

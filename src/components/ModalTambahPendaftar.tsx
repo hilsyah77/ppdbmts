@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
-import { Pendaftar, JalurPPDB, JenisKelamin, StatusPendaftar } from '../types';
-import { X, UserPlus, Save } from 'lucide-react';
+import {
+  Pendaftar,
+  JalurPPDB,
+  JenisKelamin,
+  StatusPendaftar,
+  StatusOrangTua,
+  PendidikanOrangTua,
+  PekerjaanOrangTua,
+  OPSI_STATUS_ORANG_TUA,
+  OPSI_PENDIDIKAN_ORANG_TUA,
+  OPSI_PEKERJAAN_ORANG_TUA
+} from '../types';
+import { X, UserPlus, Save, Users } from 'lucide-react';
 
 interface ModalTambahProps {
   jalurList: JalurPPDB[];
@@ -20,10 +31,25 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
     jenisKelamin: 'Laki-laki' as JenisKelamin,
     nisn: '',
     nik: '',
+    noKk: '',
+    namaKepalaKeluarga: '',
+    noKip: '',
     noHpWa: '',
     jumlahSaudara: 2,
     anakKe: 1,
     pembiayaSekolah: 'Orang Tua',
+    praSekolah: {
+      pernahTkRa: true,
+      pernahPaud: false
+    },
+    imunisasi: {
+      hepatitisB: true,
+      bcg: true,
+      dpt: true,
+      polio: true,
+      campak: true,
+      covid: false
+    },
     jalur: jalurList[0]?.namaJalur || 'Jalur Reguler',
     sekolahAsal: '',
     jenisSekolahAsal: 'MI Negeri' as Pendaftar['jenisSekolahAsal'],
@@ -36,12 +62,22 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
     kecamatan: '',
     kabKota: 'Jakarta Selatan',
     provinsi: 'DKI Jakarta',
+    // Data Ayah
+    statusAyah: 'Masih Hidup' as StatusOrangTua,
     namaAyah: '',
-    pekerjaanAyah: 'Swasta',
+    nikAyah: '',
+    tempatLahirAyah: '',
+    tanggalLahirAyah: '',
+    pendidikanAyah: 'SMA/Sederajat' as PendidikanOrangTua,
+    pekerjaanAyah: 'Wiraswasta' as PekerjaanOrangTua,
+    // Data Ibu
+    statusIbu: 'Masih Hidup' as StatusOrangTua,
     namaIbu: '',
-    pekerjaanIbu: 'Ibu Rumah Tangga',
-    noHpOrangTua: '',
-    penghasilanOrangTua: 'Rp 3.000.000 - Rp 5.000.000',
+    nikIbu: '',
+    tempatLahirIbu: '',
+    tanggalLahirIbu: '',
+    pendidikanIbu: 'SMA/Sederajat' as PendidikanOrangTua,
+    pekerjaanIbu: 'Tidak Bekerja' as PekerjaanOrangTua,
     rataRapor: 80,
     jumlahJuzTahfizh: 0,
     prestasiDetail: '',
@@ -69,6 +105,28 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
       ...prev,
       berkas: {
         ...prev.berkas,
+        [name]: checked
+      }
+    }));
+  };
+
+  const handlePraSekolahChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      praSekolah: {
+        ...prev.praSekolah,
+        [name]: checked
+      }
+    }));
+  };
+
+  const handleImunisasiChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      imunisasi: {
+        ...prev.imunisasi,
         [name]: checked
       }
     }));
@@ -241,6 +299,136 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
             </div>
 
             <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Nomor Kartu Keluarga (No. KK)</label>
+              <input
+                type="text"
+                name="noKk"
+                value={formData.noKk}
+                onChange={handleChange}
+                placeholder="3174010000000001"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Nama Kepala Keluarga</label>
+              <input
+                type="text"
+                name="namaKepalaKeluarga"
+                value={formData.namaKepalaKeluarga}
+                onChange={handleChange}
+                placeholder="Sesuai di Kartu Keluarga"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Nomor KIP (Jika Ada)</label>
+              <input
+                type="text"
+                name="noKip"
+                value={formData.noKip}
+                onChange={handleChange}
+                placeholder="Contoh: KIP-3174-2025-XXXX"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+              />
+            </div>
+
+            {/* Riwayat Pra Sekolah */}
+            <div className="md:col-span-2 bg-emerald-50/50 p-3 rounded-xl border border-emerald-200">
+              <label className="block text-xs font-bold text-emerald-900 mb-2">Riwayat Pendidikan Pra Sekolah:</label>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-emerald-300 text-xs font-medium hover:bg-emerald-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="pernahTkRa"
+                    checked={formData.praSekolah?.pernahTkRa || false}
+                    onChange={handlePraSekolahChange}
+                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span>Pernah TK / RA</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-emerald-300 text-xs font-medium hover:bg-emerald-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="pernahPaud"
+                    checked={formData.praSekolah?.pernahPaud || false}
+                    onChange={handlePraSekolahChange}
+                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span>Pernah PAUD</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Riwayat Imunisasi */}
+            <div className="md:col-span-2 bg-blue-50/50 p-3 rounded-xl border border-blue-200">
+              <label className="block text-xs font-bold text-blue-900 mb-2">Riwayat Imunisasi Calon Siswa:</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-blue-300 text-xs font-medium hover:bg-blue-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="hepatitisB"
+                    checked={formData.imunisasi?.hepatitisB || false}
+                    onChange={handleImunisasiChange}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Hepatitis B</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-blue-300 text-xs font-medium hover:bg-blue-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="bcg"
+                    checked={formData.imunisasi?.bcg || false}
+                    onChange={handleImunisasiChange}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>BCG</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-blue-300 text-xs font-medium hover:bg-blue-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="dpt"
+                    checked={formData.imunisasi?.dpt || false}
+                    onChange={handleImunisasiChange}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>DPT</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-blue-300 text-xs font-medium hover:bg-blue-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="polio"
+                    checked={formData.imunisasi?.polio || false}
+                    onChange={handleImunisasiChange}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Polio</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-blue-300 text-xs font-medium hover:bg-blue-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="campak"
+                    checked={formData.imunisasi?.campak || false}
+                    onChange={handleImunisasiChange}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Campak</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-blue-300 text-xs font-medium hover:bg-blue-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    name="covid"
+                    checked={formData.imunisasi?.covid || false}
+                    onChange={handleImunisasiChange}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Covid</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Jalur Pendaftaran *</label>
               <select
                 name="jalur"
@@ -269,14 +457,68 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
                 <option value="Berkas Belum Lengkap">Berkas Belum Lengkap</option>
               </select>
             </div>
+
+            <div className="md:col-span-2 space-y-2 pt-2 border-t border-slate-200">
+              <label className="block text-xs font-bold text-slate-700">Alamat Tempat Tinggal</label>
+              <input
+                type="text"
+                name="alamatSiswa"
+                placeholder="Jalan / Kampung / Dusun"
+                value={formData.alamatSiswa}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+              />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <input
+                  type="text"
+                  name="rtRw"
+                  placeholder="RT/RW (cth: 002/005)"
+                  value={formData.rtRw}
+                  onChange={handleChange}
+                  className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+                <input
+                  type="text"
+                  name="kelurahan"
+                  placeholder="Kelurahan / Desa"
+                  value={formData.kelurahan}
+                  onChange={handleChange}
+                  className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+                <input
+                  type="text"
+                  name="kecamatan"
+                  placeholder="Kecamatan"
+                  value={formData.kecamatan}
+                  onChange={handleChange}
+                  className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+                <input
+                  type="text"
+                  name="kabKota"
+                  placeholder="Kabupaten / Kota"
+                  value={formData.kabKota}
+                  onChange={handleChange}
+                  className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+              <input
+                type="text"
+                name="provinsi"
+                placeholder="Provinsi"
+                value={formData.provinsi}
+                onChange={handleChange}
+                className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
           </div>
 
           <div className="font-bold text-slate-800 text-xs border-b border-slate-200 pb-1 uppercase tracking-wider text-emerald-700 pt-2">
-            2. Sekolah Asal & Orang Tua
+            2. Sekolah Asal Siswa
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Nama Sekolah Asal *</label>
               <input
                 type="text"
@@ -289,45 +531,227 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1">Alamat Singkat Tempat Tinggal</label>
-              <input
-                type="text"
-                name="alamatSiswa"
-                value={formData.alamatSiswa}
-                onChange={handleChange}
-                placeholder="Jl. Fatmawati No. 10, Cilandak"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
-            </div>
-
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Nama Ayah</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">NPSN Sekolah Asal</label>
               <input
                 type="text"
-                name="namaAyah"
-                value={formData.namaAyah}
+                name="npsnSekolahAsal"
+                value={formData.npsnSekolahAsal || ''}
                 onChange={handleChange}
-                placeholder="Nama Ayah / Wali"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Nama Ibu</label>
-              <input
-                type="text"
-                name="namaIbu"
-                value={formData.namaIbu}
-                onChange={handleChange}
-                placeholder="Nama Ibu"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Contoh: 20108374 (8 Digit)"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
               />
             </div>
           </div>
 
+          {/* Section 3: Data Orang Tua / Wali */}
+          <div className="font-bold text-slate-800 text-xs border-b border-slate-200 pb-1 uppercase tracking-wider text-emerald-700 pt-2 flex items-center gap-1.5">
+            <Users className="w-4 h-4 text-emerald-600" />
+            <span>3. Data Orang Tua / Wali Siswa</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Box Data Ayah */}
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+              <div className="font-bold text-xs text-slate-800 border-b border-slate-200 pb-1 flex items-center justify-between">
+                <span>Data Ayah Kandung / Wali</span>
+                <span className="text-[10px] text-slate-500 font-normal">Identitas Ayah</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Status Ayah</label>
+                <select
+                  name="statusAyah"
+                  value={formData.statusAyah}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                >
+                  {OPSI_STATUS_ORANG_TUA.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Nama Ayah *</label>
+                <input
+                  type="text"
+                  name="namaAyah"
+                  value={formData.namaAyah}
+                  onChange={handleChange}
+                  placeholder="Nama Lengkap Ayah"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">NIK Ayah</label>
+                <input
+                  type="text"
+                  name="nikAyah"
+                  value={formData.nikAyah}
+                  onChange={handleChange}
+                  placeholder="3174010000000001 (16 Digit)"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tempat Lahir Ayah</label>
+                  <input
+                    type="text"
+                    name="tempatLahirAyah"
+                    value={formData.tempatLahirAyah}
+                    onChange={handleChange}
+                    placeholder="Kota Lahir"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tanggal Lahir Ayah</label>
+                  <input
+                    type="date"
+                    name="tanggalLahirAyah"
+                    value={formData.tanggalLahirAyah}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Pendidikan Ayah</label>
+                  <select
+                    name="pendidikanAyah"
+                    value={formData.pendidikanAyah}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                  >
+                    {OPSI_PENDIDIKAN_ORANG_TUA.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Pekerjaan Ayah</label>
+                  <select
+                    name="pekerjaanAyah"
+                    value={formData.pekerjaanAyah}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                  >
+                    {OPSI_PEKERJAAN_ORANG_TUA.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Box Data Ibu */}
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+              <div className="font-bold text-xs text-slate-800 border-b border-slate-200 pb-1 flex items-center justify-between">
+                <span>Data Ibu Kandung</span>
+                <span className="text-[10px] text-slate-500 font-normal">Identitas Ibu</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Status Ibu</label>
+                <select
+                  name="statusIbu"
+                  value={formData.statusIbu}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                >
+                  {OPSI_STATUS_ORANG_TUA.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Nama Ibu *</label>
+                <input
+                  type="text"
+                  name="namaIbu"
+                  value={formData.namaIbu}
+                  onChange={handleChange}
+                  placeholder="Nama Lengkap Ibu"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">NIK Ibu</label>
+                <input
+                  type="text"
+                  name="nikIbu"
+                  value={formData.nikIbu}
+                  onChange={handleChange}
+                  placeholder="3174010000000002 (16 Digit)"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tempat Lahir Ibu</label>
+                  <input
+                    type="text"
+                    name="tempatLahirIbu"
+                    value={formData.tempatLahirIbu}
+                    onChange={handleChange}
+                    placeholder="Kota Lahir"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tanggal Lahir Ibu</label>
+                  <input
+                    type="date"
+                    name="tanggalLahirIbu"
+                    value={formData.tanggalLahirIbu}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Pendidikan Ibu</label>
+                  <select
+                    name="pendidikanIbu"
+                    value={formData.pendidikanIbu}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                  >
+                    {OPSI_PENDIDIKAN_ORANG_TUA.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Pekerjaan Ibu</label>
+                  <select
+                    name="pekerjaanIbu"
+                    value={formData.pekerjaanIbu}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                  >
+                    {OPSI_PEKERJAAN_ORANG_TUA.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="font-bold text-slate-800 text-xs border-b border-slate-200 pb-1 uppercase tracking-wider text-emerald-700 pt-2">
-            3. Penyerahan Berkas Persyaratan
+            4. Penyerahan Berkas Persyaratan
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

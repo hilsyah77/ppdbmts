@@ -187,11 +187,62 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                     <td className="p-2 font-bold text-slate-900">{pendaftar.pembiayaSekolah || 'Orang Tua'}</td>
                   </tr>
                   <tr className="border-b border-slate-200">
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">7. No. Telepon / WhatsApp</td>
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">7. No. KK & Kepala Keluarga</td>
+                    <td className="p-2 font-medium text-slate-900">
+                      No. KK: <span className="font-mono font-bold">{pendaftar.noKk || '-'}</span> | Nama Kepala Keluarga: <span className="font-bold">{pendaftar.namaKepalaKeluarga || '-'}</span>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">8. Nomor KIP (Kartu Indonesia Pintar)</td>
+                    <td className="p-2 font-mono font-bold text-slate-900">{pendaftar.noKip || 'Tidak Memiliki KIP / Reguler'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">9. Riwayat Pra Sekolah</td>
+                    <td className="p-2">
+                      <div className="flex gap-4">
+                        <span className="flex items-center gap-1 font-medium">
+                          <span className={`w-3.5 h-3.5 border rounded flex items-center justify-center text-[10px] font-bold ${pendaftar.praSekolah?.pernahTkRa ? 'bg-slate-900 text-white' : 'border-slate-400'}`}>
+                            {pendaftar.praSekolah?.pernahTkRa ? '✓' : ''}
+                          </span>
+                          Pernah TK/RA
+                        </span>
+                        <span className="flex items-center gap-1 font-medium">
+                          <span className={`w-3.5 h-3.5 border rounded flex items-center justify-center text-[10px] font-bold ${pendaftar.praSekolah?.pernahPaud ? 'bg-slate-900 text-white' : 'border-slate-400'}`}>
+                            {pendaftar.praSekolah?.pernahPaud ? '✓' : ''}
+                          </span>
+                          Pernah PAUD
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">10. Riwayat Imunisasi Calon Siswa</td>
+                    <td className="p-2">
+                      <div className="flex flex-wrap gap-3">
+                        {[
+                          { key: 'hepatitisB', label: 'Hepatitis B' },
+                          { key: 'bcg', label: 'BCG' },
+                          { key: 'dpt', label: 'DPT' },
+                          { key: 'polio', label: 'Polio' },
+                          { key: 'campak', label: 'Campak' },
+                          { key: 'covid', label: 'Covid' },
+                        ].map((item) => (
+                          <span key={item.key} className="flex items-center gap-1 font-medium text-[11px]">
+                            <span className={`w-3.5 h-3.5 border rounded flex items-center justify-center text-[10px] font-bold ${pendaftar.imunisasi?.[item.key as keyof NonNullable<Pendaftar['imunisasi']>] ? 'bg-slate-900 text-white' : 'border-slate-400'}`}>
+                              {pendaftar.imunisasi?.[item.key as keyof NonNullable<Pendaftar['imunisasi']>] ? '✓' : ''}
+                            </span>
+                            {item.label}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">11. No. Telepon / WhatsApp</td>
                     <td className="p-2 font-mono font-bold">{pendaftar.noHpWa}</td>
                   </tr>
                   <tr>
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">8. Alamat Lengkap Siswa</td>
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">12. Alamat Lengkap Siswa</td>
                     <td className="p-2">
                       {pendaftar.alamatSiswa}, RT/RW {pendaftar.rtRw}, Kel. {pendaftar.kelurahan}, Kec. {pendaftar.kecamatan}, {pendaftar.kabKota}, Prov. {pendaftar.provinsi}
                     </td>
@@ -226,13 +277,70 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
               </div>
               <table className="w-full border border-slate-300 border-t-0 text-xs">
                 <tbody>
+                  {/* AYAH */}
+                  <tr className="border-b border-slate-200 bg-slate-100 font-semibold">
+                    <td colSpan={2} className="p-1.5 text-slate-800 text-[11px] uppercase tracking-wide">
+                      Identitas Ayah Kandung / Wali
+                    </td>
+                  </tr>
                   <tr className="border-b border-slate-200">
-                    <td className="p-2 w-48 font-medium bg-slate-50 border-r border-slate-200">1. Nama Ayah</td>
+                    <td className="p-2 w-48 font-medium bg-slate-50 border-r border-slate-200">1. Status Ayah</td>
+                    <td className="p-2 font-medium">{pendaftar.statusAyah || 'Masih Hidup'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">2. Nama Lengkap Ayah</td>
                     <td className="p-2 font-bold">{pendaftar.namaAyah}</td>
                   </tr>
-                  <tr>
-                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">2. Nama Ibu</td>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">3. NIK Ayah</td>
+                    <td className="p-2 font-mono font-medium">{pendaftar.nikAyah || '-'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">4. Tempat, Tanggal Lahir Ayah</td>
+                    <td className="p-2">
+                      {pendaftar.tempatLahirAyah || '-'}{pendaftar.tanggalLahirAyah ? `, ${pendaftar.tanggalLahirAyah}` : ''}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">5. Pendidikan Terakhir Ayah</td>
+                    <td className="p-2">{pendaftar.pendidikanAyah || '-'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">6. Pekerjaan Ayah</td>
+                    <td className="p-2">{pendaftar.pekerjaanAyah}</td>
+                  </tr>
+
+                  {/* IBU */}
+                  <tr className="border-b border-slate-200 bg-slate-100 font-semibold">
+                    <td colSpan={2} className="p-1.5 text-slate-800 text-[11px] uppercase tracking-wide">
+                      Identitas Ibu Kandung
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">7. Status Ibu</td>
+                    <td className="p-2 font-medium">{pendaftar.statusIbu || 'Masih Hidup'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">8. Nama Lengkap Ibu</td>
                     <td className="p-2 font-bold">{pendaftar.namaIbu}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">9. NIK Ibu</td>
+                    <td className="p-2 font-mono font-medium">{pendaftar.nikIbu || '-'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">10. Tempat, Tanggal Lahir Ibu</td>
+                    <td className="p-2">
+                      {pendaftar.tempatLahirIbu || '-'}{pendaftar.tanggalLahirIbu ? `, ${pendaftar.tanggalLahirIbu}` : ''}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">11. Pendidikan Terakhir Ibu</td>
+                    <td className="p-2">{pendaftar.pendidikanIbu || '-'}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-medium bg-slate-50 border-r border-slate-200">12. Pekerjaan Ibu</td>
+                    <td className="p-2">{pendaftar.pekerjaanIbu}</td>
                   </tr>
                 </tbody>
               </table>

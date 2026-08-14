@@ -84,45 +84,89 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
       'Jumlah Saudara',
       'Anak Ke',
       'Yang Membiayai Sekolah',
+      'No Kartu Keluarga',
+      'Nama Kepala Keluarga',
+      'Nomor KIP',
+      'Pra Sekolah',
+      'Riwayat Imunisasi',
       'No HP WA',
       'Jalur Pendaftaran',
       'Sekolah Asal',
+      'NPSN Sekolah Asal',
       'Status Verifikasi',
       'Catatan Verifikasi',
+      'Status Ayah',
       'Nama Ayah',
+      'NIK Ayah',
+      'Tempat Lahir Ayah',
+      'Tanggal Lahir Ayah',
+      'Pendidikan Ayah',
       'Pekerjaan Ayah',
+      'Status Ibu',
       'Nama Ibu',
-      'No Kontak Ortu',
+      'NIK Ibu',
+      'Tempat Lahir Ibu',
+      'Tanggal Lahir Ibu',
+      'Pendidikan Ibu',
+      'Pekerjaan Ibu',
       'Alamat Lengkap',
-      'Rata Rapor',
       'Tanggal Daftar'
     ];
 
-    const rows = filteredData.map((p) => [
-      p.noUrut,
-      `"${p.noRegistrasi}"`,
-      `"${p.namaLengkap}"`,
-      `"${p.tempatLahir}"`,
-      `"${p.tanggalLahir}"`,
-      `"${p.jenisKelamin}"`,
-      `"${p.nisn}"`,
-      `"${p.nik}"`,
-      p.jumlahSaudara !== undefined ? p.jumlahSaudara : '',
-      p.anakKe !== undefined ? p.anakKe : '',
-      `"${p.pembiayaSekolah || 'Orang Tua'}"`,
-      `"${p.noHpWa}"`,
-      `"${p.jalur}"`,
-      `"${p.sekolahAsal}"`,
-      `"${p.status}"`,
-      `"${p.catatanVerifikasi || ''}"`,
-      `"${p.namaAyah}"`,
-      `"${p.pekerjaanAyah}"`,
-      `"${p.namaIbu}"`,
-      `"${p.noHpOrangTua}"`,
-      `"${p.alamatSiswa}, ${p.kabKota}"`,
-      p.rataRapor || '',
-      `"${p.tanggalDaftar}"`
-    ]);
+    const rows = filteredData.map((p) => {
+      const praSekolahArr: string[] = [];
+      if (p.praSekolah?.pernahTkRa) praSekolahArr.push('TK/RA');
+      if (p.praSekolah?.pernahPaud) praSekolahArr.push('PAUD');
+
+      const imunisasiArr: string[] = [];
+      if (p.imunisasi?.hepatitisB) imunisasiArr.push('Hepatitis B');
+      if (p.imunisasi?.bcg) imunisasiArr.push('BCG');
+      if (p.imunisasi?.dpt) imunisasiArr.push('DPT');
+      if (p.imunisasi?.polio) imunisasiArr.push('Polio');
+      if (p.imunisasi?.campak) imunisasiArr.push('Campak');
+      if (p.imunisasi?.covid) imunisasiArr.push('Covid');
+
+      return [
+        p.noUrut,
+        `"${p.noRegistrasi}"`,
+        `"${p.namaLengkap}"`,
+        `"${p.tempatLahir}"`,
+        `"${p.tanggalLahir}"`,
+        `"${p.jenisKelamin}"`,
+        `"${p.nisn}"`,
+        `"${p.nik}"`,
+        p.jumlahSaudara !== undefined ? p.jumlahSaudara : '',
+        p.anakKe !== undefined ? p.anakKe : '',
+        `"${p.pembiayaSekolah || 'Orang Tua'}"`,
+        `"${p.noKk || ''}"`,
+        `"${p.namaKepalaKeluarga || ''}"`,
+        `"${p.noKip || ''}"`,
+        `"${praSekolahArr.join('; ') || 'Tidak Ada'}"`,
+        `"${imunisasiArr.join('; ') || 'Belum/Tidak Terdata'}"`,
+        `"${p.noHpWa}"`,
+        `"${p.jalur}"`,
+        `"${p.sekolahAsal}"`,
+        `"${p.npsnSekolahAsal || ''}"`,
+        `"${p.status}"`,
+        `"${p.catatanVerifikasi || ''}"`,
+        `"${p.statusAyah || 'Masih Hidup'}"`,
+        `"${p.namaAyah}"`,
+        `"${p.nikAyah || ''}"`,
+        `"${p.tempatLahirAyah || ''}"`,
+        `"${p.tanggalLahirAyah || ''}"`,
+        `"${p.pendidikanAyah || ''}"`,
+        `"${p.pekerjaanAyah}"`,
+        `"${p.statusIbu || 'Masih Hidup'}"`,
+        `"${p.namaIbu}"`,
+        `"${p.nikIbu || ''}"`,
+        `"${p.tempatLahirIbu || ''}"`,
+        `"${p.tanggalLahirIbu || ''}"`,
+        `"${p.pendidikanIbu || ''}"`,
+        `"${p.pekerjaanIbu}"`,
+        `"${p.alamatSiswa}, ${p.kabKota}"`,
+        `"${p.tanggalDaftar}"`
+      ];
+    });
 
     const csvContent =
       'data:text/csv;charset=utf-8,\uFEFF' +
@@ -339,6 +383,9 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
                       {/* 7. Sekolah Asal */}
                       <td className="p-3.5">
                         <div className="font-medium text-slate-800">{pendaftar.sekolahAsal}</div>
+                        {pendaftar.npsnSekolahAsal && (
+                          <div className="text-[10px] text-slate-500 font-mono">NPSN: {pendaftar.npsnSekolahAsal}</div>
+                        )}
                       </td>
 
                       {/* 8. Status */}
