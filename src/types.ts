@@ -160,7 +160,7 @@ export interface Pendaftar {
 export interface ItemBiayaPembayaran {
   id: string;
   namaKomponen: string;
-  kategori: 'Seragam' | 'Gedung / Infaq' | 'Kegiatan & MATSAMA' | 'Buku & Alat' | 'Lainnya';
+  kategori: string;
   nominalPutra: number;
   nominalPutri: number;
   keteranganPutra: string;

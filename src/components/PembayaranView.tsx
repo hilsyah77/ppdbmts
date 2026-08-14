@@ -32,6 +32,28 @@ import {
 import { ModalKuitansi } from './ModalKuitansi';
 import { ModalBayar } from './ModalBayar';
 
+// Opsi Kategori Berdasarkan Nama Komponen Biaya
+export const KATEGORI_OPSI_ADMINISTRASI = [
+  'Titipan SPP',
+  'Iuran OSIS, Pramuka 1 Tahun',
+  'Pemeliharaan Alat Drumband 1 Tahun',
+  'Dana Sosial 1 Tahun',
+  'Perpustakaan 1 Tahun + Kartu OSIS',
+  'Modul 5 Mapel Agama 1 Semester',
+  'Pemeliharaan Komputer 1 Tahun',
+  'Buku Pembiasaan Harian (PH)'
+];
+
+export const KATEGORI_OPSI_SERAGAM = [
+  'BET (OSIS, Pramuka, Nama, Jenjang Kelas)',
+  'Bahan Pramuka 1 Set',
+  'Bahan Batik 1 Set',
+  'Biru Putih 1 Set',
+  'Kaos Olah Raga 1 Set',
+  'Topi + Sabuk + Hasduk + Dasi',
+  'Kerudung'
+];
+
 interface PembayaranViewProps {
   pendaftarList: Pendaftar[];
   setPendaftarList: React.Dispatch<React.SetStateAction<Pendaftar[]>>;
@@ -66,13 +88,17 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
   // Fee Edit Modal state
   const [editingItemBiaya, setEditingItemBiaya] = useState<ItemBiayaPembayaran | null>(null);
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState<boolean>(false);
+  const [isCustomAddName, setIsCustomAddName] = useState<boolean>(false);
+  const [isCustomEditName, setIsCustomEditName] = useState<boolean>(false);
+  const [isCustomAddKategori, setIsCustomAddKategori] = useState<boolean>(false);
+  const [isCustomEditKategori, setIsCustomEditKategori] = useState<boolean>(false);
   const [newItemForm, setNewItemForm] = useState<Omit<ItemBiayaPembayaran, 'id'>>({
-    namaKomponen: '',
-    kategori: 'Seragam',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Titipan SPP',
     nominalPutra: 0,
     nominalPutri: 0,
-    keteranganPutra: '',
-    keteranganPutri: '',
+    keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+    keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah',
     sifat: 'Wajib'
   });
 
@@ -228,25 +254,58 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
     setEditingItemBiaya(null);
   };
 
+  const handleOpenEditComponent = (item: ItemBiayaPembayaran) => {
+    setEditingItemBiaya({ ...item });
+    const isStandardName = ['Pembayaran Administrasi keuangan', 'Pembelian Pakaian Seragam'].includes(item.namaKomponen);
+    setIsCustomEditName(!isStandardName);
+    
+    if (item.namaKomponen === 'Pembayaran Administrasi keuangan') {
+      setIsCustomEditKategori(!KATEGORI_OPSI_ADMINISTRASI.includes(item.kategori));
+    } else if (item.namaKomponen === 'Pembelian Pakaian Seragam') {
+      setIsCustomEditKategori(!KATEGORI_OPSI_SERAGAM.includes(item.kategori));
+    } else {
+      setIsCustomEditKategori(false);
+    }
+  };
+
+  const handleOpenAddComponent = () => {
+    setIsCustomAddName(false);
+    setIsCustomAddKategori(false);
+    setNewItemForm({
+      namaKomponen: 'Pembayaran Administrasi keuangan',
+      kategori: 'Titipan SPP',
+      nominalPutra: 0,
+      nominalPutri: 0,
+      keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+      keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+      sifat: 'Wajib'
+    });
+    setIsAddItemModalOpen(true);
+  };
+
   // Handler for adding new component
   const handleAddNewComponent = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemForm.namaKomponen.trim()) return;
+    const finalName = newItemForm.namaKomponen.trim();
+    if (!finalName) return;
 
     const newItem: ItemBiayaPembayaran = {
       ...newItemForm,
+      namaKomponen: finalName,
       id: `biaya-${Date.now()}`
     };
 
     setItemBiayaList((prev) => [...prev, newItem]);
     setIsAddItemModalOpen(false);
+    setIsCustomAddName(false);
+    setIsCustomAddKategori(false);
     setNewItemForm({
-      namaKomponen: '',
-      kategori: 'Seragam',
+      namaKomponen: 'Pembayaran Administrasi keuangan',
+      kategori: 'Titipan SPP',
       nominalPutra: 0,
       nominalPutri: 0,
-      keteranganPutra: '',
-      keteranganPutri: '',
+      keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+      keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah',
       sifat: 'Wajib'
     });
   };
@@ -413,7 +472,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
 
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => setIsAddItemModalOpen(true)}
+                onClick={handleOpenAddComponent}
                 className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
               >
                 <Plus className="w-4 h-4" />
@@ -607,7 +666,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                       <td className="p-3 text-center">
                         <div className="flex items-center justify-center gap-1">
                           <button
-                            onClick={() => setEditingItemBiaya(item)}
+                            onClick={() => handleOpenEditComponent(item)}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit Komponen"
                           >
@@ -925,20 +984,141 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
       {/* MODAL 3: EDIT FEE ITEM */}
       {editingItemBiaya && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-5 space-y-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 className="font-bold text-base text-slate-900 border-b border-slate-200 pb-2">
               Edit Komponen Biaya: {editingItemBiaya.namaKomponen}
             </h3>
             <form onSubmit={handleSaveEditedComponent} className="space-y-3 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Nama Komponen Biaya</label>
-                <input
-                  type="text"
-                  value={editingItemBiaya.namaKomponen}
-                  onChange={(e) => setEditingItemBiaya({ ...editingItemBiaya, namaKomponen: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
+                <label className="block font-bold text-slate-700 mb-1">Nama Komponen Biaya *</label>
+                <select
+                  value={
+                    ['Pembayaran Administrasi keuangan', 'Pembelian Pakaian Seragam'].includes(editingItemBiaya.namaKomponen) && !isCustomEditName
+                      ? editingItemBiaya.namaKomponen
+                      : 'Lainnya'
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'Pembayaran Administrasi keuangan') {
+                      setIsCustomEditName(false);
+                      setIsCustomEditKategori(false);
+                      setEditingItemBiaya({
+                        ...editingItemBiaya,
+                        namaKomponen: 'Pembayaran Administrasi keuangan',
+                        kategori: KATEGORI_OPSI_ADMINISTRASI[0]
+                      });
+                    } else if (val === 'Pembelian Pakaian Seragam') {
+                      setIsCustomEditName(false);
+                      setIsCustomEditKategori(false);
+                      setEditingItemBiaya({
+                        ...editingItemBiaya,
+                        namaKomponen: 'Pembelian Pakaian Seragam',
+                        kategori: KATEGORI_OPSI_SERAGAM[0]
+                      });
+                    } else {
+                      setIsCustomEditName(true);
+                    }
+                  }}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white font-medium text-slate-800"
+                >
+                  <option value="Pembayaran Administrasi keuangan">1. Pembayaran Administrasi keuangan</option>
+                  <option value="Pembelian Pakaian Seragam">2. Pembelian Pakaian Seragam</option>
+                  <option value="Lainnya">Lainnya / Nama Khusus</option>
+                </select>
+
+                {(!['Pembayaran Administrasi keuangan', 'Pembelian Pakaian Seragam'].includes(editingItemBiaya.namaKomponen) || isCustomEditName) && (
+                  <input
+                    type="text"
+                    value={editingItemBiaya.namaKomponen}
+                    onChange={(e) => setEditingItemBiaya({ ...editingItemBiaya, namaKomponen: e.target.value })}
+                    className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
+                    placeholder="Ketik nama komponen biaya khusus..."
+                    required
+                  />
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Kategori *</label>
+                  <select
+                    value={isCustomEditKategori ? 'Lainnya' : editingItemBiaya.kategori}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === 'Lainnya') {
+                        setIsCustomEditKategori(true);
+                      } else {
+                        setIsCustomEditKategori(false);
+                        setEditingItemBiaya({ ...editingItemBiaya, kategori: val });
+                      }
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white font-medium text-slate-800"
+                  >
+                    {editingItemBiaya.namaKomponen === 'Pembayaran Administrasi keuangan' && (
+                      <optgroup label="Opsi Pembayaran Administrasi Keuangan">
+                        <option value="Titipan SPP">a. Titipan SPP</option>
+                        <option value="Iuran OSIS, Pramuka 1 Tahun">b. Iuran OSIS, Pramuka 1 Tahun</option>
+                        <option value="Pemeliharaan Alat Drumband 1 Tahun">c. Pemeliharaan Alat Drumband 1 Tahun</option>
+                        <option value="Dana Sosial 1 Tahun">d. Dana Sosial 1 Tahun</option>
+                        <option value="Perpustakaan 1 Tahun + Kartu OSIS">e. Perpustakaan 1 Tahun + Kartu OSIS</option>
+                        <option value="Modul 5 Mapel Agama 1 Semester">f. Modul 5 Mapel Agama 1 Semester</option>
+                        <option value="Pemeliharaan Komputer 1 Tahun">g. Pemeliharaan Komputer 1 Tahun</option>
+                        <option value="Buku Pembiasaan Harian (PH)">h. Buku Pembiasaan Harian (PH)</option>
+                      </optgroup>
+                    )}
+
+                    {editingItemBiaya.namaKomponen === 'Pembelian Pakaian Seragam' && (
+                      <optgroup label="Opsi Pembelian Pakaian Seragam">
+                        <option value="BET (OSIS, Pramuka, Nama, Jenjang Kelas)">a. BET (OSIS, Pramuka, Nama, Jenjang Kelas)</option>
+                        <option value="Bahan Pramuka 1 Set">b. Bahan Pramuka 1 Set</option>
+                        <option value="Bahan Batik 1 Set">c. Bahan Batik 1 Set</option>
+                        <option value="Biru Putih 1 Set">d. Biru Putih 1 Set</option>
+                        <option value="Kaos Olah Raga 1 Set">e. Kaos Olah Raga 1 Set</option>
+                        <option value="Topi + Sabuk + Hasduk + Dasi">f. Topi + Sabuk + Hasduk + Dasi</option>
+                        <option value="Kerudung">g. Kerudung</option>
+                      </optgroup>
+                    )}
+
+                    {editingItemBiaya.namaKomponen !== 'Pembayaran Administrasi keuangan' && editingItemBiaya.namaKomponen !== 'Pembelian Pakaian Seragam' && (
+                      <>
+                        <optgroup label="Administrasi Keuangan">
+                          {KATEGORI_OPSI_ADMINISTRASI.map((k) => (
+                            <option key={k} value={k}>{k}</option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Seragam">
+                          {KATEGORI_OPSI_SERAGAM.map((k) => (
+                            <option key={k} value={k}>{k}</option>
+                          ))}
+                        </optgroup>
+                      </>
+                    )}
+                    <option value="Lainnya">Lainnya (Ketik Manual)</option>
+                  </select>
+
+                  {isCustomEditKategori && (
+                    <input
+                      type="text"
+                      value={editingItemBiaya.kategori}
+                      onChange={(e) => setEditingItemBiaya({ ...editingItemBiaya, kategori: e.target.value })}
+                      className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
+                      placeholder="Ketik nama kategori kustom..."
+                      required
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Sifat Biaya</label>
+                  <select
+                    value={editingItemBiaya.sifat}
+                    onChange={(e: any) => setEditingItemBiaya({ ...editingItemBiaya, sifat: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white"
+                  >
+                    <option value="Wajib">Wajib</option>
+                    <option value="Pilihan">Pilihan / Opsional</option>
+                  </select>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -1007,21 +1187,148 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
       {/* MODAL 4: ADD NEW FEE ITEM */}
       {isAddItemModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-5 space-y-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 className="font-bold text-base text-slate-900 border-b border-slate-200 pb-2">
               Tambah Komponen Biaya Baru
             </h3>
             <form onSubmit={handleAddNewComponent} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Nama Komponen Biaya *</label>
-                <input
-                  type="text"
-                  value={newItemForm.namaKomponen}
-                  onChange={(e) => setNewItemForm({ ...newItemForm, namaKomponen: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  placeholder="Misal: Infaq Koperasi / Laboratorium"
+                <select
+                  value={isCustomAddName ? 'Lainnya' : newItemForm.namaKomponen}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'Pembayaran Administrasi keuangan') {
+                      setIsCustomAddName(false);
+                      setIsCustomAddKategori(false);
+                      setNewItemForm((prev) => ({
+                        ...prev,
+                        namaKomponen: 'Pembayaran Administrasi keuangan',
+                        kategori: KATEGORI_OPSI_ADMINISTRASI[0],
+                        keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+                        keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah'
+                      }));
+                    } else if (val === 'Pembelian Pakaian Seragam') {
+                      setIsCustomAddName(false);
+                      setIsCustomAddKategori(false);
+                      setNewItemForm((prev) => ({
+                        ...prev,
+                        namaKomponen: 'Pembelian Pakaian Seragam',
+                        kategori: KATEGORI_OPSI_SERAGAM[0],
+                        keteranganPutra: 'Seragam Madrasah & Perlengkapan Putra',
+                        keteranganPutri: 'Seragam Madrasah & Perlengkapan Muslimah Putri'
+                      }));
+                    } else {
+                      setIsCustomAddName(true);
+                      setNewItemForm((prev) => ({
+                        ...prev,
+                        namaKomponen: ''
+                      }));
+                    }
+                  }}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white font-medium text-slate-800"
                   required
-                />
+                >
+                  <option value="Pembayaran Administrasi keuangan">1. Pembayaran Administrasi keuangan</option>
+                  <option value="Pembelian Pakaian Seragam">2. Pembelian Pakaian Seragam</option>
+                  <option value="Lainnya">Lainnya (Ketik Manual)</option>
+                </select>
+
+                {isCustomAddName && (
+                  <input
+                    type="text"
+                    value={newItemForm.namaKomponen}
+                    onChange={(e) => setNewItemForm({ ...newItemForm, namaKomponen: e.target.value })}
+                    className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
+                    placeholder="Masukkan nama komponen biaya kustom..."
+                    autoFocus
+                    required
+                  />
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Kategori *</label>
+                  <select
+                    value={isCustomAddKategori ? 'Lainnya' : newItemForm.kategori}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === 'Lainnya') {
+                        setIsCustomAddKategori(true);
+                      } else {
+                        setIsCustomAddKategori(false);
+                        setNewItemForm({ ...newItemForm, kategori: val });
+                      }
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white font-medium text-slate-800"
+                    required
+                  >
+                    {(!isCustomAddName && newItemForm.namaKomponen === 'Pembayaran Administrasi keuangan') && (
+                      <optgroup label="Opsi Pembayaran Administrasi Keuangan">
+                        <option value="Titipan SPP">a. Titipan SPP</option>
+                        <option value="Iuran OSIS, Pramuka 1 Tahun">b. Iuran OSIS, Pramuka 1 Tahun</option>
+                        <option value="Pemeliharaan Alat Drumband 1 Tahun">c. Pemeliharaan Alat Drumband 1 Tahun</option>
+                        <option value="Dana Sosial 1 Tahun">d. Dana Sosial 1 Tahun</option>
+                        <option value="Perpustakaan 1 Tahun + Kartu OSIS">e. Perpustakaan 1 Tahun + Kartu OSIS</option>
+                        <option value="Modul 5 Mapel Agama 1 Semester">f. Modul 5 Mapel Agama 1 Semester</option>
+                        <option value="Pemeliharaan Komputer 1 Tahun">g. Pemeliharaan Komputer 1 Tahun</option>
+                        <option value="Buku Pembiasaan Harian (PH)">h. Buku Pembiasaan Harian (PH)</option>
+                      </optgroup>
+                    )}
+
+                    {(!isCustomAddName && newItemForm.namaKomponen === 'Pembelian Pakaian Seragam') && (
+                      <optgroup label="Opsi Pembelian Pakaian Seragam">
+                        <option value="BET (OSIS, Pramuka, Nama, Jenjang Kelas)">a. BET (OSIS, Pramuka, Nama, Jenjang Kelas)</option>
+                        <option value="Bahan Pramuka 1 Set">b. Bahan Pramuka 1 Set</option>
+                        <option value="Bahan Batik 1 Set">c. Bahan Batik 1 Set</option>
+                        <option value="Biru Putih 1 Set">d. Biru Putih 1 Set</option>
+                        <option value="Kaos Olah Raga 1 Set">e. Kaos Olah Raga 1 Set</option>
+                        <option value="Topi + Sabuk + Hasduk + Dasi">f. Topi + Sabuk + Hasduk + Dasi</option>
+                        <option value="Kerudung">g. Kerudung</option>
+                      </optgroup>
+                    )}
+
+                    {isCustomAddName && (
+                      <>
+                        <optgroup label="Administrasi Keuangan">
+                          {KATEGORI_OPSI_ADMINISTRASI.map((k) => (
+                            <option key={k} value={k}>{k}</option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Seragam">
+                          {KATEGORI_OPSI_SERAGAM.map((k) => (
+                            <option key={k} value={k}>{k}</option>
+                          ))}
+                        </optgroup>
+                      </>
+                    )}
+                    <option value="Lainnya">Lainnya (Ketik Manual)</option>
+                  </select>
+
+                  {isCustomAddKategori && (
+                    <input
+                      type="text"
+                      value={newItemForm.kategori}
+                      onChange={(e) => setNewItemForm({ ...newItemForm, kategori: e.target.value })}
+                      className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
+                      placeholder="Ketik kategori kustom..."
+                      required
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Sifat Biaya</label>
+                  <select
+                    value={newItemForm.sifat}
+                    onChange={(e: any) => setNewItemForm({ ...newItemForm, sifat: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white"
+                  >
+                    <option value="Wajib">Wajib</option>
+                    <option value="Pilihan">Pilihan / Opsional</option>
+                  </select>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -1044,34 +1351,6 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     className="w-full px-3 py-2 border border-pink-300 rounded-lg font-mono focus:ring-2 focus:ring-pink-500"
                     required
                   />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Kategori</label>
-                  <select
-                    value={newItemForm.kategori}
-                    onChange={(e: any) => setNewItemForm({ ...newItemForm, kategori: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="Seragam">Seragam</option>
-                    <option value="Gedung / Infaq">Gedung / Infaq</option>
-                    <option value="Kegiatan & MATSAMA">Kegiatan & MATSAMA</option>
-                    <option value="Buku & Alat">Buku & Alat</option>
-                    <option value="Lainnya">Lainnya</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Sifat</label>
-                  <select
-                    value={newItemForm.sifat}
-                    onChange={(e: any) => setNewItemForm({ ...newItemForm, sifat: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="Wajib">Wajib</option>
-                    <option value="Pilihan">Pilihan / Opsional</option>
-                  </select>
                 </div>
               </div>
 
