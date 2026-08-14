@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { ModalKuitansi } from './ModalKuitansi';
 import { ModalBayar } from './ModalBayar';
+import { ModalHasilRincian } from './ModalHasilRincian';
 
 // Opsi Kategori Berdasarkan Nama Komponen Biaya
 export const KATEGORI_OPSI_ADMINISTRASI = [
@@ -79,6 +80,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
   const [filterStatusBayar, setFilterStatusBayar] = useState<string>('semua');
 
   // Modal States
+  const [isModalHasilRincianOpen, setIsModalHasilRincianOpen] = useState<boolean>(false);
   const [selectedPendaftarForPay, setSelectedPendaftarForPay] = useState<Pendaftar | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<{
     pendaftar: Pendaftar;
@@ -273,11 +275,11 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
     setIsCustomAddKategori(false);
     setNewItemForm({
       namaKomponen: 'Pembayaran Administrasi keuangan',
-      kategori: 'Titipan SPP',
+      kategori: KATEGORI_OPSI_ADMINISTRASI[0],
       nominalPutra: 0,
       nominalPutri: 0,
-      keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
-      keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+      keteranganPutra: KATEGORI_OPSI_ADMINISTRASI[0],
+      keteranganPutri: KATEGORI_OPSI_ADMINISTRASI[0],
       sifat: 'Wajib'
     });
     setIsAddItemModalOpen(true);
@@ -301,11 +303,11 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
     setIsCustomAddKategori(false);
     setNewItemForm({
       namaKomponen: 'Pembayaran Administrasi keuangan',
-      kategori: 'Titipan SPP',
+      kategori: KATEGORI_OPSI_ADMINISTRASI[0],
       nominalPutra: 0,
       nominalPutri: 0,
-      keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
-      keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+      keteranganPutra: KATEGORI_OPSI_ADMINISTRASI[0],
+      keteranganPutri: KATEGORI_OPSI_ADMINISTRASI[0],
       sifat: 'Wajib'
     });
   };
@@ -470,7 +472,16 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0 flex-wrap">
+              <button
+                onClick={() => setIsModalHasilRincianOpen(true)}
+                className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+                title="Tampilkan popup hasil rincian biaya sesuai format resmi"
+              >
+                <Receipt className="w-4 h-4 text-indigo-200" />
+                <span>Lihat Hasil Rincian (Modal)</span>
+              </button>
+
               <button
                 onClick={handleOpenAddComponent}
                 className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
@@ -613,7 +624,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
 
           {/* EDITABLE TABLE OF FEE COMPONENTS */}
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm space-y-0">
-            <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h4 className="font-bold text-slate-800 text-sm">
                   Kelola Master Data Komponen Biaya
@@ -622,6 +633,14 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                   Klik tombol "Edit" untuk mengubah nominal Putra atau Putri secara spesifik.
                 </p>
               </div>
+
+              <button
+                onClick={() => setIsModalHasilRincianOpen(true)}
+                className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm shrink-0"
+              >
+                <Receipt className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Buka Modal Rincian Resmi</span>
+              </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -1005,7 +1024,9 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                       setEditingItemBiaya({
                         ...editingItemBiaya,
                         namaKomponen: 'Pembayaran Administrasi keuangan',
-                        kategori: KATEGORI_OPSI_ADMINISTRASI[0]
+                        kategori: KATEGORI_OPSI_ADMINISTRASI[0],
+                        keteranganPutra: KATEGORI_OPSI_ADMINISTRASI[0],
+                        keteranganPutri: KATEGORI_OPSI_ADMINISTRASI[0]
                       });
                     } else if (val === 'Pembelian Pakaian Seragam') {
                       setIsCustomEditName(false);
@@ -1013,7 +1034,9 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                       setEditingItemBiaya({
                         ...editingItemBiaya,
                         namaKomponen: 'Pembelian Pakaian Seragam',
-                        kategori: KATEGORI_OPSI_SERAGAM[0]
+                        kategori: KATEGORI_OPSI_SERAGAM[0],
+                        keteranganPutra: KATEGORI_OPSI_SERAGAM[0],
+                        keteranganPutri: KATEGORI_OPSI_SERAGAM[0]
                       });
                     } else {
                       setIsCustomEditName(true);
@@ -1049,7 +1072,12 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                         setIsCustomEditKategori(true);
                       } else {
                         setIsCustomEditKategori(false);
-                        setEditingItemBiaya({ ...editingItemBiaya, kategori: val });
+                        setEditingItemBiaya({
+                          ...editingItemBiaya,
+                          kategori: val,
+                          keteranganPutra: val,
+                          keteranganPutri: val
+                        });
                       }
                     }}
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white font-medium text-slate-800"
@@ -1100,7 +1128,15 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     <input
                       type="text"
                       value={editingItemBiaya.kategori}
-                      onChange={(e) => setEditingItemBiaya({ ...editingItemBiaya, kategori: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditingItemBiaya({
+                          ...editingItemBiaya,
+                          kategori: val,
+                          keteranganPutra: val,
+                          keteranganPutri: val
+                        });
+                      }}
                       className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
                       placeholder="Ketik nama kategori kustom..."
                       required
@@ -1205,8 +1241,8 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                         ...prev,
                         namaKomponen: 'Pembayaran Administrasi keuangan',
                         kategori: KATEGORI_OPSI_ADMINISTRASI[0],
-                        keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
-                        keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah'
+                        keteranganPutra: KATEGORI_OPSI_ADMINISTRASI[0],
+                        keteranganPutri: KATEGORI_OPSI_ADMINISTRASI[0]
                       }));
                     } else if (val === 'Pembelian Pakaian Seragam') {
                       setIsCustomAddName(false);
@@ -1215,8 +1251,8 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                         ...prev,
                         namaKomponen: 'Pembelian Pakaian Seragam',
                         kategori: KATEGORI_OPSI_SERAGAM[0],
-                        keteranganPutra: 'Seragam Madrasah & Perlengkapan Putra',
-                        keteranganPutri: 'Seragam Madrasah & Perlengkapan Muslimah Putri'
+                        keteranganPutra: KATEGORI_OPSI_SERAGAM[0],
+                        keteranganPutri: KATEGORI_OPSI_SERAGAM[0]
                       }));
                     } else {
                       setIsCustomAddName(true);
@@ -1258,7 +1294,12 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                         setIsCustomAddKategori(true);
                       } else {
                         setIsCustomAddKategori(false);
-                        setNewItemForm({ ...newItemForm, kategori: val });
+                        setNewItemForm({
+                          ...newItemForm,
+                          kategori: val,
+                          keteranganPutra: val,
+                          keteranganPutri: val
+                        });
                       }
                     }}
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white font-medium text-slate-800"
@@ -1310,7 +1351,15 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     <input
                       type="text"
                       value={newItemForm.kategori}
-                      onChange={(e) => setNewItemForm({ ...newItemForm, kategori: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setNewItemForm({
+                          ...newItemForm,
+                          kategori: val,
+                          keteranganPutra: val,
+                          keteranganPutri: val
+                        });
+                      }}
                       className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
                       placeholder="Ketik kategori kustom..."
                       required
@@ -1394,6 +1443,16 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
             </form>
           </div>
         </div>
+      )}
+
+      {/* MODAL 5: TAMPILAN HASIL RINCIAN BIAYA PPDB RESMI */}
+      {isModalHasilRincianOpen && (
+        <ModalHasilRincian
+          itemBiayaList={itemBiayaList}
+          profil={profil}
+          pengaturan={pengaturan}
+          onClose={() => setIsModalHasilRincianOpen(false)}
+        />
       )}
 
     </div>
