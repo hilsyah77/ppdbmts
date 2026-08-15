@@ -63,14 +63,14 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-fadeIn print:p-0 print:m-0 print:bg-white print:fixed print:inset-0 print:overflow-hidden">
-      {/* Embedded Print Styles for Exact A4 (Margin: Kiri/Kanan 3cm, Atas/Bawah 2.5cm) */}
+      {/* Embedded Print Styles for Exact A4 (Margin: Atas 1cm, Kiri 1.5cm, Kanan 1.5cm, Bawah 1.5cm) */}
       <style>{`
         @page {
           size: A4 portrait;
-          margin-top: 2.5cm;
-          margin-bottom: 2.5cm;
-          margin-left: 3cm;
-          margin-right: 3cm;
+          margin-top: 1cm;
+          margin-bottom: 1.5cm;
+          margin-left: 1.5cm;
+          margin-right: 1.5cm;
         }
         @media print {
           *, *::before, *::after {
@@ -134,7 +134,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 <h3 className="text-sm font-bold">Cetak Formulir Pendaftaran PPDB</h3>
                 <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                  Kertas A4 &bull; Margin Kiri/Kanan 3cm &bull; Atas/Bawah 2.5cm
+                  Kertas A4 &bull; Margin: Atas 1cm &bull; Kiri/Kanan/Bawah 1.5cm
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
