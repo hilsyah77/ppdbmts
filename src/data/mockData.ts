@@ -29,7 +29,8 @@ export const initialProfilMadrasah: ProfilMadrasahData = {
     'Mewujudkan lingkungan madrasah yang bersih, asri, nyaman, dan berwawasan adiwiyata.'
   ],
   logoUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=200&q=80',
-  bannerUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80'
+  bannerUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80',
+  kopSuratUrl: ''
 };
 
 export const initialJalurPPDB: JalurPPDB[] = [

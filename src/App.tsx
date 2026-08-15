@@ -378,6 +378,7 @@ export default function App() {
         pengaturan={pengaturan}
         jadwalPiketList={jadwalPiketList}
         onClose={() => setCetakModalItem(null)}
+        onUpdateProfil={(newProfil) => setProfilMadrasah(newProfil)}
       />
 
       <ModalVerifikasi

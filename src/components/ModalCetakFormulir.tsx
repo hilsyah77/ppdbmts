@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Pendaftar, ProfilMadrasahData, PengaturanPPDBData, JadwalPiket } from '../types';
-import { X, Printer, UserCheck, FileText, CheckCircle2 } from 'lucide-react';
+import { X, Printer, UserCheck, FileText, CheckCircle2, Upload, ImageIcon, AlertCircle } from 'lucide-react';
 
 interface ModalCetakProps {
   pendaftar: Pendaftar | null;
@@ -8,6 +8,7 @@ interface ModalCetakProps {
   pengaturan: PengaturanPPDBData;
   jadwalPiketList?: JadwalPiket[];
   onClose: () => void;
+  onUpdateProfil?: (newProfil: ProfilMadrasahData) => void;
 }
 
 export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
@@ -15,12 +16,46 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
   profil,
   pengaturan,
   jadwalPiketList = [],
-  onClose
+  onClose,
+  onUpdateProfil
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const kopInputRef = useRef<HTMLInputElement>(null);
   const [penandatangan, setPenandatangan] = useState<string>(pengaturan.panitiaKetua);
+  const [useKopGambar, setUseKopGambar] = useState<boolean>(Boolean(profil.kopSuratUrl));
+
+  useEffect(() => {
+    if (profil.kopSuratUrl) {
+      setUseKopGambar(true);
+    }
+  }, [profil.kopSuratUrl]);
 
   if (!pendaftar) return null;
+
+  const handleKopFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Harap pilih file gambar (JPG, PNG, atau WebP)');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file kop surat maksimal 5 MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result && onUpdateProfil) {
+        const updated = { ...profil, kopSuratUrl: event.target.result as string };
+        onUpdateProfil(updated);
+        setUseKopGambar(true);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handlePrint = () => {
     window.print();
@@ -108,7 +143,51 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Hidden Input for Kop Upload */}
+            <input
+              type="file"
+              ref={kopInputRef}
+              onChange={handleKopFileChange}
+              accept="image/png,image/jpeg,image/jpg,image/webp"
+              className="hidden"
+            />
+
+            {/* Quick Upload / Switch Kop Surat Button */}
+            <button
+              type="button"
+              onClick={() => kopInputRef.current?.click()}
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              title={profil.kopSuratUrl ? 'Ganti file Kop Surat' : 'Upload Kop Surat Resmi (JPG/PNG)'}
+            >
+              <Upload className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">{profil.kopSuratUrl ? 'Ganti Kop' : 'Upload Kop Surat'}</span>
+            </button>
+
+            {/* Kop Type Toggle if Kop Gambar exists */}
+            {profil.kopSuratUrl && (
+              <div className="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-0.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setUseKopGambar(true)}
+                  className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-colors cursor-pointer ${
+                    useKopGambar ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Kop Gambar (JPG/PNG)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUseKopGambar(false)}
+                  className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-colors cursor-pointer ${
+                    !useKopGambar ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Kop Teks
+                </button>
+              </div>
+            )}
+
             {/* Penandatangan Dropdown */}
             <div className="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1 text-xs">
               <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -116,7 +195,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
               <select
                 value={penandatangan}
                 onChange={(e) => setPenandatangan(e.target.value)}
-                className="bg-slate-900 text-emerald-300 text-xs font-bold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[160px] truncate"
+                className="bg-slate-900 text-emerald-300 text-xs font-bold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[160px] truncate cursor-pointer"
               >
                 {pengaturan.panitiaKetua && (
                   <option value={pengaturan.panitiaKetua}>
@@ -156,6 +235,26 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
           </div>
         </div>
 
+        {/* Kop Surat info banner if not uploaded yet */}
+        {!profil.kopSuratUrl && (
+          <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 print:hidden">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>
+                <strong>Info Kop Surat:</strong> Belum ada gambar Kop Surat resmi. Anda dapat mengunggah file Kop Surat (JPG/PNG) agar muncul di bagian atas formulir.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => kopInputRef.current?.click()}
+              className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Upload Kop Sekarang</span>
+            </button>
+          </div>
+        )}
+
         {/* Paper Container Wrapper on Screen */}
         <div className="bg-slate-200/70 p-3 sm:p-5 flex justify-center print:bg-white print:p-0 print:m-0">
           {/* Printable Paper Area (Exact A4 specifications: Margin 2.5cm Top/Bottom, 3cm Left/Right, Font 12, Spacing 1.5) */}
@@ -165,31 +264,41 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
             className="w-full max-w-2xl bg-white text-slate-950 shadow-xl border border-slate-300 print:border-none print:shadow-none p-6 sm:p-8 font-sans text-[12px] print:p-0"
             style={{ boxSizing: 'border-box', lineHeight: '1.5' }}
           >
-            {/* 1. Kop Surat Resmi Madrasah */}
-            <div className="border-b-4 border-double border-slate-950 pb-1.5 mb-2 text-center relative" style={{ lineHeight: '1.3' }}>
-              {/* Logo Madrasah / Kemenag */}
-              <div className="absolute left-0 top-0.5 w-14 h-14 sm:w-15 sm:h-15 flex items-center justify-center font-bold text-[11px] text-emerald-800 uppercase tracking-tighter text-center leading-tight overflow-hidden">
-                {profil.logoUrl ? (
-                  <img src={profil.logoUrl} alt="Logo Sekolah" className="w-full h-full object-contain" />
-                ) : (
-                  <div className="w-full h-full border-2 border-emerald-800 rounded-full flex items-center justify-center font-black text-emerald-900 text-[11px]">
-                    KEMENAG
-                  </div>
-                )}
+            {/* 1. Kop Surat Resmi Madrasah (Gambar atau Teks Standar) */}
+            {useKopGambar && profil.kopSuratUrl ? (
+              <div className="mb-2.5 pb-1.5 text-center border-b-2 border-slate-900 w-full overflow-hidden">
+                <img
+                  src={profil.kopSuratUrl}
+                  alt="Kop Surat Resmi Madrasah"
+                  className="w-full h-auto max-h-28 sm:max-h-32 object-contain mx-auto print:max-h-36 block"
+                />
               </div>
+            ) : (
+              <div className="border-b-4 border-double border-slate-950 pb-1.5 mb-2 text-center relative" style={{ lineHeight: '1.3' }}>
+                {/* Logo Madrasah / Kemenag */}
+                <div className="absolute left-0 top-0.5 w-14 h-14 sm:w-15 sm:h-15 flex items-center justify-center font-bold text-[11px] text-emerald-800 uppercase tracking-tighter text-center leading-tight overflow-hidden">
+                  {profil.logoUrl ? (
+                    <img src={profil.logoUrl} alt="Logo Sekolah" className="w-full h-full object-contain" />
+                  ) : (
+                    <div className="w-full h-full border-2 border-emerald-800 rounded-full flex items-center justify-center font-black text-emerald-900 text-[11px]">
+                      KEMENAG
+                    </div>
+                  )}
+                </div>
 
-              <div className="px-14 space-y-0.5">
-                <h1 className="text-[13.5px] sm:text-[14.5px] font-black uppercase tracking-tight text-slate-950 leading-tight">
-                  {pengaturan.kopHeaderLine3 || `PENERIMAAN PESERTA DIDIK BARU (PPDB) ${profil.namaMadrasah.toUpperCase()}`}
-                </h1>
-                <p className="text-[9.5px] text-slate-700 leading-tight">
-                  {profil.alamat}, {profil.kelurahan}, {profil.kecamatan}, {profil.kabKota}, {profil.provinsi} {profil.kodePos}
-                </p>
-                <p className="text-[9px] text-slate-700 leading-tight">
-                  Telp: {profil.telepon} | WA: {profil.whatsappCenter} | Website: {profil.website} | Email: {profil.email}
-                </p>
+                <div className="px-14 space-y-0.5">
+                  <h1 className="text-[13.5px] sm:text-[14.5px] font-black uppercase tracking-tight text-slate-950 leading-tight">
+                    {pengaturan.kopHeaderLine3 || `PENERIMAAN PESERTA DIDIK BARU (PPDB) ${profil.namaMadrasah.toUpperCase()}`}
+                  </h1>
+                  <p className="text-[9.5px] text-slate-700 leading-tight">
+                    {profil.alamat}, {profil.kelurahan}, {profil.kecamatan}, {profil.kabKota}, {profil.provinsi} {profil.kodePos}
+                  </p>
+                  <p className="text-[9px] text-slate-700 leading-tight">
+                    Telp: {profil.telepon} | WA: {profil.whatsappCenter} | Website: {profil.website} | Email: {profil.email}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* 2. Judul Formulir & Ringkasan Registrasi */}
             <div className="text-center mb-2" style={{ lineHeight: '1.3' }}>

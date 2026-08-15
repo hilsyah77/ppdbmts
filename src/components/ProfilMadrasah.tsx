@@ -15,7 +15,10 @@ import {
   Upload,
   Trash2,
   Camera,
-  Link as LinkIcon
+  Link as LinkIcon,
+  FileType,
+  Printer,
+  Sparkles
 } from 'lucide-react';
 
 interface ProfilMadrasahProps {
@@ -26,8 +29,10 @@ interface ProfilMadrasahProps {
 export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }) => {
   const [formData, setFormData] = useState<ProfilMadrasahData>(profil);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isKopDragOver, setIsKopDragOver] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
+  const kopInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -80,6 +85,42 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
     reader.readAsDataURL(file);
   };
 
+  const processKopFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Harap pilih file gambar (JPG, PNG, atau WebP)');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file kop surat maksimal 5 MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setFormData((prev) => ({ ...prev, kopSuratUrl: event.target!.result as string }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleKopFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processKopFile(file);
+    }
+  };
+
+  const handleKopDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsKopDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processKopFile(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
@@ -122,12 +163,17 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
 
       <form onSubmit={handleSubmit} className="space-y-6">
         
-        {/* Logo & Banner Upload Card */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-5">
-          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100">
-            <ImageIcon className="w-4 h-4 text-emerald-600" />
-            <span>Upload Logo & Sampul Banner Madrasah</span>
-          </h3>
+        {/* Logo, Kop Surat & Banner Upload Card */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-100">
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-emerald-600" />
+              <span>Upload Berkas Identitas Madrasah (Logo, Kop Surat & Banner)</span>
+            </h3>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Mendukung format gambar <strong className="text-slate-700 font-bold">JPG, PNG, WebP</strong>
+            </span>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
@@ -137,7 +183,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                 <div>
                   <h4 className="text-xs font-bold text-slate-900">Logo Resmi Sekolah / Madrasah</h4>
                   <p className="text-[11px] text-slate-500">
-                    Ditampilkan pada header aplikasi, kop surat, dan formulir pendaftaran.
+                    Ditampilkan pada header navigasi, dashboard, dan dokumen resmi.
                   </p>
                 </div>
                 <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -171,7 +217,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                     type="file"
                     ref={logoInputRef}
                     onChange={handleLogoFileChange}
-                    accept="image/*"
+                    accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                     className="hidden"
                   />
 
@@ -179,17 +225,17 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                     <button
                       type="button"
                       onClick={() => logoInputRef.current?.click()}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-sm"
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
                     >
                       <Upload className="w-3.5 h-3.5" />
-                      <span>Upload File Logo</span>
+                      <span>Upload Logo</span>
                     </button>
 
                     {formData.logoUrl && (
                       <button
                         type="button"
                         onClick={() => setFormData((prev) => ({ ...prev, logoUrl: '' }))}
-                        className="px-2.5 py-1.5 bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 font-bold rounded-lg text-xs transition-colors flex items-center gap-1"
+                        className="px-2.5 py-1.5 bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 font-bold rounded-lg text-xs transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Hapus</span>
@@ -198,7 +244,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                   </div>
 
                   <p className="text-[10px] text-slate-500">
-                    Format: PNG, JPG, SVG, WebP (Maks. 3MB). Disarankan berlatar transparan.
+                    Format: PNG, JPG (Maks. 3MB). Disarankan PNG transparan.
                   </p>
                 </div>
               </div>
@@ -226,7 +272,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                 <div>
                   <h4 className="text-xs font-bold text-slate-900">Gambar Sampul Banner Gedung</h4>
                   <p className="text-[11px] text-slate-500">
-                    Ditampilkan sebagai header latar profil madrasah.
+                    Ditampilkan sebagai latar header profil madrasah & portal.
                   </p>
                 </div>
                 <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-blue-100 text-blue-800 border border-blue-200">
@@ -260,7 +306,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                     type="file"
                     ref={bannerInputRef}
                     onChange={handleBannerFileChange}
-                    accept="image/*"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
                     className="hidden"
                   />
 
@@ -268,7 +314,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                     <button
                       type="button"
                       onClick={() => bannerInputRef.current?.click()}
-                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-sm"
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
                     >
                       <Upload className="w-3.5 h-3.5" />
                       <span>Upload Banner</span>
@@ -278,7 +324,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                       <button
                         type="button"
                         onClick={() => setFormData((prev) => ({ ...prev, bannerUrl: '' }))}
-                        className="px-2.5 py-1.5 bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 font-bold rounded-lg text-xs transition-colors flex items-center gap-1"
+                        className="px-2.5 py-1.5 bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 font-bold rounded-lg text-xs transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Hapus</span>
@@ -287,7 +333,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                   </div>
 
                   <p className="text-[10px] text-slate-500">
-                    Format: JPG, PNG, WebP (Maks. 5MB).
+                    Format: JPG, PNG (Maks. 5MB). Rasio lebar landscape.
                   </p>
                 </div>
               </div>
@@ -310,6 +356,164 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
             </div>
 
           </div>
+
+          {/* 3. Dedicated Card: Upload Gambar Kop Surat Resmi (JPG / PNG) */}
+          <div className="p-5 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 border-2 border-emerald-200/80 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-emerald-600 text-white rounded-xl shadow-sm">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-black text-slate-900">Upload Kop Surat Resmi Madrasah</h4>
+                    <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-md bg-emerald-600 text-white shadow-xs">
+                      Bentuk JPG / PNG
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600">
+                    Gambar Kop Surat resmi ini akan otomatis dicantumkan di bagian atas saat mencetak <strong>Formulir Pendaftaran PPDB</strong> dan <strong>Kuitansi Pembayaran</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={kopInputRef}
+                  onChange={handleKopFileChange}
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => kopInputRef.current?.click()}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+                >
+                  <Upload className="w-4 h-4" />
+                  <span>{formData.kopSuratUrl ? 'Ganti Kop Surat' : 'Upload Kop Surat (JPG/PNG)'}</span>
+                </button>
+
+                {formData.kopSuratUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, kopSuratUrl: '' }))}
+                    className="px-3 py-2 bg-white hover:bg-rose-50 hover:text-rose-700 text-slate-700 border border-slate-300 hover:border-rose-300 font-bold rounded-xl text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4 text-rose-600" />
+                    <span>Hapus Kop</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Drag & Drop and Preview Container */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsKopDragOver(true);
+              }}
+              onDragLeave={() => setIsKopDragOver(false)}
+              onDrop={handleKopDrop}
+              onClick={() => {
+                if (!formData.kopSuratUrl) {
+                  kopInputRef.current?.click();
+                }
+              }}
+              className={`border-2 border-dashed rounded-xl p-4 sm:p-5 transition-all text-center ${
+                isKopDragOver
+                  ? 'border-emerald-500 bg-emerald-100/60 scale-[1.005]'
+                  : formData.kopSuratUrl
+                  ? 'border-emerald-300 bg-white shadow-inner'
+                  : 'border-slate-300 bg-white/70 hover:bg-white hover:border-emerald-400 cursor-pointer'
+              }`}
+            >
+              {formData.kopSuratUrl ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pb-2 border-b border-slate-100">
+                    <span className="font-bold text-emerald-800 flex items-center gap-1.5">
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                      Pratinjau Kop Surat Aktif (Akan Dicetak pada Dokumen)
+                    </span>
+                    <span className="text-[10px] bg-slate-100 text-slate-700 font-mono px-2 py-0.5 rounded">
+                      Rasio Kop Surat Standar A4
+                    </span>
+                  </div>
+                  
+                  {/* Live Kop Image Frame */}
+                  <div className="bg-slate-50 p-2 sm:p-3 rounded-lg border border-slate-200 flex items-center justify-center min-h-[90px] max-h-[140px] overflow-hidden">
+                    <img
+                      src={formData.kopSuratUrl}
+                      alt="Pratinjau Kop Surat Resmi"
+                      className="w-full max-h-[120px] object-contain mx-auto"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        kopInputRef.current?.click();
+                      }}
+                      className="text-xs text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Klik untuk ganti file gambar Kop</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-6 space-y-2.5">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-xs">
+                    <Upload className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">
+                      Tarik & lepaskan file Kop Surat ke sini, atau <span className="text-emerald-700 underline">klik untuk mencari file</span>
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Mendukung format gambar: <strong className="font-semibold text-slate-700">.JPG, .JPEG, .PNG</strong> (Maksimal 5 MB)
+                    </p>
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-[10px] font-semibold text-amber-900 mt-2">
+                    <Printer className="w-3 h-3 text-amber-700" />
+                    <span>Tips: Gunakan resolusi tinggi (misal: lebar 1200–2400px) untuk hasil cetak dokumen yang jernih dan tajam</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Direct URL Fallback Option for Kop Surat */}
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <label className="text-[11px] font-bold text-slate-600 flex items-center gap-1 shrink-0">
+                <LinkIcon className="w-3 h-3 text-slate-400" />
+                <span>Atau Link URL Kop Surat (JPG/PNG):</span>
+              </label>
+              <div className="flex-1 flex gap-2">
+                <input
+                  type="text"
+                  name="kopSuratUrl"
+                  value={formData.kopSuratUrl || ''}
+                  onChange={handleChange}
+                  placeholder="https://domain.com/kop-surat-resmi.png"
+                  className="flex-1 px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+                {formData.kopSuratUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, kopSuratUrl: '' }))}
+                    className="px-2.5 py-1.5 bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-600 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                    title="Kosongkan"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+
+          </div>
+
         </div>
 
         {/* Banner Preview & Identity Card */}

@@ -230,6 +230,7 @@ export interface ProfilMadrasahData {
   slogan?: string;
   logoUrl?: string;
   bannerUrl?: string;
+  kopSuratUrl?: string;
 }
 
 export interface PengaturanPPDBData {

@@ -102,31 +102,41 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
         {/* Printable Kuitansi Sheet */}
         <div className="p-6 sm:p-8 bg-white text-slate-900 space-y-5" id="printable-kuitansi">
           
-          {/* Header Kop Surat */}
-          <div className="flex items-center gap-4 pb-4 border-b-2 border-slate-800">
-            <div className="w-16 h-16 rounded-xl border border-slate-300 p-1 flex items-center justify-center shrink-0">
-              {profil.logoUrl ? (
-                <img src={profil.logoUrl} alt="Logo" className="w-full h-full object-contain" />
-              ) : (
-                <span className="font-bold text-xs text-emerald-800 text-center">MTsN 1</span>
-              )}
+          {/* Header Kop Surat (Image or Text Layout) */}
+          {profil.kopSuratUrl ? (
+            <div className="pb-3 border-b-2 border-slate-800 text-center">
+              <img
+                src={profil.kopSuratUrl}
+                alt="Kop Surat Resmi Madrasah"
+                className="w-full h-auto max-h-24 object-contain mx-auto"
+              />
             </div>
-            <div className="flex-1 text-center">
-              <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">
-                {profil.namaMadrasah}
-              </h2>
-              <p className="text-[11px] text-slate-600">
-                {profil.alamat}, {profil.kelurahan}, {profil.kecamatan}, {profil.kabKota}
-              </p>
-              <p className="text-[10px] text-slate-500">
-                Telp: {profil.telepon} | WA: {profil.whatsappCenter} | Email: {profil.email}
-              </p>
+          ) : (
+            <div className="flex items-center gap-4 pb-4 border-b-2 border-slate-800">
+              <div className="w-16 h-16 rounded-xl border border-slate-300 p-1 flex items-center justify-center shrink-0">
+                {profil.logoUrl ? (
+                  <img src={profil.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <span className="font-bold text-xs text-emerald-800 text-center">MTsN 1</span>
+                )}
+              </div>
+              <div className="flex-1 text-center">
+                <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">
+                  {profil.namaMadrasah}
+                </h2>
+                <p className="text-[11px] text-slate-600">
+                  {profil.alamat}, {profil.kelurahan}, {profil.kecamatan}, {profil.kabKota}
+                </p>
+                <p className="text-[10px] text-slate-500">
+                  Telp: {profil.telepon} | WA: {profil.whatsappCenter} | Email: {profil.email}
+                </p>
+              </div>
+              <div className="w-16 h-16 border border-slate-200 rounded-xl p-1 bg-slate-50 flex flex-col items-center justify-center text-[10px] text-center font-bold text-slate-700 shrink-0">
+                <span>PPDB</span>
+                <span className="text-emerald-700">{pengaturan.tahunAjaran}</span>
+              </div>
             </div>
-            <div className="w-16 h-16 border border-slate-200 rounded-xl p-1 bg-slate-50 flex flex-col items-center justify-center text-[10px] text-center font-bold text-slate-700 shrink-0">
-              <span>PPDB</span>
-              <span className="text-emerald-700">{pengaturan.tahunAjaran}</span>
-            </div>
-          </div>
+          )}
 
           {/* Title & Receipt Meta */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl">
