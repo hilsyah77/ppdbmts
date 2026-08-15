@@ -28,7 +28,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-fadeIn print:p-0 print:m-0 print:bg-white print:fixed print:inset-0 print:overflow-hidden">
-      {/* Embedded Print Styles for 1-Page A4 Precision Layout with Font Size 12 */}
+      {/* Embedded Print Styles for 1-Page A4 Precision Layout with Font Size 12 & Spacing 1.5 */}
       <style>{`
         @page {
           size: A4 portrait;
@@ -96,7 +96,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 <h3 className="text-sm font-bold">Cetak Formulir Pendaftaran PPDB</h3>
                 <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                  Font 12 &bull; Ayah & Ibu Sejajar &bull; Full Rapi A4
+                  Font 12 &bull; Spasi 1.5 &bull; Ibu di Bawah Ayah &bull; A4
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
@@ -155,15 +155,15 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
 
         {/* Paper Container Wrapper on Screen */}
         <div className="bg-slate-200/70 p-2 sm:p-4 flex justify-center print:bg-white print:p-0 print:m-0">
-          {/* Printable Paper Area (Full Width, Font Size 12, Crisp Borders & Exact A4 1-Page) */}
+          {/* Printable Paper Area (Full Width, Font Size 12, Spasi 1.5, Crisp Borders & Exact A4 1-Page) */}
           <div
             id="printable-formulir-ppdb"
             ref={printRef}
-            className="w-full max-w-3xl bg-white text-slate-950 shadow-xl border border-slate-300 print:border-none print:shadow-none p-4 sm:p-6 font-sans leading-snug text-[12px] print:p-0"
-            style={{ boxSizing: 'border-box' }}
+            className="w-full max-w-3xl bg-white text-slate-950 shadow-xl border border-slate-300 print:border-none print:shadow-none p-4 sm:p-6 font-sans text-[12px] print:p-0"
+            style={{ boxSizing: 'border-box', lineHeight: '1.5' }}
           >
             {/* 1. Kop Surat Resmi Madrasah */}
-            <div className="border-b-4 border-double border-slate-950 pb-1.5 mb-2 text-center relative">
+            <div className="border-b-4 border-double border-slate-950 pb-1.5 mb-2 text-center relative" style={{ lineHeight: '1.3' }}>
               {/* Logo Madrasah / Kemenag */}
               <div className="absolute left-1 top-0 w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center font-bold text-[11px] text-emerald-800 uppercase tracking-tighter text-center leading-tight overflow-hidden">
                 {profil.logoUrl ? (
@@ -189,7 +189,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
             </div>
 
             {/* 2. Judul Formulir & Kartu Registrasi */}
-            <div className="text-center mb-2">
+            <div className="text-center mb-2" style={{ lineHeight: '1.35' }}>
               <h2 className="text-[13px] font-bold uppercase tracking-wider underline decoration-2 text-slate-950 leading-tight">
                 FORMULIR PENDAFTARAN PESERTA DIDIK BARU (PPDB)
               </h2>
@@ -197,7 +197,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 TAHUN AJARAN {pengaturan.tahunAjaran} &bull; {pengaturan.gelombangActive.toUpperCase()}
               </p>
 
-              <div className="mt-1.5 grid grid-cols-4 gap-1.5 bg-slate-50 border border-slate-300 p-1.5 rounded text-left">
+              <div className="mt-1.5 grid grid-cols-4 gap-1.5 bg-slate-50 border border-slate-300 p-1 rounded text-left" style={{ lineHeight: '1.3' }}>
                 <div className="border-r border-slate-300 pr-1.5">
                   <span className="text-[9px] uppercase font-bold text-slate-600 block">NOMOR REGISTRASI</span>
                   <span className="text-[13px] font-black font-mono text-emerald-950 block truncate">{pendaftar.noRegistrasi}</span>
@@ -217,16 +217,16 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
               </div>
             </div>
 
-            {/* 3. Isi Formulir Pendaftaran (Semua Data Berukuran Font 12) */}
-            <div className="space-y-1.5 text-[12px] text-slate-950">
+            {/* 3. Isi Formulir Pendaftaran (Semua Data Berukuran Font 12 & Spasi 1.5) */}
+            <div className="space-y-1.5 text-[12px] text-slate-950" style={{ lineHeight: '1.5' }}>
               
               {/* A. IDENTITAS CALON PESERTA DIDIK */}
               <div className="border border-slate-400 rounded overflow-hidden">
-                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider flex items-center justify-between">
+                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider flex items-center justify-between" style={{ lineHeight: '1.3' }}>
                   <span>A. IDENTITAS CALON PESERTA DIDIK</span>
                   <span className="text-[10px] font-mono text-emerald-300 font-normal">Data Calon Siswa</span>
                 </div>
-                <table className="w-full text-[12px] border-collapse">
+                <table className="w-full text-[12px] border-collapse" style={{ lineHeight: '1.5' }}>
                   <tbody>
                     <tr className="border-b border-slate-200">
                       <td className="py-0.5 px-2.5 w-48 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">1. Nama Lengkap</td>
@@ -252,7 +252,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                     </tr>
                     <tr>
                       <td className="py-0.5 px-2.5 w-48 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">6. Alamat Lengkap Siswa</td>
-                      <td className="py-0.5 px-2.5 leading-tight text-slate-950 text-[12px]">
+                      <td className="py-0.5 px-2.5 text-slate-950 text-[12px]">
                         {pendaftar.alamatSiswa}, RT/RW {pendaftar.rtRw}, Kel. {pendaftar.kelurahan}, Kec. {pendaftar.kecamatan}, {pendaftar.kabKota}, Prov. {pendaftar.provinsi}
                       </td>
                     </tr>
@@ -262,10 +262,10 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
 
               {/* B. SEKOLAH ASAL */}
               <div className="border border-slate-400 rounded overflow-hidden">
-                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider">
+                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider" style={{ lineHeight: '1.3' }}>
                   B. SEKOLAH ASAL
                 </div>
-                <table className="w-full text-[12px] border-collapse">
+                <table className="w-full text-[12px] border-collapse" style={{ lineHeight: '1.5' }}>
                   <tbody>
                     <tr className="border-b border-slate-200">
                       <td className="py-0.5 px-2.5 w-48 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">1. Nama Sekolah Asal</td>
@@ -279,58 +279,52 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 </table>
               </div>
 
-              {/* C. DATA ORANG TUA / WALI SISWA (SEJAJAR 2 KOLOM: AYAH & IBU) */}
+              {/* C. DATA ORANG TUA / WALI SISWA (IBU KANDUNG DI BAWAH IDENTITAS AYAH) */}
               <div className="border border-slate-400 rounded overflow-hidden">
-                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider">
+                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider" style={{ lineHeight: '1.3' }}>
                   C. DATA ORANG TUA / WALI SISWA
                 </div>
-                <div className="grid grid-cols-2 divide-x divide-slate-300">
-                  {/* Kolom Kiri: Ayah Kandung / Wali */}
-                  <div>
-                    <div className="bg-slate-100 font-bold px-2.5 py-0.5 text-[11px] text-slate-800 border-b border-slate-200 uppercase tracking-wide">
-                      Identitas Ayah Kandung / Wali
-                    </div>
-                    <table className="w-full text-[12px] border-collapse">
-                      <tbody>
-                        <tr className="border-b border-slate-200">
-                          <td className="py-0.5 px-2 w-32 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">1. Nama Ayah</td>
-                          <td className="py-0.5 px-2 font-bold uppercase text-slate-950 text-[12px]">{pendaftar.namaAyah}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-0.5 px-2 w-32 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">2. Pekerjaan Ayah</td>
-                          <td className="py-0.5 px-2 text-slate-950 text-[12px]">{pendaftar.pekerjaanAyah}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                <table className="w-full text-[12px] border-collapse" style={{ lineHeight: '1.5' }}>
+                  <tbody>
+                    {/* Header Identitas Ayah */}
+                    <tr className="bg-slate-100 border-b border-slate-200">
+                      <td colSpan={2} className="py-0.5 px-2.5 font-bold text-[11px] text-slate-800 uppercase tracking-wide" style={{ lineHeight: '1.3' }}>
+                        Identitas Ayah Kandung / Wali
+                      </td>
+                    </tr>
+                    <tr className="border-b border-slate-200">
+                      <td className="py-0.5 px-2.5 w-48 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">1. Nama Ayah</td>
+                      <td className="py-0.5 px-2.5 font-bold uppercase text-slate-950 text-[12px]">{pendaftar.namaAyah}</td>
+                    </tr>
+                    <tr className="border-b border-slate-200">
+                      <td className="py-0.5 px-2.5 w-48 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">2. Pekerjaan Ayah</td>
+                      <td className="py-0.5 px-2.5 text-slate-950 text-[12px]">{pendaftar.pekerjaanAyah}</td>
+                    </tr>
 
-                  {/* Kolom Kanan: Ibu Kandung (Sejajar dengan Ayah) */}
-                  <div>
-                    <div className="bg-slate-100 font-bold px-2.5 py-0.5 text-[11px] text-slate-800 border-b border-slate-200 uppercase tracking-wide">
-                      Identitas Ibu Kandung
-                    </div>
-                    <table className="w-full text-[12px] border-collapse">
-                      <tbody>
-                        <tr className="border-b border-slate-200">
-                          <td className="py-0.5 px-2 w-32 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">1. Nama Ibu</td>
-                          <td className="py-0.5 px-2 font-bold uppercase text-slate-950 text-[12px]">{pendaftar.namaIbu}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-0.5 px-2 w-32 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">2. Pekerjaan Ibu</td>
-                          <td className="py-0.5 px-2 text-slate-950 text-[12px]">{pendaftar.pekerjaanIbu}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                    {/* Header Identitas Ibu (Di bawah Ayah) */}
+                    <tr className="bg-slate-100 border-b border-slate-200">
+                      <td colSpan={2} className="py-0.5 px-2.5 font-bold text-[11px] text-slate-800 uppercase tracking-wide" style={{ lineHeight: '1.3' }}>
+                        Identitas Ibu Kandung
+                      </td>
+                    </tr>
+                    <tr className="border-b border-slate-200">
+                      <td className="py-0.5 px-2.5 w-48 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">1. Nama Ibu</td>
+                      <td className="py-0.5 px-2.5 font-bold uppercase text-slate-950 text-[12px]">{pendaftar.namaIbu}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-0.5 px-2.5 w-48 font-medium bg-slate-50 border-r border-slate-200 text-slate-700">2. Pekerjaan Ibu</td>
+                      <td className="py-0.5 px-2.5 text-slate-950 text-[12px]">{pendaftar.pekerjaanIbu}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
               {/* D. STATUS KELENGKAPAN BERKAS PERSYARATAN */}
               <div className="border border-slate-400 rounded overflow-hidden">
-                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider">
+                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider" style={{ lineHeight: '1.3' }}>
                   D. STATUS KELENGKAPAN BERKAS PERSYARATAN
                 </div>
-                <div className="p-1.5 bg-white grid grid-cols-5 gap-1.5 text-[10.5px]">
+                <div className="p-1.5 bg-white grid grid-cols-5 gap-1.5 text-[10px]" style={{ lineHeight: '1.4' }}>
                   <div className="flex items-center gap-1.5">
                     <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center font-bold text-[9px] ${pendaftar.berkas.ijazahSkl ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50'}`}>
                       {pendaftar.berkas.ijazahSkl ? '✓' : ''}
@@ -364,11 +358,11 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 </div>
               </div>
 
-              {/* 4. BLOK PENGESAHAN & PASFOTO 3X4 (RAPAT & PROPORSIONAL DENGAN FONT 12) */}
-              <div className="pt-1.5 grid grid-cols-3 gap-2.5 text-center text-[11px]">
+              {/* 4. BLOK PENGESAHAN & PASFOTO 3X4 */}
+              <div className="pt-1 grid grid-cols-3 gap-2.5 text-center text-[11px]" style={{ lineHeight: '1.4' }}>
                 {/* Kotak Pasfoto 3x4 Proporsional Standar */}
                 <div className="flex flex-col items-center justify-center">
-                  <div className="w-18 h-24 border-2 border-dashed border-slate-400 bg-slate-50/80 flex flex-col items-center justify-center text-[9px] text-slate-400 font-bold p-1 rounded uppercase">
+                  <div className="w-18 h-22 border-2 border-dashed border-slate-400 bg-slate-50/80 flex flex-col items-center justify-center text-[9px] text-slate-400 font-bold p-1 rounded uppercase">
                     <span>TEMPEL</span>
                     <span>PASFOTO</span>
                     <span className="text-[11px] text-slate-700 font-black mt-0.5">3 X 4</span>
@@ -376,7 +370,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 </div>
 
                 {/* Tanda Tangan Orang Tua / Calon Siswa */}
-                <div className="flex flex-col justify-between h-24 py-0.5">
+                <div className="flex flex-col justify-between h-22 py-0.5">
                   <div>
                     <p className="text-slate-600 text-[11px]">Calon Siswa / Orang Tua,</p>
                   </div>
@@ -387,7 +381,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 </div>
 
                 {/* Tanda Tangan Panitia PPDB */}
-                <div className="flex flex-col justify-between h-24 py-0.5">
+                <div className="flex flex-col justify-between h-22 py-0.5">
                   <div>
                     <p className="text-slate-600 text-[11px]">
                       {profil.kabKota.replace('Kota ', '').replace('Kab. ', '')}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -402,7 +396,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
               </div>
 
               {/* 5. PRINT FOOTER CATATAN RESMI */}
-              <div className="pt-1 border-t border-slate-300 text-[8.5px] text-slate-500 flex justify-between items-center">
+              <div className="pt-1 border-t border-slate-300 text-[8px] text-slate-500 flex justify-between items-center" style={{ lineHeight: '1.2' }}>
                 <span>&bull; Bukti Pendaftaran Resmi PPDB {profil.namaMadrasah} TA {pengaturan.tahunAjaran} &bull; Dicetak pada: {new Date().toLocaleString('id-ID')}</span>
                 <span className="font-mono font-semibold">1 Halaman Dokumen Resmi PPDB</span>
               </div>
@@ -415,7 +409,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
         <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex justify-between items-center rounded-b-2xl print:hidden">
           <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            Format cetak formulir PPDB dengan ukuran font 12, ayah & ibu sejajar, pas 1 halaman A4.
+            Format cetak: Identitas Ibu di bawah Ayah &bull; Spasi 1.5 &bull; Font 12 &bull; 1 Halaman A4.
           </div>
           <div className="flex items-center gap-2">
             <button
