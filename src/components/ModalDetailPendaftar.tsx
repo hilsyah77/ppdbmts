@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  AlertTriangle,
   Users,
   Edit3,
   Save,
@@ -42,11 +43,17 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Pendaftar | null>(pendaftar);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: boolean }>({});
+  const [missingFieldsList, setMissingFieldsList] = useState<string[]>([]);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   useEffect(() => {
     setFormData(pendaftar);
     setIsEditing(false);
     setSavedSuccess(false);
+    setValidationErrors({});
+    setMissingFieldsList([]);
+    setShowErrorAlert(false);
   }, [pendaftar]);
 
   if (!pendaftar || !formData) return null;
@@ -62,6 +69,13 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
         [name]: value
       };
     });
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
   };
 
   const handleNumberInputChange = (
@@ -75,6 +89,13 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
         [name]: value === '' ? undefined : Number(value)
       };
     });
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
   };
 
   const handleBerkasToggle = (key: keyof Pendaftar['berkas']) => {
@@ -117,19 +138,158 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
   };
 
   const handleSave = () => {
-    if (onSavePendaftar && formData) {
+    if (!formData) return;
+
+    const errors: { [key: string]: boolean } = {};
+    const missing: string[] = [];
+
+    // 1. Identitas Calon Siswa
+    if (!formData.namaLengkap?.trim()) {
+      errors.namaLengkap = true;
+      missing.push('Nama Lengkap Siswa');
+    }
+    if (!formData.tempatLahir?.trim()) {
+      errors.tempatLahir = true;
+      missing.push('Tempat Lahir');
+    }
+    if (!formData.tanggalLahir?.trim()) {
+      errors.tanggalLahir = true;
+      missing.push('Tanggal Lahir');
+    }
+    if (!formData.jenisKelamin) {
+      errors.jenisKelamin = true;
+      missing.push('Jenis Kelamin');
+    }
+    if (!formData.nisn?.trim()) {
+      errors.nisn = true;
+      missing.push('NISN');
+    }
+    if (!formData.nik?.trim()) {
+      errors.nik = true;
+      missing.push('NIK Siswa');
+    }
+    if (formData.jumlahSaudara === undefined || formData.jumlahSaudara === null || String(formData.jumlahSaudara).trim() === '') {
+      errors.jumlahSaudara = true;
+      missing.push('Jumlah Saudara');
+    }
+    if (formData.anakKe === undefined || formData.anakKe === null || String(formData.anakKe).trim() === '') {
+      errors.anakKe = true;
+      missing.push('Anak Ke-');
+    }
+    if (!formData.pembiayaSekolah?.trim()) {
+      errors.pembiayaSekolah = true;
+      missing.push('Yang Membiayai Sekolah');
+    }
+    if (!formData.noKk?.trim()) {
+      errors.noKk = true;
+      missing.push('Nomor Kartu Keluarga (No. KK)');
+    }
+    if (!formData.noHpWa?.trim()) {
+      errors.noHpWa = true;
+      missing.push('No. HP / WhatsApp Siswa');
+    }
+    if (!formData.alamatSiswa?.trim()) {
+      errors.alamatSiswa = true;
+      missing.push('Alamat Tempat Tinggal');
+    }
+
+    // 2. Sekolah Asal
+    if (!formData.sekolahAsal?.trim()) {
+      errors.sekolahAsal = true;
+      missing.push('Nama Sekolah Asal');
+    }
+    if (!formData.npsnSekolahAsal?.trim()) {
+      errors.npsnSekolahAsal = true;
+      missing.push('NPSN Sekolah Asal');
+    }
+
+    // 3. Data Ayah
+    if (!formData.statusAyah?.trim()) {
+      errors.statusAyah = true;
+      missing.push('Status Ayah');
+    }
+    if (!formData.namaAyah?.trim()) {
+      errors.namaAyah = true;
+      missing.push('Nama Ayah');
+    }
+    if (!formData.nikAyah?.trim()) {
+      errors.nikAyah = true;
+      missing.push('NIK Ayah (16 Digit)');
+    }
+    if (!formData.tempatLahirAyah?.trim()) {
+      errors.tempatLahirAyah = true;
+      missing.push('Tempat Lahir (Ayah)');
+    }
+    if (!formData.tanggalLahirAyah?.trim()) {
+      errors.tanggalLahirAyah = true;
+      missing.push('Tgl Lahir (yyyy-mm-dd) (Ayah)');
+    }
+    if (!formData.pendidikanAyah?.trim()) {
+      errors.pendidikanAyah = true;
+      missing.push('Pendidikan (Ayah)');
+    }
+    if (!formData.pekerjaanAyah?.trim()) {
+      errors.pekerjaanAyah = true;
+      missing.push('Pekerjaan (Ayah)');
+    }
+
+    // 4. Data Ibu
+    if (!formData.statusIbu?.trim()) {
+      errors.statusIbu = true;
+      missing.push('Status Ibu');
+    }
+    if (!formData.namaIbu?.trim()) {
+      errors.namaIbu = true;
+      missing.push('Nama Ibu');
+    }
+    if (!formData.nikIbu?.trim()) {
+      errors.nikIbu = true;
+      missing.push('NIK Ibu (16 Digit)');
+    }
+    if (!formData.tempatLahirIbu?.trim()) {
+      errors.tempatLahirIbu = true;
+      missing.push('Tempat Lahir (Ibu)');
+    }
+    if (!formData.tanggalLahirIbu?.trim()) {
+      errors.tanggalLahirIbu = true;
+      missing.push('Tgl Lahir (yyyy-mm-dd) (Ibu)');
+    }
+    if (!formData.pendidikanIbu?.trim()) {
+      errors.pendidikanIbu = true;
+      missing.push('Pendidikan (Ibu)');
+    }
+    if (!formData.pekerjaanIbu?.trim()) {
+      errors.pekerjaanIbu = true;
+      missing.push('Pekerjaan (Ibu)');
+    }
+
+    if (missing.length > 0) {
+      setValidationErrors(errors);
+      setMissingFieldsList(missing);
+      setShowErrorAlert(true);
+      return;
+    }
+
+    setValidationErrors({});
+    setMissingFieldsList([]);
+    setShowErrorAlert(false);
+
+    if (onSavePendaftar) {
       onSavePendaftar(formData);
       setIsEditing(false);
       setSavedSuccess(true);
       setTimeout(() => {
         setSavedSuccess(false);
-      }, 3000);
+      }, 3500);
     }
   };
 
   const handleCancel = () => {
     setFormData(pendaftar);
     setIsEditing(false);
+    setValidationErrors({});
+    setMissingFieldsList([]);
+    setShowErrorAlert(false);
   };
 
   return (
@@ -188,7 +348,7 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
 
         {/* Success Toast Banner */}
         {savedSuccess && (
-          <div className="bg-emerald-50 border-b border-emerald-200 px-6 py-2.5 flex items-center justify-between text-emerald-800 text-xs font-bold">
+          <div className="bg-emerald-50 border-b border-emerald-200 px-6 py-2.5 flex items-center justify-between text-emerald-800 text-xs font-bold animate-fadeIn">
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-600" />
               <span>Data pendaftar berhasil diperbarui dan disimpan!</span>
@@ -202,9 +362,57 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
           </div>
         )}
 
+        {/* Error Alert Box when required fields are missing */}
+        {showErrorAlert && (
+          <div className="bg-rose-50 border-b border-rose-200 px-6 py-4 text-rose-900 text-xs animate-fadeIn">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5">
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-bold text-sm text-rose-800">
+                    Gagal Menyimpan Data! Terdapat Kolom Wajib yang Belum Terisi
+                  </div>
+                  <p className="text-rose-700 mt-1">
+                    Semua kolom yang bertanda bintang (<span className="text-rose-600 font-bold">*</span>) wajib diisi agar perubahan data pendaftar dapat disimpan ke dalam sistem. Silakan lengkapi kolom berikut:
+                  </p>
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {missingFieldsList.map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center px-2 py-0.5 rounded-md bg-rose-100 border border-rose-300 text-rose-800 text-[11px] font-semibold"
+                      >
+                        • {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowErrorAlert(false)}
+                className="text-rose-500 hover:text-rose-800 font-bold text-xs p-1"
+                title="Tutup Pesan"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Modal Body */}
         <div className="p-6 space-y-6 text-xs text-slate-700">
           
+          {/* Mode Edit Notice */}
+          {isEditing && (
+            <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-300 flex items-center justify-between text-xs text-amber-900">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  <strong>Mode Edit Data Aktif:</strong> Kolom dengan tanda bintang (<span className="text-rose-600 font-bold">*</span>) wajib diisi agar data berhasil disimpan.
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Status Alert Banner */}
           {!isEditing && (
             <div className="p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 border-slate-200">
@@ -363,75 +571,131 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
               // EDITING FORM
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-amber-50/40 p-4 rounded-xl border border-amber-200">
                 <div className="col-span-1 sm:col-span-2">
-                  <label className="block font-semibold text-slate-700 mb-1">Nama Lengkap Siswa</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Nama Lengkap Siswa <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="namaLengkap"
                     value={formData.namaLengkap}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-900 bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-bold text-slate-900 bg-white ${
+                      validationErrors.namaLengkap
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.namaLengkap && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Tempat Lahir</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Tempat Lahir <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="tempatLahir"
                     value={formData.tempatLahir}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                      validationErrors.tempatLahir
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.tempatLahir && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Tanggal Lahir</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Tanggal Lahir <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="date"
                     name="tanggalLahir"
                     value={formData.tanggalLahir}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                      validationErrors.tanggalLahir
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.tanggalLahir && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Jenis Kelamin <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <select
                     name="jenisKelamin"
                     value={formData.jenisKelamin}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white font-medium ${
+                      validationErrors.jenisKelamin
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   >
                     <option value="Laki-laki">Laki-laki</option>
                     <option value="Perempuan">Perempuan</option>
                   </select>
+                  {validationErrors.jenisKelamin && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">NISN</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    NISN <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="nisn"
                     value={formData.nisn}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                      validationErrors.nisn
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.nisn && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">NIK Siswa</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    NIK Siswa <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="nik"
                     value={formData.nik}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                      validationErrors.nik
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.nik && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Jumlah Saudara</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Jumlah Saudara <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="number"
                     name="jumlahSaudara"
@@ -439,12 +703,21 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                     value={formData.jumlahSaudara ?? ''}
                     onChange={handleNumberInputChange}
                     placeholder="2"
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white font-medium ${
+                      validationErrors.jumlahSaudara
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.jumlahSaudara && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Anak Ke-</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Anak Ke- <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="number"
                     name="anakKe"
@@ -452,35 +725,60 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                     value={formData.anakKe ?? ''}
                     onChange={handleNumberInputChange}
                     placeholder="1"
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white font-medium ${
+                      validationErrors.anakKe
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.anakKe && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Yang Membiayai Sekolah</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Yang Membiayai Sekolah <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <select
                     name="pembiayaSekolah"
                     value={formData.pembiayaSekolah || 'Orang Tua'}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white font-medium ${
+                      validationErrors.pembiayaSekolah
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   >
                     <option value="Orang Tua">Orang Tua</option>
                     <option value="Wali / Orang Tua Asuh">Wali / Orang Tua Asuh</option>
                     <option value="Tanggungan Sendiri">Tanggungan Sendiri</option>
                     <option value="Lainnya">Lainnya</option>
                   </select>
+                  {validationErrors.pembiayaSekolah && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Nomor Kartu Keluarga (No. KK)</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Nomor Kartu Keluarga (No. KK) <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="noKk"
                     value={formData.noKk || ''}
                     onChange={handleInputChange}
                     placeholder="3174010000000001"
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                      validationErrors.noKk
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.noKk && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
@@ -558,14 +856,23 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">No. HP / WhatsApp Siswa</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    No. HP / WhatsApp Siswa <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="noHpWa"
                     value={formData.noHpWa}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                      validationErrors.noHpWa
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.noHpWa && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
@@ -585,15 +892,24 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                 </div>
 
                 <div className="col-span-1 sm:col-span-2 space-y-2 pt-1 border-t border-amber-200">
-                  <label className="block font-semibold text-slate-700">Alamat Tempat Tinggal</label>
+                  <label className="block font-semibold text-slate-700">
+                    Alamat Tempat Tinggal <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="alamatSiswa"
                     placeholder="Jalan / Kampung / Dusun"
                     value={formData.alamatSiswa}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                      validationErrors.alamatSiswa
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.alamatSiswa && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <input
                       type="text"
@@ -664,26 +980,44 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
               // EDITING FORM
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-amber-50/40 p-4 rounded-xl border border-amber-200">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Nama Sekolah Asal</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Nama Sekolah Asal <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="sekolahAsal"
                     value={formData.sekolahAsal}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-medium bg-white ${
+                      validationErrors.sekolahAsal
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.sekolahAsal && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">NPSN Sekolah Asal</label>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    NPSN Sekolah Asal <span className="text-rose-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
                     name="npsnSekolahAsal"
                     value={formData.npsnSekolahAsal || ''}
                     onChange={handleInputChange}
                     placeholder="Contoh: 20108374 (8 Digit)"
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                    className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                      validationErrors.npsnSekolahAsal
+                        ? 'border-rose-500 ring-2 ring-rose-300'
+                        : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                    }`}
                   />
+                  {validationErrors.npsnSekolahAsal && (
+                    <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                  )}
                 </div>
               </div>
             )}
@@ -787,91 +1121,154 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                       Data Ayah Kandung / Wali
                     </div>
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Status Ayah</label>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Status Ayah <span className="text-rose-500 font-bold">*</span>
+                      </label>
                       <select
                         name="statusAyah"
                         value={formData.statusAyah || 'Masih Hidup'}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                        className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white font-medium ${
+                          validationErrors.statusAyah
+                            ? 'border-rose-500 ring-2 ring-rose-300'
+                            : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                        }`}
                       >
                         {OPSI_STATUS_ORANG_TUA.map((s) => (
                           <option key={s} value={s}>{s}</option>
                         ))}
                       </select>
+                      {validationErrors.statusAyah && (
+                        <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Nama Ayah</label>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Nama Ayah <span className="text-rose-500 font-bold">*</span>
+                      </label>
                       <input
                         type="text"
                         name="namaAyah"
                         value={formData.namaAyah}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold bg-white"
+                        className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-bold bg-white ${
+                          validationErrors.namaAyah
+                            ? 'border-rose-500 ring-2 ring-rose-300'
+                            : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                        }`}
                       />
+                      {validationErrors.namaAyah && (
+                        <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">NIK Ayah (16 Digit)</label>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        NIK Ayah (16 Digit) <span className="text-rose-500 font-bold">*</span>
+                      </label>
                       <input
                         type="text"
                         name="nikAyah"
                         value={formData.nikAyah || ''}
                         onChange={handleInputChange}
                         placeholder="Contoh: 3174010000000001"
-                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                        className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                          validationErrors.nikAyah
+                            ? 'border-rose-500 ring-2 ring-rose-300'
+                            : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                        }`}
                       />
+                      {validationErrors.nikAyah && (
+                        <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Tempat Lahir</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Tempat Lahir <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <input
                           type="text"
                           name="tempatLahirAyah"
                           value={formData.tempatLahirAyah || ''}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                            validationErrors.tempatLahirAyah
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         />
+                        {validationErrors.tempatLahirAyah && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Tgl Lahir (yyyy-mm-dd)</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Tgl Lahir (yyyy-mm-dd) <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <input
                           type="date"
                           name="tanggalLahirAyah"
                           value={formData.tanggalLahirAyah || ''}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                            validationErrors.tanggalLahirAyah
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         />
+                        {validationErrors.tanggalLahirAyah && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Pendidikan</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Pendidikan <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <select
                           name="pendidikanAyah"
                           value={formData.pendidikanAyah || 'SMA/Sederajat'}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                            validationErrors.pendidikanAyah
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         >
                           {OPSI_PENDIDIKAN_ORANG_TUA.map((p) => (
                             <option key={p} value={p}>{p}</option>
                           ))}
                         </select>
+                        {validationErrors.pendidikanAyah && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Pekerjaan</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Pekerjaan <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <select
                           name="pekerjaanAyah"
                           value={formData.pekerjaanAyah || 'Wiraswasta'}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                            validationErrors.pekerjaanAyah
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         >
                           {OPSI_PEKERJAAN_ORANG_TUA.map((p) => (
                             <option key={p} value={p}>{p}</option>
                           ))}
                         </select>
+                        {validationErrors.pekerjaanAyah && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -882,91 +1279,154 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                       Data Ibu Kandung
                     </div>
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Status Ibu</label>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Status Ibu <span className="text-rose-500 font-bold">*</span>
+                      </label>
                       <select
                         name="statusIbu"
                         value={formData.statusIbu || 'Masih Hidup'}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
+                        className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white font-medium ${
+                          validationErrors.statusIbu
+                            ? 'border-rose-500 ring-2 ring-rose-300'
+                            : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                        }`}
                       >
                         {OPSI_STATUS_ORANG_TUA.map((s) => (
                           <option key={s} value={s}>{s}</option>
                         ))}
                       </select>
+                      {validationErrors.statusIbu && (
+                        <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Nama Ibu</label>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Nama Ibu <span className="text-rose-500 font-bold">*</span>
+                      </label>
                       <input
                         type="text"
                         name="namaIbu"
                         value={formData.namaIbu}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold bg-white"
+                        className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-bold bg-white ${
+                          validationErrors.namaIbu
+                            ? 'border-rose-500 ring-2 ring-rose-300'
+                            : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                        }`}
                       />
+                      {validationErrors.namaIbu && (
+                        <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">NIK Ibu (16 Digit)</label>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        NIK Ibu (16 Digit) <span className="text-rose-500 font-bold">*</span>
+                      </label>
                       <input
                         type="text"
                         name="nikIbu"
                         value={formData.nikIbu || ''}
                         onChange={handleInputChange}
                         placeholder="Contoh: 3174010000000002"
-                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                        className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                          validationErrors.nikIbu
+                            ? 'border-rose-500 ring-2 ring-rose-300'
+                            : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                        }`}
                       />
+                      {validationErrors.nikIbu && (
+                        <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Tempat Lahir</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Tempat Lahir <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <input
                           type="text"
                           name="tempatLahirIbu"
                           value={formData.tempatLahirIbu || ''}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                            validationErrors.tempatLahirIbu
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         />
+                        {validationErrors.tempatLahirIbu && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Tgl Lahir (yyyy-mm-dd)</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Tgl Lahir (yyyy-mm-dd) <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <input
                           type="date"
                           name="tanggalLahirIbu"
                           value={formData.tanggalLahirIbu || ''}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none font-mono bg-white ${
+                            validationErrors.tanggalLahirIbu
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         />
+                        {validationErrors.tanggalLahirIbu && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Pendidikan</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Pendidikan <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <select
                           name="pendidikanIbu"
                           value={formData.pendidikanIbu || 'SMA/Sederajat'}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                            validationErrors.pendidikanIbu
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         >
                           {OPSI_PENDIDIKAN_ORANG_TUA.map((p) => (
                             <option key={p} value={p}>{p}</option>
                           ))}
                         </select>
+                        {validationErrors.pendidikanIbu && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">Pekerjaan</label>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Pekerjaan <span className="text-rose-500 font-bold">*</span>
+                        </label>
                         <select
                           name="pekerjaanIbu"
                           value={formData.pekerjaanIbu || 'Tidak Bekerja'}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                          className={`w-full px-3 py-1.5 border rounded-lg focus:outline-none bg-white ${
+                            validationErrors.pekerjaanIbu
+                              ? 'border-rose-500 ring-2 ring-rose-300'
+                              : 'border-slate-300 focus:ring-2 focus:ring-emerald-500'
+                          }`}
                         >
                           {OPSI_PEKERJAAN_ORANG_TUA.map((p) => (
                             <option key={p} value={p}>{p}</option>
                           ))}
                         </select>
+                        {validationErrors.pekerjaanIbu && (
+                          <span className="text-[11px] text-rose-600 font-semibold block mt-1">Wajib diisi *</span>
+                        )}
                       </div>
                     </div>
                   </div>

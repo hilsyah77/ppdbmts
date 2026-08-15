@@ -27,7 +27,8 @@ import {
   CreditCard,
   ArrowRight,
   Sparkles,
-  FileSpreadsheet
+  FileSpreadsheet,
+  X
 } from 'lucide-react';
 import { ModalKuitansi } from './ModalKuitansi';
 import { ModalBayar } from './ModalBayar';
@@ -250,8 +251,15 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
     e.preventDefault();
     if (!editingItemBiaya) return;
 
+    const rincianVal = editingItemBiaya.kategori || editingItemBiaya.namaKomponen;
+    const updated = {
+      ...editingItemBiaya,
+      keteranganPutra: rincianVal,
+      keteranganPutri: rincianVal
+    };
+
     setItemBiayaList((prev) =>
-      prev.map((item) => (item.id === editingItemBiaya.id ? editingItemBiaya : item))
+      prev.map((item) => (item.id === editingItemBiaya.id ? updated : item))
     );
     setEditingItemBiaya(null);
   };
@@ -288,12 +296,16 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
   // Handler for adding new component
   const handleAddNewComponent = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalName = newItemForm.namaKomponen.trim();
-    if (!finalName) return;
+    const finalKategori = newItemForm.namaKomponen.trim();
+    const finalRincian = newItemForm.kategori.trim();
+    if (!finalKategori || !finalRincian) return;
 
     const newItem: ItemBiayaPembayaran = {
       ...newItemForm,
-      namaKomponen: finalName,
+      namaKomponen: finalKategori,
+      kategori: finalRincian,
+      keteranganPutra: finalRincian,
+      keteranganPutri: finalRincian,
       id: `biaya-${Date.now()}`
     };
 
@@ -525,14 +537,16 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                           <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold flex items-center justify-center">
                             {idx + 1}
                           </span>
-                          <span>{item.namaKomponen}</span>
+                          <span>{item.kategori || item.namaKomponen}</span>
                         </span>
                         <span className="font-mono text-blue-900 font-bold">
                           Rp {item.nominalPutra.toLocaleString('id-ID')}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 pl-7 leading-relaxed">
-                        {item.keteranganPutra}
+                        <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded font-semibold mr-1.5">
+                          {item.namaKomponen}
+                        </span>
                       </p>
                     </div>
                   ))}
@@ -577,14 +591,16 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                           <span className="w-5 h-5 rounded-full bg-pink-100 text-pink-800 text-[10px] font-bold flex items-center justify-center">
                             {idx + 1}
                           </span>
-                          <span>{item.namaKomponen}</span>
+                          <span>{item.kategori || item.namaKomponen}</span>
                         </span>
                         <span className="font-mono text-pink-900 font-bold">
                           Rp {item.nominalPutri.toLocaleString('id-ID')}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 pl-7 leading-relaxed">
-                        {item.keteranganPutri}
+                        <span className="text-[10px] bg-pink-50 text-pink-700 border border-pink-200 px-1.5 py-0.5 rounded font-semibold mr-1.5">
+                          {item.namaKomponen}
+                        </span>
                       </p>
                     </div>
                   ))}
@@ -630,7 +646,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                   Kelola Master Data Komponen Biaya
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  Klik tombol "Edit" untuk mengubah nominal Putra atau Putri secara spesifik.
+                  Kelola kategori, rincian biaya, serta nominal untuk calon siswa Putra dan Putri.
                 </p>
               </div>
 
@@ -648,8 +664,8 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                 <thead>
                   <tr className="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200 text-[11px]">
                     <th className="p-3">No</th>
-                    <th className="p-3">Nama Komponen Biaya</th>
                     <th className="p-3">Kategori</th>
+                    <th className="p-3">Rincian</th>
                     <th className="p-3 text-right text-blue-900 bg-blue-50/50">Putra (Rp)</th>
                     <th className="p-3 text-right text-pink-900 bg-pink-50/50">Putri (Rp)</th>
                     <th className="p-3">Sifat</th>
@@ -661,13 +677,10 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="p-3 font-bold text-slate-400">{idx + 1}</td>
                       <td className="p-3 font-bold text-slate-800">
-                        <div>{item.namaKomponen}</div>
-                        <div className="text-[10px] text-slate-400 font-normal">
-                          L: {item.keteranganPutra.slice(0, 40)}...
-                        </div>
+                        {item.namaKomponen}
                       </td>
                       <td className="p-3">
-                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold text-[10px]">
+                        <span className="font-semibold text-slate-800">
                           {item.kategori}
                         </span>
                       </td>
@@ -687,14 +700,14 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                           <button
                             onClick={() => handleOpenEditComponent(item)}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit Komponen"
+                            title="Edit Rincian Biaya"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => handleDeleteComponent(item.id, item.namaKomponen)}
+                            onClick={() => handleDeleteComponent(item.id, item.kategori || item.namaKomponen)}
                             className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Hapus Komponen"
+                            title="Hapus Rincian Biaya"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -1004,12 +1017,21 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
       {editingItemBiaya && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="font-bold text-base text-slate-900 border-b border-slate-200 pb-2">
-              Edit Komponen Biaya: {editingItemBiaya.namaKomponen}
-            </h3>
-            <form onSubmit={handleSaveEditedComponent} className="space-y-3 text-xs">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+              <h3 className="font-bold text-base text-slate-900">
+                Edit Komponen Biaya: {editingItemBiaya.kategori || editingItemBiaya.namaKomponen}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingItemBiaya(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveEditedComponent} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Nama Komponen Biaya *</label>
+                <label className="block font-bold text-slate-700 mb-1">Kategori *</label>
                 <select
                   value={
                     ['Pembayaran Administrasi keuangan', 'Pembelian Pakaian Seragam'].includes(editingItemBiaya.namaKomponen) && !isCustomEditName
@@ -1046,7 +1068,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                 >
                   <option value="Pembayaran Administrasi keuangan">1. Pembayaran Administrasi keuangan</option>
                   <option value="Pembelian Pakaian Seragam">2. Pembelian Pakaian Seragam</option>
-                  <option value="Lainnya">Lainnya / Nama Khusus</option>
+                  <option value="Lainnya">Lainnya / Kategori Khusus</option>
                 </select>
 
                 {(!['Pembayaran Administrasi keuangan', 'Pembelian Pakaian Seragam'].includes(editingItemBiaya.namaKomponen) || isCustomEditName) && (
@@ -1055,7 +1077,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     value={editingItemBiaya.namaKomponen}
                     onChange={(e) => setEditingItemBiaya({ ...editingItemBiaya, namaKomponen: e.target.value })}
                     className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
-                    placeholder="Ketik nama komponen biaya khusus..."
+                    placeholder="Ketik kategori biaya..."
                     required
                   />
                 )}
@@ -1063,7 +1085,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Kategori *</label>
+                  <label className="block font-bold text-slate-700 mb-1">Rincian *</label>
                   <select
                     value={isCustomEditKategori ? 'Lainnya' : editingItemBiaya.kategori}
                     onChange={(e) => {
@@ -1138,7 +1160,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                         });
                       }}
                       className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
-                      placeholder="Ketik nama kategori kustom..."
+                      placeholder="Ketik rincian item biaya..."
                       required
                     />
                   )}
@@ -1180,37 +1202,17 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Rincian / Keterangan Putra</label>
-                <input
-                  type="text"
-                  value={editingItemBiaya.keteranganPutra}
-                  onChange={(e) => setEditingItemBiaya({ ...editingItemBiaya, keteranganPutra: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Rincian / Keterangan Putri</label>
-                <input
-                  type="text"
-                  value={editingItemBiaya.keteranganPutri}
-                  onChange={(e) => setEditingItemBiaya({ ...editingItemBiaya, keteranganPutri: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
-
               <div className="pt-3 border-t flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setEditingItemBiaya(null)}
-                  className="px-3 py-1.5 border rounded-lg hover:bg-slate-100"
+                  className="px-3.5 py-2 border border-slate-300 rounded-xl hover:bg-slate-100 font-semibold"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700"
+                  className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-sm"
                 >
                   Simpan Perubahan
                 </button>
@@ -1224,12 +1226,21 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
       {isAddItemModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="font-bold text-base text-slate-900 border-b border-slate-200 pb-2">
-              Tambah Komponen Biaya Baru
-            </h3>
-            <form onSubmit={handleAddNewComponent} className="space-y-3 text-xs">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+              <h3 className="font-bold text-base text-slate-900">
+                Tambah Komponen Biaya Baru
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsAddItemModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleAddNewComponent} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Nama Komponen Biaya *</label>
+                <label className="block font-bold text-slate-700 mb-1">Kategori *</label>
                 <select
                   value={isCustomAddName ? 'Lainnya' : newItemForm.namaKomponen}
                   onChange={(e) => {
@@ -1276,7 +1287,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     value={newItemForm.namaKomponen}
                     onChange={(e) => setNewItemForm({ ...newItemForm, namaKomponen: e.target.value })}
                     className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
-                    placeholder="Masukkan nama komponen biaya kustom..."
+                    placeholder="Masukkan nama kategori biaya..."
                     autoFocus
                     required
                   />
@@ -1285,7 +1296,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Kategori *</label>
+                  <label className="block font-bold text-slate-700 mb-1">Rincian *</label>
                   <select
                     value={isCustomAddKategori ? 'Lainnya' : newItemForm.kategori}
                     onChange={(e) => {
@@ -1361,7 +1372,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                         });
                       }}
                       className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-amber-50/50"
-                      placeholder="Ketik kategori kustom..."
+                      placeholder="Ketik rincian item biaya..."
                       required
                     />
                   )}
@@ -1387,7 +1398,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     type="number"
                     value={newItemForm.nominalPutra}
                     onChange={(e) => setNewItemForm({ ...newItemForm, nominalPutra: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-blue-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-blue-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500 font-bold"
                     required
                   />
                 </div>
@@ -1397,45 +1408,23 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                     type="number"
                     value={newItemForm.nominalPutri}
                     onChange={(e) => setNewItemForm({ ...newItemForm, nominalPutri: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-pink-300 rounded-lg font-mono focus:ring-2 focus:ring-pink-500"
+                    className="w-full px-3 py-2 border border-pink-300 rounded-lg font-mono focus:ring-2 focus:ring-pink-500 font-bold"
                     required
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Rincian Putra</label>
-                <input
-                  type="text"
-                  value={newItemForm.keteranganPutra}
-                  onChange={(e) => setNewItemForm({ ...newItemForm, keteranganPutra: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  placeholder="Deskripsi item untuk siswa putra"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Rincian Putri</label>
-                <input
-                  type="text"
-                  value={newItemForm.keteranganPutri}
-                  onChange={(e) => setNewItemForm({ ...newItemForm, keteranganPutri: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  placeholder="Deskripsi item untuk siswa putri"
-                />
               </div>
 
               <div className="pt-3 border-t flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddItemModalOpen(false)}
-                  className="px-3 py-1.5 border rounded-lg hover:bg-slate-100"
+                  className="px-3.5 py-2 border border-slate-300 rounded-xl hover:bg-slate-100 font-semibold"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700"
+                  className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-sm"
                 >
                   Tambah Komponen
                 </button>

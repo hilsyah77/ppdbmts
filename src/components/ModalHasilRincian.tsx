@@ -317,8 +317,8 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                   <thead>
                     <tr className="bg-slate-900 text-white font-bold text-[11px] uppercase tracking-wider">
                       <th className="p-3 w-12 text-center">No</th>
-                      <th className="p-3">Nama Komponen / Kategori</th>
-                      <th className="p-3">Rincian & Keterangan</th>
+                      <th className="p-3">Kategori</th>
+                      <th className="p-3">Rincian</th>
                       <th className="p-3 text-right bg-blue-900/60 w-36">Putra (Rp)</th>
                       <th className="p-3 text-right bg-pink-900/60 w-36">Putri (Rp)</th>
                       <th className="p-3 text-center w-20">Sifat</th>
@@ -329,14 +329,12 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                       <tr key={item.id} className="hover:bg-slate-50">
                         <td className="p-3 text-center font-bold text-slate-500">{idx + 1}</td>
                         <td className="p-3 font-bold text-slate-900">
-                          <div>{item.namaKomponen}</div>
-                          <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px]">
+                          {item.namaKomponen}
+                        </td>
+                        <td className="p-3">
+                          <span className="font-semibold text-slate-800">
                             {item.kategori}
                           </span>
-                        </td>
-                        <td className="p-3 text-slate-600 text-[11px] leading-relaxed">
-                          <div><span className="font-semibold text-blue-900">L:</span> {item.keteranganPutra}</div>
-                          <div><span className="font-semibold text-pink-900">P:</span> {item.keteranganPutri}</div>
                         </td>
                         <td className="p-3 text-right font-mono font-bold text-blue-900 bg-blue-50/30">
                           Rp {item.nominalPutra.toLocaleString('id-ID')}
@@ -391,8 +389,8 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                   <thead>
                     <tr className="bg-slate-100 text-slate-800 font-bold border-b">
                       <th className="p-3 w-12 text-center">No</th>
-                      <th className="p-3">Nama Komponen & Kategori</th>
-                      <th className="p-3">Rincian Kelengkapan</th>
+                      <th className="p-3">Kategori</th>
+                      <th className="p-3">Rincian</th>
                       <th className="p-3 text-right w-36">Nominal (Rp)</th>
                     </tr>
                   </thead>
@@ -401,10 +399,9 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                       <tr key={item.id} className="hover:bg-blue-50/40">
                         <td className="p-3 text-center font-bold text-slate-400">{idx + 1}</td>
                         <td className="p-3 font-bold text-slate-800">
-                          <div>{item.namaKomponen}</div>
-                          <span className="text-[10px] text-slate-500 font-normal">{item.kategori}</span>
+                          {item.namaKomponen}
                         </td>
-                        <td className="p-3 text-slate-600">{item.keteranganPutra}</td>
+                        <td className="p-3 font-semibold text-slate-700">{item.kategori}</td>
                         <td className="p-3 text-right font-mono font-bold text-blue-900">
                           Rp {item.nominalPutra.toLocaleString('id-ID')}
                         </td>
@@ -442,8 +439,8 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                   <thead>
                     <tr className="bg-slate-100 text-slate-800 font-bold border-b">
                       <th className="p-3 w-12 text-center">No</th>
-                      <th className="p-3">Nama Komponen & Kategori</th>
-                      <th className="p-3">Rincian Kelengkapan</th>
+                      <th className="p-3">Kategori</th>
+                      <th className="p-3">Rincian</th>
                       <th className="p-3 text-right w-36">Nominal (Rp)</th>
                     </tr>
                   </thead>
@@ -452,10 +449,9 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                       <tr key={item.id} className="hover:bg-pink-50/40">
                         <td className="p-3 text-center font-bold text-slate-400">{idx + 1}</td>
                         <td className="p-3 font-bold text-slate-800">
-                          <div>{item.namaKomponen}</div>
-                          <span className="text-[10px] text-slate-500 font-normal">{item.kategori}</span>
+                          {item.namaKomponen}
                         </td>
-                        <td className="p-3 text-slate-600">{item.keteranganPutri}</td>
+                        <td className="p-3 font-semibold text-slate-700">{item.kategori}</td>
                         <td className="p-3 text-right font-mono font-bold text-pink-900">
                           Rp {item.nominalPutri.toLocaleString('id-ID')}
                         </td>
