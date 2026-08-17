@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ItemBiayaPembayaran, ProfilMadrasahData, PengaturanPPDBData, Pendaftar } from '../types';
+import React, { useState, useMemo } from 'react';
+import { ItemBiayaPembayaran, ProfilMadrasahData, PengaturanPPDBData, Pendaftar, JadwalPiket } from '../types';
+import { initialJadwalPiket } from '../data/mockData';
 import { 
   Printer, 
   X, 
@@ -7,7 +8,8 @@ import {
   Check, 
   FileText, 
   FileCheck,
-  UserCheck
+  UserCheck,
+  User
 } from 'lucide-react';
 
 interface ModalHasilRincianProps {
@@ -15,6 +17,7 @@ interface ModalHasilRincianProps {
   profil: ProfilMadrasahData;
   pengaturan: PengaturanPPDBData;
   pendaftar?: Pendaftar | null;
+  jadwalPiketList?: JadwalPiket[];
   onClose: () => void;
 }
 
@@ -48,6 +51,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
   profil,
   pengaturan,
   pendaftar,
+  jadwalPiketList,
   onClose
 }) => {
   const [viewMode, setViewMode] = useState<'formulir_resmi' | 'putra' | 'putri'>(
@@ -94,6 +98,42 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
   const terbilangPutra = angkaKeTerbilang(totalBiayaPutra);
   const terbilangPutri = angkaKeTerbilang(totalBiayaPutri);
 
+  // List of all Petugas Piket
+  const piketList: JadwalPiket[] = useMemo(() => {
+    if (jadwalPiketList && jadwalPiketList.length > 0) return jadwalPiketList;
+    try {
+      const saved = localStorage.getItem('ppdb_mts_piket');
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // fallback
+    }
+    return initialJadwalPiket;
+  }, [jadwalPiketList]);
+
+  // Extract all petugas names from piketList
+  const allPetugasNames = useMemo(() => {
+    const names: string[] = [];
+    piketList.forEach((p) => {
+      p.petugas.forEach((pt) => {
+        if (pt && !names.includes(pt)) {
+          names.push(pt);
+        }
+      });
+    });
+    return names.length > 0 ? names : ['Ust. M. Ridwan, S.Pd.I.', 'Ahmad Syafii, S.Pd.I.'];
+  }, [piketList]);
+
+  // Find today's active piket officer as default
+  const defaultPetugas = useMemo(() => {
+    const todayPiket = piketList.find((p) => p.status === 'Piket Hari Ini');
+    if (todayPiket && todayPiket.petugas.length > 0) {
+      return todayPiket.petugas[0];
+    }
+    return allPetugasNames[0] || 'Petugas Piket PPDB';
+  }, [piketList, allPetugasNames]);
+
+  const [selectedPetugas, setSelectedPetugas] = useState<string>(defaultPetugas);
+
   const handlePrint = () => {
     window.print();
   };
@@ -103,6 +143,17 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
     text += `*${profil.namaMadrasah.toUpperCase()}*\n`;
     text += `*TAHUN PELAJARAN ${pengaturan.tahunAjaran.toUpperCase()}*\n`;
     text += `========================================\n\n`;
+
+    if (pendaftar) {
+      text += `IDENTITAS SISWA:\n`;
+      text += `1. Nama Lengkap: ${pendaftar.namaLengkap}\n`;
+      text += `2. No Registrasi: ${pendaftar.noRegistrasi}\n`;
+      text += `3. Jenis Kelamin: ${pendaftar.jenisKelamin}\n`;
+      text += `4. NISN: ${pendaftar.nisn}\n`;
+      text += `5. No. Telepon / WhatsApp: ${pendaftar.noHpWa || pendaftar.noHpOrangTua || '-'}\n`;
+      text += `6. Nama Orang Tua: ${pendaftar.namaAyah || pendaftar.namaIbu || pendaftar.namaKepalaKeluarga || '-'}\n`;
+      text += `7. Alamat Lengkap: ${alamatLengkapSiswa || '-'}\n\n`;
+    }
 
     groupedCategories.forEach((grp, catIdx) => {
       text += `*${catIdx + 1}. ${grp.kategoriName}*\n`;
@@ -123,32 +174,36 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
     text += `Ketentuan:\n`;
     text += `3. Bersedia menaati peraturan yang ada di madrasah\n`;
     text += `4. Semua biaya administrasi yang telah masuk tidak akan saya Tarik kembali\n\n`;
-    text += `Lokasi: ${profil.alamat}, ${profil.kabupatenKota}\n`;
+    text += `Lokasi: ${profil.alamat}, ${profil.kabKota || profil.kecamatan}\n`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const currentYear = new Date().getFullYear();
-
-  // Extract 3 digits for PMBM boxes from pendaftar registration number or sequence number
-  const pmbmDigits = pendaftar
-    ? (pendaftar.noRegistrasi.match(/\d+$/)?.[0] || String(pendaftar.noUrut)).padStart(3, '0').slice(-3).split('')
-    : ['', '', ''];
-
-  const orangTuaNama = pendaftar
-    ? (pendaftar.namaAyah || pendaftar.namaIbu || pendaftar.namaKepalaKeluarga || pendaftar.namaWali || '')
+  // Build full student address string
+  const alamatLengkapSiswa = pendaftar
+    ? [
+        pendaftar.alamatSiswa,
+        pendaftar.rtRw ? `RT/RW ${pendaftar.rtRw}` : '',
+        pendaftar.kelurahan ? `Desa/Kel. ${pendaftar.kelurahan}` : '',
+        pendaftar.kecamatan ? `Kec. ${pendaftar.kecamatan}` : '',
+        pendaftar.kabKota ? `${pendaftar.kabKota}` : '',
+        pendaftar.provinsi ? `Prov. ${pendaftar.provinsi}` : ''
+      ].filter(Boolean).join(', ')
     : '';
 
-  const alamatSiswa = pendaftar
-    ? (pendaftar.alamatLengkap || [
-        pendaftar.desaKelurahan,
-        pendaftar.rt ? `RT ${pendaftar.rt}` : '',
-        pendaftar.rw ? `RW ${pendaftar.rw}` : '',
-        pendaftar.kecamatan
-      ].filter(Boolean).join(' ') || '')
-    : '';
+  // Get father name for signature
+  const namaAyah = pendaftar?.namaAyah || (pendaftar?.namaKepalaKeluarga || pendaftar?.namaIbu || '');
+
+  // Formatted date
+  const tanggalHariIni = new Date().toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  const lokasiKota = profil.kecamatan || profil.kabKota || 'Jatibarang';
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:bg-white print:static print:overflow-visible">
@@ -181,6 +236,23 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Petugas Piket Selector for Signature */}
+            <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-700">
+              <User className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-[11px] text-slate-300 font-medium">Petugas Piket:</span>
+              <select
+                value={selectedPetugas}
+                onChange={(e) => setSelectedPetugas(e.target.value)}
+                className="bg-slate-900 text-white text-xs rounded-lg px-2 py-1 border border-slate-600 focus:outline-none focus:border-emerald-500 font-medium cursor-pointer"
+              >
+                {allPetugasNames.map((name, idx) => (
+                  <option key={idx} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* View Mode Switcher */}
             <div className="bg-slate-800 p-1 rounded-xl flex items-center text-xs">
               <button
@@ -243,84 +315,103 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
           {viewMode === 'formulir_resmi' && (
             <div className="space-y-4 max-w-3xl mx-auto">
               
-              {/* TOP HEADER SECTION */}
+              {/* TOP HEADER SECTION (TANPA NO PMBM & NO DAFTAR ULANG) */}
               <div className="flex justify-between items-start pt-1">
-                {/* Header Kiri: Judul Formulir */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <h2 className="font-bold text-[15px] underline uppercase tracking-tight text-black">
                     FORMULIR DAFTAR ULANG PESERTA DIDIK BARU
                   </h2>
                   <h3 className="font-bold text-[14px] uppercase text-black">
                     {profil.namaMadrasah.toUpperCase()}
                   </h3>
-                  <h4 className="font-bold text-[14px] underline uppercase text-black">
+                  <h4 className="font-bold text-[13px] underline uppercase text-black">
                     TAHUN PELAJARAN {pengaturan.tahunAjaran.replace('/', ' – ')}
                   </h4>
-                </div>
-
-                {/* Header Kanan: No PMBM & No Daftar Ulang */}
-                <div className="text-right space-y-1.5 shrink-0 text-[13px]">
-                  <div className="flex items-center justify-end gap-1.5">
-                    <span className="font-medium text-black">No PMBM :</span>
-                    <span className="font-medium text-black">PPDB{currentYear}</span>
-                    <div className="flex gap-1 ml-1">
-                      <span className="w-5 h-6 border border-black inline-block text-center font-bold text-xs pt-0.5">
-                        {pmbmDigits[0] || ''}
-                      </span>
-                      <span className="w-5 h-6 border border-black inline-block text-center font-bold text-xs pt-0.5">
-                        {pmbmDigits[1] || ''}
-                      </span>
-                      <span className="w-5 h-6 border border-black inline-block text-center font-bold text-xs pt-0.5">
-                        {pmbmDigits[2] || ''}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-end gap-2 pt-0.5">
-                    <span className="font-medium text-black">No Daftar Ulang :</span>
-                    <span className="inline-block border-b border-black w-28 text-left font-semibold pl-1">
-                      {pendaftar ? pendaftar.noRegistrasi : <>&nbsp;</>}
-                    </span>
-                  </div>
                 </div>
               </div>
 
               {/* TUJUAN SURAT (KEPADA YTH KEPALA) */}
-              <div className="flex justify-end pt-2 text-[13px] leading-relaxed">
+              <div className="flex justify-end pt-1 text-[13px] leading-relaxed">
                 <div className="w-64 text-left">
                   <p className="text-black">Kepada Yth. Kepala</p>
                   <p className="text-black">{profil.namaMadrasah}</p>
-                  <p className="text-black">{profil.kecamatan || 'Jatibarang'}-{profil.kabupatenKota || 'Brebes'}</p>
+                  <p className="text-black">{profil.kecamatan || 'Jatibarang'}-{profil.kabKota || 'Brebes'}</p>
                 </div>
               </div>
 
-              {/* SALAM & BIODATA ISIAN */}
-              <div className="space-y-2 text-[13px] pt-1">
+              {/* SALAM & BIODATA ISIAN 7 POIN SESUAI FORMAT */}
+              <div className="space-y-2 text-[13px] pt-0.5">
                 <p className="text-black">Assalamualaikum Wr. Wb.</p>
                 <p className="text-black">Yang bertanda tangan di bawah ini, saya:</p>
 
-                <div className="space-y-1.5 pl-4">
+                <div className="space-y-1.5 pl-2 text-[12.5px]">
+                  {/* 1. Nama Lengkap */}
                   <div className="flex items-baseline">
-                    <span className="w-6 text-black">1.</span>
-                    <span className="w-36 text-black">Nama</span>
+                    <span className="w-5 text-black font-semibold">1.</span>
+                    <span className="w-48 text-black">Nama Lengkap</span>
                     <span className="mr-2 text-black">:</span>
-                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-bold uppercase">
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-bold uppercase text-black">
                       {pendaftar?.namaLengkap || <>&nbsp;</>}
                     </span>
                   </div>
+
+                  {/* 2. No Registrasi */}
                   <div className="flex items-baseline">
-                    <span className="w-6 text-black">2.</span>
-                    <span className="w-36 text-black">Nama Orang tua</span>
+                    <span className="w-5 text-black font-semibold">2.</span>
+                    <span className="w-48 text-black">No. Registrasi</span>
                     <span className="mr-2 text-black">:</span>
-                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium">
-                      {orangTuaNama || <>&nbsp;</>}
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-semibold text-black">
+                      {pendaftar?.noRegistrasi || <>&nbsp;</>}
                     </span>
                   </div>
+
+                  {/* 3. Jenis Kelamin */}
                   <div className="flex items-baseline">
-                    <span className="w-6 text-black">3.</span>
-                    <span className="w-36 text-black">Alamat</span>
+                    <span className="w-5 text-black font-semibold">3.</span>
+                    <span className="w-48 text-black">Jenis Kelamin</span>
                     <span className="mr-2 text-black">:</span>
-                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium">
-                      {alamatSiswa || <>&nbsp;</>}
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium text-black">
+                      {pendaftar?.jenisKelamin || <>&nbsp;</>}
+                    </span>
+                  </div>
+
+                  {/* 4. NISN */}
+                  <div className="flex items-baseline">
+                    <span className="w-5 text-black font-semibold">4.</span>
+                    <span className="w-48 text-black">NISN</span>
+                    <span className="mr-2 text-black">:</span>
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium text-black">
+                      {pendaftar?.nisn || <>&nbsp;</>}
+                    </span>
+                  </div>
+
+                  {/* 5. No. Telepon / WhatsApp */}
+                  <div className="flex items-baseline">
+                    <span className="w-5 text-black font-semibold">5.</span>
+                    <span className="w-48 text-black">No. Telepon / WhatsApp</span>
+                    <span className="mr-2 text-black">:</span>
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium text-black">
+                      {pendaftar?.noHpWa || pendaftar?.noHpOrangTua || <>&nbsp;</>}
+                    </span>
+                  </div>
+
+                  {/* 6. Nama Orang Tua */}
+                  <div className="flex items-baseline">
+                    <span className="w-5 text-black font-semibold">6.</span>
+                    <span className="w-48 text-black">Nama Orang Tua</span>
+                    <span className="mr-2 text-black">:</span>
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-semibold text-black">
+                      {pendaftar?.namaAyah || pendaftar?.namaKepalaKeluarga || pendaftar?.namaIbu || <>&nbsp;</>}
+                    </span>
+                  </div>
+
+                  {/* 7. Alamat Lengkap Siswa */}
+                  <div className="flex items-baseline">
+                    <span className="w-5 text-black font-semibold">7.</span>
+                    <span className="w-48 text-black">Alamat Lengkap Siswa</span>
+                    <span className="mr-2 text-black">:</span>
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium text-black">
+                      {alamatLengkapSiswa || <>&nbsp;</>}
                     </span>
                   </div>
                 </div>
@@ -469,33 +560,33 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                 </table>
               </div>
 
-              {/* SALAM PENUTUP & TANDA TANGAN */}
+              {/* SALAM PENUTUP & TANDA TANGAN (PETUGAS PIKET & NAMA AYAH) */}
               <div className="pt-2 space-y-3 text-[13px]">
                 <p className="text-black">Wassalamualaikum Wr. Wb</p>
 
                 <div className="pt-2 grid grid-cols-2 gap-12 text-left">
-                  {/* TTD KIRI: PETUGAS PMB */}
+                  {/* TTD KIRI: PETUGAS PIKET */}
                   <div className="space-y-16">
-                    <p className="text-black">
+                    <p className="text-black leading-tight">
                       Mengetahui,<br />
-                      Petugas PMB
+                      Petugas Piket PPDB
                     </p>
                     <div>
-                      <p className="font-medium text-black">
-                        (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                      <p className="font-bold underline text-black">
+                        (&nbsp;{selectedPetugas}&nbsp;)
                       </p>
                     </div>
                   </div>
 
-                  {/* TTD KANAN: PENDAFTAR */}
+                  {/* TTD KANAN: ORANG TUA (NAMA AYAH) */}
                   <div className="space-y-16">
-                    <p className="text-black">
-                      {profil.kecamatan || 'Jatibarang'}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {currentYear}<br />
-                      Pendaftar
+                    <p className="text-black leading-tight">
+                      {lokasiKota}, {tanggalHariIni}<br />
+                      Orang Tua / Wali (Ayah)
                     </p>
                     <div>
-                      <p className="font-medium text-black">
-                        (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                      <p className="font-bold underline text-black">
+                        (&nbsp;{namaAyah || '........................................'}&nbsp;)
                       </p>
                     </div>
                   </div>
@@ -619,5 +710,6 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
     </div>
   );
 };
+
 
 

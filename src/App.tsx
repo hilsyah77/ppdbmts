@@ -325,6 +325,7 @@ export default function App() {
               setItemBiayaList={setItemBiayaList}
               profil={profilMadrasah}
               pengaturan={pengaturan}
+              jadwalPiketList={jadwalPiketList}
             />
           )}
 
@@ -415,6 +416,7 @@ export default function App() {
           profil={profilMadrasah}
           pengaturan={pengaturan}
           pendaftar={hasilRincianModalItem.pendaftar}
+          jadwalPiketList={jadwalPiketList}
           onClose={() => setHasilRincianModalItem({ isOpen: false, pendaftar: null })}
         />
       )}

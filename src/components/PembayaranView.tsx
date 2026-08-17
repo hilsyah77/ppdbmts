@@ -4,7 +4,8 @@ import {
   ItemBiayaPembayaran,
   ProfilMadrasahData,
   PengaturanPPDBData,
-  RiwayatPembayaranItem
+  RiwayatPembayaranItem,
+  JadwalPiket
 } from '../types';
 import {
   Receipt,
@@ -64,6 +65,7 @@ interface PembayaranViewProps {
   setItemBiayaList: React.Dispatch<React.SetStateAction<ItemBiayaPembayaran[]>>;
   profil: ProfilMadrasahData;
   pengaturan: PengaturanPPDBData;
+  jadwalPiketList?: JadwalPiket[];
 }
 
 export const PembayaranView: React.FC<PembayaranViewProps> = ({
@@ -72,7 +74,8 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
   itemBiayaList,
   setItemBiayaList,
   profil,
-  pengaturan
+  pengaturan,
+  jadwalPiketList
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'rincian' | 'siswa' | 'laporan'>('rincian');
   
@@ -1508,6 +1511,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
           profil={profil}
           pengaturan={pengaturan}
           pendaftar={selectedPendaftarForRincian}
+          jadwalPiketList={jadwalPiketList}
           onClose={() => {
             setIsModalHasilRincianOpen(false);
             setSelectedPendaftarForRincian(null);
