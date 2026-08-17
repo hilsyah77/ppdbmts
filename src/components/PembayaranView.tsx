@@ -532,16 +532,12 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                 <div className="p-4 space-y-4 text-xs">
                   {Array.from(new Set(itemBiayaList.map((i) => i.namaKomponen || 'Lain-lain'))).map((catName, catIdx) => {
                     const catItems = itemBiayaList.filter((i) => (i.namaKomponen || 'Lain-lain') === catName);
-                    const catSubtotal = catItems.filter((i) => i.sifat === 'Wajib').reduce((sum, i) => sum + i.nominalPutra, 0);
 
                     return (
                       <div key={catIdx} className="border border-blue-100 rounded-xl overflow-hidden bg-blue-50/20">
-                        <div className="bg-blue-100/70 px-3.5 py-2 flex items-center justify-between font-black text-blue-950">
+                        <div className="bg-blue-100/70 px-3.5 py-2 font-black text-blue-950">
                           <span className="text-[11px] uppercase tracking-wide">
                             {catIdx + 1}. {catName}
-                          </span>
-                          <span className="text-[11px] font-mono text-blue-900">
-                            Subtotal: Rp {catSubtotal.toLocaleString('id-ID')}
                           </span>
                         </div>
                         <div className="p-3 divide-y divide-blue-50 space-y-1">
@@ -608,16 +604,12 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                 <div className="p-4 space-y-4 text-xs">
                   {Array.from(new Set(itemBiayaList.map((i) => i.namaKomponen || 'Lain-lain'))).map((catName, catIdx) => {
                     const catItems = itemBiayaList.filter((i) => (i.namaKomponen || 'Lain-lain') === catName);
-                    const catSubtotal = catItems.filter((i) => i.sifat === 'Wajib').reduce((sum, i) => sum + i.nominalPutri, 0);
 
                     return (
                       <div key={catIdx} className="border border-pink-100 rounded-xl overflow-hidden bg-pink-50/20">
-                        <div className="bg-pink-100/70 px-3.5 py-2 flex items-center justify-between font-black text-pink-950">
+                        <div className="bg-pink-100/70 px-3.5 py-2 font-black text-pink-950">
                           <span className="text-[11px] uppercase tracking-wide">
                             {catIdx + 1}. {catName}
-                          </span>
-                          <span className="text-[11px] font-mono text-pink-900">
-                            Subtotal: Rp {catSubtotal.toLocaleString('id-ID')}
                           </span>
                         </div>
                         <div className="p-3 divide-y divide-pink-50 space-y-1">

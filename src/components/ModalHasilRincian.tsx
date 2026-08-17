@@ -88,7 +88,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
           text += `   ${char}. ${rincianName.padEnd(38, ' ')} Putra: Rp ${item.nominalPutra.toLocaleString('id-ID')} | Putri: Rp ${item.nominalPutri.toLocaleString('id-ID')}\n`;
         }
       });
-      text += `   *(Subtotal ${grp.kategoriName}: Putra Rp ${grp.subtotalPutra.toLocaleString('id-ID')} | Putri Rp ${grp.subtotalPutri.toLocaleString('id-ID')})*\n\n`;
+      text += `\n`;
     });
 
     text += `----------------------------------------\n`;
@@ -235,15 +235,10 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
               {groupedCategories.map((grp, catIdx) => (
                 <div key={catIdx} className="border border-slate-900 rounded-lg overflow-hidden bg-white shadow-sm">
                   {/* Category Header */}
-                  <div className="bg-slate-100 border-b border-slate-900 px-4 py-2.5 flex items-center justify-between">
+                  <div className="bg-slate-100 border-b border-slate-900 px-4 py-2.5">
                     <h4 className="text-sm font-black text-slate-900">
                       {catIdx + 1}. {grp.kategoriName}
                     </h4>
-                    <div className="hidden sm:flex items-center gap-3 text-[11px] font-bold text-slate-600">
-                      <span className="text-blue-900">Putra: Rp {grp.subtotalPutra.toLocaleString('id-ID')}</span>
-                      <span>|</span>
-                      <span className="text-pink-900">Putri: Rp {grp.subtotalPutri.toLocaleString('id-ID')}</span>
-                    </div>
                   </div>
 
                   {/* Items Sub-list Table */}
@@ -287,19 +282,6 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                         );
                       })}
                     </tbody>
-                    <tfoot>
-                      <tr className="bg-slate-100/80 font-black text-slate-900 border-t border-slate-300">
-                        <td colSpan={2} className="py-2.5 pl-6 pr-4 text-right uppercase text-[11px]">
-                          Subtotal {grp.kategoriName}:
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-xs text-blue-950">
-                          Rp {grp.subtotalPutra.toLocaleString('id-ID')}
-                        </td>
-                        <td className="py-2.5 pr-6 pl-3 text-right font-mono text-xs text-pink-950">
-                          Rp {grp.subtotalPutri.toLocaleString('id-ID')}
-                        </td>
-                      </tr>
-                    </tfoot>
                   </table>
                 </div>
               ))}
@@ -345,8 +327,8 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                     <h4 className="font-bold text-xs uppercase tracking-wider">
                       {catIdx + 1}. {grp.kategoriName}
                     </h4>
-                    <span className="text-[11px] font-mono text-emerald-300 font-bold">
-                      {grp.items.length} Item Rincian
+                    <span className="text-[11px] font-mono text-slate-300 font-medium">
+                      {grp.items.length} Rincian
                     </span>
                   </div>
                   <table className="w-full text-xs text-left border-collapse">
@@ -385,20 +367,6 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                         );
                       })}
                     </tbody>
-                    <tfoot>
-                      <tr className="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-300">
-                        <td colSpan={2} className="p-3 text-right uppercase text-xs">
-                          SUBTOTAL {grp.kategoriName}:
-                        </td>
-                        <td className="p-3 text-right font-mono text-sm text-blue-950 bg-blue-100/60">
-                          Rp {grp.subtotalPutra.toLocaleString('id-ID')}
-                        </td>
-                        <td className="p-3 text-right font-mono text-sm text-pink-950 bg-pink-100/60">
-                          Rp {grp.subtotalPutri.toLocaleString('id-ID')}
-                        </td>
-                        <td></td>
-                      </tr>
-                    </tfoot>
                   </table>
                 </div>
               ))}
@@ -428,13 +396,10 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
 
               {groupedCategories.map((grp, catIdx) => (
                 <div key={catIdx} className="border border-blue-300 rounded-xl overflow-hidden bg-white shadow-sm">
-                  <div className="bg-blue-50/80 border-b border-blue-200 px-4 py-2.5 flex items-center justify-between">
+                  <div className="bg-blue-50/80 border-b border-blue-200 px-4 py-2.5">
                     <h4 className="font-black text-xs text-blue-950 uppercase tracking-wide">
                       {catIdx + 1}. {grp.kategoriName}
                     </h4>
-                    <span className="text-xs font-mono font-bold text-blue-900">
-                      Subtotal: Rp {grp.subtotalPutra.toLocaleString('id-ID')}
-                    </span>
                   </div>
                   <table className="w-full text-xs text-left border-collapse">
                     <tbody className="divide-y divide-slate-100">
@@ -483,13 +448,10 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
 
               {groupedCategories.map((grp, catIdx) => (
                 <div key={catIdx} className="border border-pink-300 rounded-xl overflow-hidden bg-white shadow-sm">
-                  <div className="bg-pink-50/80 border-b border-pink-200 px-4 py-2.5 flex items-center justify-between">
+                  <div className="bg-pink-50/80 border-b border-pink-200 px-4 py-2.5">
                     <h4 className="font-black text-xs text-pink-950 uppercase tracking-wide">
                       {catIdx + 1}. {grp.kategoriName}
                     </h4>
-                    <span className="text-xs font-mono font-bold text-pink-900">
-                      Subtotal: Rp {grp.subtotalPutri.toLocaleString('id-ID')}
-                    </span>
                   </div>
                   <table className="w-full text-xs text-left border-collapse">
                     <tbody className="divide-y divide-slate-100">
