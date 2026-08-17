@@ -42,6 +42,7 @@ import { ModalCetakFormulir } from './components/ModalCetakFormulir';
 import { ModalVerifikasi } from './components/ModalVerifikasi';
 import { ModalTambahPendaftar } from './components/ModalTambahPendaftar';
 import { ModalLogin } from './components/ModalLogin';
+import { ModalHasilRincian } from './components/ModalHasilRincian';
 
 export default function App() {
   // Navigation State
@@ -98,6 +99,10 @@ export default function App() {
   // Modal States
   const [detailModalItem, setDetailModalItem] = useState<Pendaftar | null>(null);
   const [cetakModalItem, setCetakModalItem] = useState<Pendaftar | null>(null);
+  const [hasilRincianModalItem, setHasilRincianModalItem] = useState<{ isOpen: boolean; pendaftar?: Pendaftar | null }>({
+    isOpen: false,
+    pendaftar: null
+  });
   const [verifikasiModalItem, setVerifikasiModalItem] = useState<Pendaftar | null>(null);
   const [isTambahModalOpen, setIsTambahModalOpen] = useState<boolean>(false);
 
@@ -305,6 +310,7 @@ export default function App() {
               initialFilterStatus={filterStatusParam}
               onOpenDetail={(p) => setDetailModalItem(p)}
               onOpenCetak={(p) => setCetakModalItem(p)}
+              onOpenCetakDaftarUlang={(p) => setHasilRincianModalItem({ isOpen: true, pendaftar: p || null })}
               onOpenVerifikasi={(p) => setVerifikasiModalItem(p)}
               onDeletePendaftar={handleDeletePendaftar}
               onOpenTambahModal={() => setIsTambahModalOpen(true)}
@@ -366,6 +372,14 @@ export default function App() {
         jalurList={jalurList}
         onClose={() => setDetailModalItem(null)}
         onSavePendaftar={handleSavePendaftar}
+        onOpenCetak={(p) => {
+          setDetailModalItem(null);
+          setCetakModalItem(p);
+        }}
+        onOpenCetakDaftarUlang={(p) => {
+          setDetailModalItem(null);
+          setHasilRincianModalItem({ isOpen: true, pendaftar: p });
+        }}
         onOpenVerifikasi={(p) => {
           setDetailModalItem(null);
           setVerifikasiModalItem(p);
@@ -392,6 +406,16 @@ export default function App() {
           jalurList={jalurList}
           onClose={() => setIsTambahModalOpen(false)}
           onAddPendaftar={handleAddPendaftar}
+        />
+      )}
+
+      {hasilRincianModalItem.isOpen && (
+        <ModalHasilRincian
+          itemBiayaList={itemBiayaList}
+          profil={profilMadrasah}
+          pengaturan={pengaturan}
+          pendaftar={hasilRincianModalItem.pendaftar}
+          onClose={() => setHasilRincianModalItem({ isOpen: false, pendaftar: null })}
         />
       )}
 

@@ -28,6 +28,7 @@ import {
   ArrowRight,
   Sparkles,
   FileSpreadsheet,
+  FileCheck,
   X
 } from 'lucide-react';
 import { ModalKuitansi } from './ModalKuitansi';
@@ -82,6 +83,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
 
   // Modal States
   const [isModalHasilRincianOpen, setIsModalHasilRincianOpen] = useState<boolean>(false);
+  const [selectedPendaftarForRincian, setSelectedPendaftarForRincian] = useState<Pendaftar | null>(null);
   const [selectedPendaftarForPay, setSelectedPendaftarForPay] = useState<Pendaftar | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<{
     pendaftar: Pendaftar;
@@ -932,6 +934,18 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                                 <span>Bayar</span>
                               </button>
 
+                              <button
+                                onClick={() => {
+                                  setSelectedPendaftarForRincian(p);
+                                  setIsModalHasilRincianOpen(true);
+                                }}
+                                className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold text-[11px] rounded-lg transition-all flex items-center gap-1"
+                                title="Cetak Formulir Daftar Ulang & Rincian Biaya PPDB"
+                              >
+                                <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
+                                <span>Daftar Ulang</span>
+                              </button>
+
                               {riwayat.length > 0 && (
                                 <button
                                   onClick={() => setSelectedReceipt({ pendaftar: p, riwayat: riwayat[0] })}
@@ -1493,7 +1507,11 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
           itemBiayaList={itemBiayaList}
           profil={profil}
           pengaturan={pengaturan}
-          onClose={() => setIsModalHasilRincianOpen(false)}
+          pendaftar={selectedPendaftarForRincian}
+          onClose={() => {
+            setIsModalHasilRincianOpen(false);
+            setSelectedPendaftarForRincian(null);
+          }}
         />
       )}
 

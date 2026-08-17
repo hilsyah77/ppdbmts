@@ -21,7 +21,8 @@ import {
   Edit3,
   Save,
   RotateCcw,
-  Check
+  Check,
+  Printer
 } from 'lucide-react';
 
 interface ModalDetailProps {
@@ -30,7 +31,8 @@ interface ModalDetailProps {
   onClose: () => void;
   onSavePendaftar?: (updatedPendaftar: Pendaftar) => void;
   onOpenVerifikasi?: (pendaftar: Pendaftar) => void;
-  onOpenCetak?: (pendaftar: Pendaftar) => void; // Optional fallback if referenced
+  onOpenCetak?: (pendaftar: Pendaftar) => void;
+  onOpenCetakDaftarUlang?: (pendaftar: Pendaftar) => void;
 }
 
 export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
@@ -38,7 +40,9 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
   jalurList = [],
   onClose,
   onSavePendaftar,
-  onOpenVerifikasi
+  onOpenVerifikasi,
+  onOpenCetak,
+  onOpenCetakDaftarUlang
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Pendaftar | null>(pendaftar);
@@ -317,7 +321,33 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
             </h3>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {!isEditing && (
+              <>
+                {onOpenCetak && (
+                  <button
+                    onClick={() => onOpenCetak(formData)}
+                    className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
+                    title="Cetak Formulir Pendaftaran (Biodata)"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Cetak Formulir</span>
+                  </button>
+                )}
+
+                {onOpenCetakDaftarUlang && (
+                  <button
+                    onClick={() => onOpenCetakDaftarUlang(formData)}
+                    className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
+                    title="Cetak Formulir Daftar Ulang & Rincian Biaya PPDB"
+                  >
+                    <FileCheck className="w-3.5 h-3.5" />
+                    <span>Cetak Daftar Ulang & Rincian</span>
+                  </button>
+                )}
+              </>
+            )}
+
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}

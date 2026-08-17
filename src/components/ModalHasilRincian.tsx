@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { ItemBiayaPembayaran, ProfilMadrasahData, PengaturanPPDBData } from '../types';
+import { ItemBiayaPembayaran, ProfilMadrasahData, PengaturanPPDBData, Pendaftar } from '../types';
 import { 
   Printer, 
   X, 
   Copy, 
   Check, 
   FileText, 
-  FileCheck
+  FileCheck,
+  UserCheck
 } from 'lucide-react';
 
 interface ModalHasilRincianProps {
   itemBiayaList: ItemBiayaPembayaran[];
   profil: ProfilMadrasahData;
   pengaturan: PengaturanPPDBData;
+  pendaftar?: Pendaftar | null;
   onClose: () => void;
 }
 
@@ -45,9 +47,12 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
   itemBiayaList,
   profil,
   pengaturan,
+  pendaftar,
   onClose
 }) => {
-  const [viewMode, setViewMode] = useState<'formulir_resmi' | 'putra' | 'putri'>('formulir_resmi');
+  const [viewMode, setViewMode] = useState<'formulir_resmi' | 'putra' | 'putri'>(
+    'formulir_resmi'
+  );
   const [copied, setCopied] = useState<boolean>(false);
 
   // Group items by category (namaKomponen)
@@ -127,6 +132,24 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
 
   const currentYear = new Date().getFullYear();
 
+  // Extract 3 digits for PMBM boxes from pendaftar registration number or sequence number
+  const pmbmDigits = pendaftar
+    ? (pendaftar.noRegistrasi.match(/\d+$/)?.[0] || String(pendaftar.noUrut)).padStart(3, '0').slice(-3).split('')
+    : ['', '', ''];
+
+  const orangTuaNama = pendaftar
+    ? (pendaftar.namaAyah || pendaftar.namaIbu || pendaftar.namaKepalaKeluarga || pendaftar.namaWali || '')
+    : '';
+
+  const alamatSiswa = pendaftar
+    ? (pendaftar.alamatLengkap || [
+        pendaftar.desaKelurahan,
+        pendaftar.rt ? `RT ${pendaftar.rt}` : '',
+        pendaftar.rw ? `RW ${pendaftar.rw}` : '',
+        pendaftar.kecamatan
+      ].filter(Boolean).join(' ') || '')
+    : '';
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:bg-white print:static print:overflow-visible">
       <div className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col max-h-[96vh] print:max-h-none print:shadow-none print:border-none print:rounded-none print:m-0 print:w-full print:static">
@@ -144,8 +167,15 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                   T.A. {pengaturan.tahunAjaran}
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-400">
-                Format resmi cetak dokumen sesuai berkas formulir pendaftaran PPDB
+              <p className="text-[11px] text-slate-400 flex items-center gap-2">
+                {pendaftar ? (
+                  <span className="text-emerald-300 font-semibold flex items-center gap-1">
+                    <UserCheck className="w-3.5 h-3.5" />
+                    {pendaftar.namaLengkap} ({pendaftar.jenisKelamin}) • Reg: {pendaftar.noRegistrasi}
+                  </span>
+                ) : (
+                  <span>Format resmi cetak dokumen sesuai berkas formulir pendaftaran PPDB</span>
+                )}
               </p>
             </div>
           </div>
@@ -234,14 +264,22 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                     <span className="font-medium text-black">No PMBM :</span>
                     <span className="font-medium text-black">PPDB{currentYear}</span>
                     <div className="flex gap-1 ml-1">
-                      <span className="w-5 h-6 border border-black inline-block text-center text-xs"></span>
-                      <span className="w-5 h-6 border border-black inline-block text-center text-xs"></span>
-                      <span className="w-5 h-6 border border-black inline-block text-center text-xs"></span>
+                      <span className="w-5 h-6 border border-black inline-block text-center font-bold text-xs pt-0.5">
+                        {pmbmDigits[0] || ''}
+                      </span>
+                      <span className="w-5 h-6 border border-black inline-block text-center font-bold text-xs pt-0.5">
+                        {pmbmDigits[1] || ''}
+                      </span>
+                      <span className="w-5 h-6 border border-black inline-block text-center font-bold text-xs pt-0.5">
+                        {pmbmDigits[2] || ''}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-2 pt-0.5">
                     <span className="font-medium text-black">No Daftar Ulang :</span>
-                    <span className="inline-block border-b border-black w-28">&nbsp;</span>
+                    <span className="inline-block border-b border-black w-28 text-left font-semibold pl-1">
+                      {pendaftar ? pendaftar.noRegistrasi : <>&nbsp;</>}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -265,19 +303,25 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                     <span className="w-6 text-black">1.</span>
                     <span className="w-36 text-black">Nama</span>
                     <span className="mr-2 text-black">:</span>
-                    <span className="flex-1 border-b border-dotted border-black pb-0.5">&nbsp;</span>
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-bold uppercase">
+                      {pendaftar?.namaLengkap || <>&nbsp;</>}
+                    </span>
                   </div>
                   <div className="flex items-baseline">
                     <span className="w-6 text-black">2.</span>
                     <span className="w-36 text-black">Nama Orang tua</span>
                     <span className="mr-2 text-black">:</span>
-                    <span className="flex-1 border-b border-dotted border-black pb-0.5">&nbsp;</span>
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium">
+                      {orangTuaNama || <>&nbsp;</>}
+                    </span>
                   </div>
                   <div className="flex items-baseline">
                     <span className="w-6 text-black">3.</span>
                     <span className="w-36 text-black">Alamat</span>
                     <span className="mr-2 text-black">:</span>
-                    <span className="flex-1 border-b border-dotted border-black pb-0.5">&nbsp;</span>
+                    <span className="flex-1 border-b border-dotted border-black pb-0.5 font-medium">
+                      {alamatSiswa || <>&nbsp;</>}
+                    </span>
                   </div>
                 </div>
 

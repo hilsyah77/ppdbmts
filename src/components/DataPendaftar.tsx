@@ -15,7 +15,9 @@ import {
   Clock,
   XCircle,
   AlertTriangle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  FileCheck,
+  FileText
 } from 'lucide-react';
 
 interface DataPendaftarProps {
@@ -25,6 +27,7 @@ interface DataPendaftarProps {
   initialFilterStatus?: string;
   onOpenDetail: (pendaftar: Pendaftar) => void;
   onOpenCetak: (pendaftar: Pendaftar) => void;
+  onOpenCetakDaftarUlang?: (pendaftar?: Pendaftar) => void;
   onOpenVerifikasi: (pendaftar: Pendaftar) => void;
   onDeletePendaftar: (id: string, nama: string) => void;
   onOpenTambahModal: () => void;
@@ -37,6 +40,7 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
   initialFilterStatus = '',
   onOpenDetail,
   onOpenCetak,
+  onOpenCetakDaftarUlang,
   onOpenVerifikasi,
   onDeletePendaftar,
   onOpenTambahModal
@@ -202,6 +206,16 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Cetak Formulir Daftar Ulang (Format Resmi) */}
+          <button
+            onClick={() => onOpenCetakDaftarUlang?.()}
+            className="px-3.5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-bold rounded-xl text-xs transition-colors shadow-sm flex items-center gap-2"
+            title="Cetak Format Resmi Formulir Daftar Ulang & Rincian Biaya PPDB"
+          >
+            <FileCheck className="w-4 h-4 text-indigo-600" />
+            <span>Formulir Daftar Ulang</span>
+          </button>
+
           {/* Export CSV Button */}
           <button
             onClick={exportToCSV}
@@ -409,7 +423,7 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
                         </span>
                       </td>
 
-                      {/* 9. Aksi (Detail, Cetak Formulir, Verifikasi, Hapus) */}
+                      {/* 9. Aksi (Detail, Cetak Formulir, Cetak Daftar Ulang, Verifikasi, Hapus) */}
                       <td className="p-3.5 text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1">
                           
@@ -423,14 +437,24 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
                             <span className="hidden sm:inline">Detail</span>
                           </button>
 
-                          {/* Cetak Formulir */}
+                          {/* Cetak Formulir Biodata */}
                           <button
                             onClick={() => onOpenCetak(pendaftar)}
                             className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg font-semibold transition-colors flex items-center gap-1 text-[11px] border border-emerald-200"
-                            title="Cetak Formulir Pendaftaran Official"
+                            title="Cetak Formulir Pendaftaran (Biodata Siswa)"
                           >
                             <Printer className="w-3.5 h-3.5 text-emerald-600" />
-                            <span className="hidden sm:inline">Cetak</span>
+                            <span className="hidden sm:inline">Formulir</span>
+                          </button>
+
+                          {/* Cetak Formulir Daftar Ulang & Rincian Biaya */}
+                          <button
+                            onClick={() => onOpenCetakDaftarUlang?.(pendaftar)}
+                            className="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg font-semibold transition-colors flex items-center gap-1 text-[11px] border border-indigo-200"
+                            title="Cetak Formulir Daftar Ulang & Rincian Biaya PPDB"
+                          >
+                            <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
+                            <span className="hidden sm:inline">Daftar Ulang</span>
                           </button>
 
                           {/* Verifikasi */}
