@@ -431,43 +431,94 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                 </table>
               </div>
 
-              {/* D. STATUS KELENGKAPAN BERKAS PERSYARATAN */}
+              {/* D. STATUS KELENGKAPAN BERKAS PERSYARATAN (CEKLIST DATA KE BAWAH) */}
               <div className="border border-slate-400 rounded overflow-hidden">
-                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[11.5px] font-bold uppercase tracking-wider" style={{ lineHeight: '1.3' }}>
-                  D. STATUS KELENGKAPAN BERKAS PERSYARATAN
+                <div className="bg-slate-800 text-white px-2.5 py-0.5 text-[11.5px] font-bold uppercase tracking-wider flex items-center justify-between" style={{ lineHeight: '1.3' }}>
+                  <span>D. STATUS KELENGKAPAN BERKAS PERSYARATAN</span>
+                  <span className="text-[9.5px] font-mono text-emerald-300 font-normal">Ceklis Fisik Dokumen</span>
                 </div>
-                <div className="p-1.5 bg-white grid grid-cols-5 gap-1 text-[9.5px]" style={{ lineHeight: '1.3' }}>
-                  <div className="flex items-center gap-1">
-                    <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center font-bold text-[8.5px] ${pendaftar.berkas.ijazahSkl ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50'}`}>
-                      {pendaftar.berkas.ijazahSkl ? '✓' : ''}
-                    </span>
-                    <span className="font-medium text-slate-900 truncate">Fotokopi Ijazah/SKL</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center font-bold text-[8.5px] ${pendaftar.berkas.kartuKeluarga ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50'}`}>
-                      {pendaftar.berkas.kartuKeluarga ? '✓' : ''}
-                    </span>
-                    <span className="font-medium text-slate-900 truncate">Fotokopi KK</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center font-bold text-[8.5px] ${pendaftar.berkas.aktaLahir ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50'}`}>
-                      {pendaftar.berkas.aktaLahir ? '✓' : ''}
-                    </span>
-                    <span className="font-medium text-slate-900 truncate">Fotokopi Akta Lahir</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center font-bold text-[8.5px] ${pendaftar.berkas.pasFoto ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50'}`}>
-                      {pendaftar.berkas.pasFoto ? '✓' : ''}
-                    </span>
-                    <span className="font-medium text-slate-900 truncate">Pasfoto 3x4 (3 Lbr)</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center font-bold text-[8.5px] ${pendaftar.berkas.kipPkhKks ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50'}`}>
-                      {pendaftar.berkas.kipPkhKks ? '✓' : ''}
-                    </span>
-                    <span className="font-medium text-slate-900 truncate">KIP / PKH / KKS</span>
-                  </div>
-                </div>
+                <table className="w-full text-[11px] border-collapse" style={{ lineHeight: '1.35' }}>
+                  <thead>
+                    <tr className="bg-slate-100 border-b border-slate-300 text-[9.5px] text-slate-700 font-bold uppercase">
+                      <th className="py-0.5 px-2 text-center w-8 border-r border-slate-200">No</th>
+                      <th className="py-0.5 px-2.5 text-left border-r border-slate-200">Nama Berkas / Dokumen Persyaratan</th>
+                      <th className="py-0.5 px-2 text-center w-32 border-r border-slate-200">Status Penyerahan</th>
+                      <th className="py-0.5 px-2 text-center w-20">Ceklis</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-slate-200">
+                      <td className="py-0.5 px-2 text-center font-bold bg-slate-50 border-r border-slate-200 text-slate-700">1</td>
+                      <td className="py-0.5 px-2.5 font-medium text-slate-900 border-r border-slate-200">Fotokopi Ijazah / Surat Keterangan Lulus (SKL) Legalisir</td>
+                      <td className="py-0.5 px-2 text-center border-r border-slate-200">
+                        <span className={`inline-flex items-center gap-1 font-bold text-[9.5px] ${pendaftar.berkas.ijazahSkl ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          {pendaftar.berkas.ijazahSkl ? '✓ Ada / Lengkap' : '— Belum Ada'}
+                        </span>
+                      </td>
+                      <td className="py-0.5 px-2 text-center">
+                        <span className={`inline-flex items-center justify-center w-4 h-4 rounded border font-bold text-[9.5px] leading-none ${pendaftar.berkas.ijazahSkl ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50 text-transparent'}`}>
+                          ✓
+                        </span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-slate-200">
+                      <td className="py-0.5 px-2 text-center font-bold bg-slate-50 border-r border-slate-200 text-slate-700">2</td>
+                      <td className="py-0.5 px-2.5 font-medium text-slate-900 border-r border-slate-200">Fotokopi Kartu Keluarga (KK)</td>
+                      <td className="py-0.5 px-2 text-center border-r border-slate-200">
+                        <span className={`inline-flex items-center gap-1 font-bold text-[9.5px] ${pendaftar.berkas.kartuKeluarga ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          {pendaftar.berkas.kartuKeluarga ? '✓ Ada / Lengkap' : '— Belum Ada'}
+                        </span>
+                      </td>
+                      <td className="py-0.5 px-2 text-center">
+                        <span className={`inline-flex items-center justify-center w-4 h-4 rounded border font-bold text-[9.5px] leading-none ${pendaftar.berkas.kartuKeluarga ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50 text-transparent'}`}>
+                          ✓
+                        </span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-slate-200">
+                      <td className="py-0.5 px-2 text-center font-bold bg-slate-50 border-r border-slate-200 text-slate-700">3</td>
+                      <td className="py-0.5 px-2.5 font-medium text-slate-900 border-r border-slate-200">Fotokopi Akta Kelahiran</td>
+                      <td className="py-0.5 px-2 text-center border-r border-slate-200">
+                        <span className={`inline-flex items-center gap-1 font-bold text-[9.5px] ${pendaftar.berkas.aktaLahir ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          {pendaftar.berkas.aktaLahir ? '✓ Ada / Lengkap' : '— Belum Ada'}
+                        </span>
+                      </td>
+                      <td className="py-0.5 px-2 text-center">
+                        <span className={`inline-flex items-center justify-center w-4 h-4 rounded border font-bold text-[9.5px] leading-none ${pendaftar.berkas.aktaLahir ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50 text-transparent'}`}>
+                          ✓
+                        </span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-slate-200">
+                      <td className="py-0.5 px-2 text-center font-bold bg-slate-50 border-r border-slate-200 text-slate-700">4</td>
+                      <td className="py-0.5 px-2.5 font-medium text-slate-900 border-r border-slate-200">Pasfoto Berwarna 3x4 (3 Lembar)</td>
+                      <td className="py-0.5 px-2 text-center border-r border-slate-200">
+                        <span className={`inline-flex items-center gap-1 font-bold text-[9.5px] ${pendaftar.berkas.pasFoto ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          {pendaftar.berkas.pasFoto ? '✓ Ada / Lengkap' : '— Belum Ada'}
+                        </span>
+                      </td>
+                      <td className="py-0.5 px-2 text-center">
+                        <span className={`inline-flex items-center justify-center w-4 h-4 rounded border font-bold text-[9.5px] leading-none ${pendaftar.berkas.pasFoto ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50 text-transparent'}`}>
+                          ✓
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-0.5 px-2 text-center font-bold bg-slate-50 border-r border-slate-200 text-slate-700">5</td>
+                      <td className="py-0.5 px-2.5 font-medium text-slate-900 border-r border-slate-200">Kartu KIP / PKH / KKS / Bukti Bantuan Sosial (Jika Ada)</td>
+                      <td className="py-0.5 px-2 text-center border-r border-slate-200">
+                        <span className={`inline-flex items-center gap-1 font-bold text-[9.5px] ${pendaftar.berkas.kipPkhKks ? 'text-emerald-700' : 'text-slate-400'}`}>
+                          {pendaftar.berkas.kipPkhKks ? '✓ Ada / Lengkap' : '— Tidak Ada / Opsional'}
+                        </span>
+                      </td>
+                      <td className="py-0.5 px-2 text-center">
+                        <span className={`inline-flex items-center justify-center w-4 h-4 rounded border font-bold text-[9.5px] leading-none ${pendaftar.berkas.kipPkhKks ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-400 bg-slate-50 text-transparent'}`}>
+                          ✓
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
               {/* 4. BLOK PENGESAHAN & PASFOTO 3X4 */}
