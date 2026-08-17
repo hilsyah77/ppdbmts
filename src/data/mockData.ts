@@ -621,64 +621,156 @@ export const initialPendaftar: Pendaftar[] = [
 ];
 
 export const initialItemBiayaPembayaran: ItemBiayaPembayaran[] = [
+  // 1. Pembayaran Administrasi keuangan
   {
-    id: 'biaya-1',
-    namaKomponen: 'Paket Seragam Sekolah & Atribut',
-    kategori: 'Seragam',
-    nominalPutra: 550000,
-    nominalPutri: 700000,
-    keteranganPutra: '3 Stel Seragam (Putih-Biru, Batik Madrasah, Olahraga) + Peci Songkok, Dasi, Sabuk & Badge Lokasi',
-    keteranganPutri: '3 Stel Seragam (Putih-Biru Rok Panjang, Batik, Olahraga) + Jilbab/Kerudung (2 Stel) & Badge Lokasi',
-    sifat: 'Wajib'
-  },
-  {
-    id: 'biaya-2',
-    namaKomponen: 'Infaq Gedung & Pengembangan Madrasah',
-    kategori: 'Gedung / Infaq',
-    nominalPutra: 600000,
-    nominalPutri: 600000,
-    keteranganPutra: 'Pemeliharaan Gedung, AC Kelas, Sarana Lab Komputer & Masjid Madrasah',
-    keteranganPutri: 'Pemeliharaan Gedung, AC Kelas, Sarana Lab Komputer & Masjid Madrasah',
-    sifat: 'Wajib'
-  },
-  {
-    id: 'biaya-3',
-    namaKomponen: 'MATSAMA & Masa Orientasi Siswa Baru',
-    kategori: 'Kegiatan & MATSAMA',
+    id: 'biaya-adm-1',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Titipan SPP',
     nominalPutra: 150000,
     nominalPutri: 150000,
-    keteranganPutra: 'Perlengkapan MATSAMA, Name Tag, Modul Karakter, Kaos Kegiatan & Snack Orientasi',
-    keteranganPutri: 'Perlengkapan MATSAMA, Name Tag, Modul Karakter, Kaos Kegiatan & Snack Orientasi',
+    keteranganPutra: 'Titipan SPP Bulan Pertama (Juli)',
+    keteranganPutri: 'Titipan SPP Bulan Pertama (Juli)',
     sifat: 'Wajib'
   },
   {
-    id: 'biaya-4',
-    namaKomponen: 'Buku Paket Digital, Modul & Kartu Pelajar',
-    kategori: 'Buku & Alat',
-    nominalPutra: 200000,
-    nominalPutri: 200000,
-    keteranganPutra: 'Kartu Pelajar RFID Digital, Modul Pembelajaran Al-Qur\'an Hadis & Bahasa Arab',
-    keteranganPutri: 'Kartu Pelajar RFID Digital, Modul Pembelajaran Al-Qur\'an Hadis & Bahasa Arab',
+    id: 'biaya-adm-2',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Iuran OSIS, Pramuka 1 Tahun',
+    nominalPutra: 120000,
+    nominalPutri: 120000,
+    keteranganPutra: 'Iuran OSIS & Kegiatan Kepramukaan 1 Tahun',
+    keteranganPutri: 'Iuran OSIS & Kegiatan Kepramukaan 1 Tahun',
     sifat: 'Wajib'
   },
   {
-    id: 'biaya-5',
-    namaKomponen: 'Iuran OSIS, Ekstrakurikuler & Lomba (1 Tahun)',
-    kategori: 'Kegiatan & MATSAMA',
-    nominalPutra: 100000,
-    nominalPutri: 100000,
-    keteranganPutra: 'Pengembangan Bakat, Pramuka, Paskibra, PMR, Futsal & Kas OSIS',
-    keteranganPutri: 'Pengembangan Bakat, Pramuka, Paskibra, PMR, Badminton & Kas OSIS',
-    sifat: 'Wajib'
-  },
-  {
-    id: 'biaya-6',
-    namaKomponen: 'Sampul Rapor & Kartu Ujian CBT Digital',
-    kategori: 'Lainnya',
+    id: 'biaya-adm-3',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Pemeliharaan Alat Drumband 1 Tahun',
     nominalPutra: 50000,
     nominalPutri: 50000,
-    keteranganPutra: 'Sampul Rapor Emboss Garuda/Kemenag & Akses Akun Ujian CBT Digital',
-    keteranganPutri: 'Sampul Rapor Emboss Garuda/Kemenag & Akses Akun Ujian CBT Digital',
+    keteranganPutra: 'Pemeliharaan Sarana & Alat Musik Drumband',
+    keteranganPutri: 'Pemeliharaan Sarana & Alat Musik Drumband',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-adm-4',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Dana Sosial 1 Tahun',
+    nominalPutra: 30000,
+    nominalPutri: 30000,
+    keteranganPutra: 'Dana Sosial & Kepedulian Siswa',
+    keteranganPutri: 'Dana Sosial & Kepedulian Siswa',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-adm-5',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Perpustakaan 1 Tahun + Kartu OSIS',
+    nominalPutra: 50000,
+    nominalPutri: 50000,
+    keteranganPutra: 'Kartu Anggota Perpustakaan & Kartu OSIS Digital',
+    keteranganPutri: 'Kartu Anggota Perpustakaan & Kartu OSIS Digital',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-adm-6',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Modul 5 Mapel Agama 1 Semester',
+    nominalPutra: 100000,
+    nominalPutri: 100000,
+    keteranganPutra: 'Modul Pembelajaran Agama Islam Lengkap (5 Mapel)',
+    keteranganPutri: 'Modul Pembelajaran Agama Islam Lengkap (5 Mapel)',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-adm-7',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Pemeliharaan Komputer 1 Tahun',
+    nominalPutra: 100000,
+    nominalPutri: 100000,
+    keteranganPutra: 'Perawatan Laboratorium Komputer & CBT Digital',
+    keteranganPutri: 'Perawatan Laboratorium Komputer & CBT Digital',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-adm-8',
+    namaKomponen: 'Pembayaran Administrasi keuangan',
+    kategori: 'Buku Pembiasaan Harian (PH)',
+    nominalPutra: 30000,
+    nominalPutri: 30000,
+    keteranganPutra: 'Buku Pantauan Shalat & Mutaba\'ah Yaumiyah',
+    keteranganPutri: 'Buku Pantauan Shalat & Mutaba\'ah Yaumiyah',
+    sifat: 'Wajib'
+  },
+  // 2. Pembelian Pakaian Seragam
+  {
+    id: 'biaya-srg-1',
+    namaKomponen: 'Pembelian Pakaian Seragam',
+    kategori: 'BET (OSIS, Pramuka, Nama, Jenjang Kelas)',
+    nominalPutra: 35000,
+    nominalPutri: 35000,
+    keteranganPutra: 'Atribut Bordir Lengkap',
+    keteranganPutri: 'Atribut Bordir Lengkap',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-srg-2',
+    namaKomponen: 'Pembelian Pakaian Seragam',
+    kategori: 'Bahan Pramuka 1 Set',
+    nominalPutra: 130000,
+    nominalPutri: 150000,
+    keteranganPutra: 'Kain Pramuka Lengkap Putra',
+    keteranganPutri: 'Kain Pramuka Gamis/Rok Panjang Putri',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-srg-3',
+    namaKomponen: 'Pembelian Pakaian Seragam',
+    kategori: 'Bahan Batik 1 Set',
+    nominalPutra: 120000,
+    nominalPutri: 140000,
+    keteranganPutra: 'Kain Batik Khas Madrasah Putra',
+    keteranganPutri: 'Kain Batik Khas Madrasah Putri',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-srg-4',
+    namaKomponen: 'Pembelian Pakaian Seragam',
+    kategori: 'Biru Putih 1 Set',
+    nominalPutra: 135000,
+    nominalPutri: 155000,
+    keteranganPutra: 'Kemeja Putih & Celana Biru Putra',
+    keteranganPutri: 'Kemeja Putih & Rok Biru Panjang Putri',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-srg-5',
+    namaKomponen: 'Pembelian Pakaian Seragam',
+    kategori: 'Kaos Olah Raga 1 Set',
+    nominalPutra: 110000,
+    nominalPutri: 110000,
+    keteranganPutra: 'Stelan Olahraga Madrasah Putra',
+    keteranganPutri: 'Stelan Olahraga Lengan Panjang Muslimah',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-srg-6',
+    namaKomponen: 'Pembelian Pakaian Seragam',
+    kategori: 'Topi + Sabuk + Hasduk + Dasi',
+    nominalPutra: 50000,
+    nominalPutri: 50000,
+    keteranganPutra: 'Perlengkapan Upacara & Pramuka Putra',
+    keteranganPutri: 'Perlengkapan Upacara & Pramuka Putri',
+    sifat: 'Wajib'
+  },
+  {
+    id: 'biaya-srg-7',
+    namaKomponen: 'Pembelian Pakaian Seragam',
+    kategori: 'Kerudung',
+    nominalPutra: 0,
+    nominalPutri: 80000,
+    keteranganPutra: 'Tidak ada (Khusus Putri)',
+    keteranganPutri: '2 Buah Jilbab/Kerudung Madrasah (Putih & Pramuka)',
     sifat: 'Wajib'
   }
 ];

@@ -13,7 +13,6 @@ import {
   ChevronRight,
   ShieldCheck
 } from 'lucide-react';
-import { KATEGORI_OPSI_ADMINISTRASI, KATEGORI_OPSI_SERAGAM } from './PembayaranView';
 
 interface ModalHasilRincianProps {
   itemBiayaList: ItemBiayaPembayaran[];
@@ -31,25 +30,32 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
   const [viewMode, setViewMode] = useState<'standar' | 'lengkap' | 'putra' | 'putri'>('standar');
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Group items by category / component name
-  const adminItems = itemBiayaList.filter(
-    (i) => i.namaKomponen === 'Pembayaran Administrasi keuangan' || 
-           i.kategori.toLowerCase().includes('spp') || 
-           i.kategori.toLowerCase().includes('osis') || 
-           i.kategori.toLowerCase().includes('administrasi') ||
-           i.kategori.toLowerCase().includes('gedung')
-  );
+  // Group items by category (namaKomponen)
+  const groupedCategories: {
+    kategoriName: string;
+    items: ItemBiayaPembayaran[];
+    subtotalPutra: number;
+    subtotalPutri: number;
+  }[] = [];
 
-  const seragamItems = itemBiayaList.filter(
-    (i) => i.namaKomponen === 'Pembelian Pakaian Seragam' || 
-           i.kategori.toLowerCase().includes('seragam') || 
-           i.kategori.toLowerCase().includes('batik') || 
-           i.kategori.toLowerCase().includes('pramuka')
-  );
-
-  const otherItems = itemBiayaList.filter(
-    (i) => !adminItems.includes(i) && !seragamItems.includes(i)
-  );
+  itemBiayaList.forEach((item) => {
+    const catName = item.namaKomponen || 'Lain-lain';
+    let grp = groupedCategories.find((g) => g.kategoriName.trim().toLowerCase() === catName.trim().toLowerCase());
+    if (!grp) {
+      grp = {
+        kategoriName: catName,
+        items: [],
+        subtotalPutra: 0,
+        subtotalPutri: 0
+      };
+      groupedCategories.push(grp);
+    }
+    grp.items.push(item);
+    if (item.sifat === 'Wajib') {
+      grp.subtotalPutra += item.nominalPutra;
+      grp.subtotalPutri += item.nominalPutri;
+    }
+  });
 
   // Totals
   const totalBiayaPutra = itemBiayaList
@@ -71,23 +77,25 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
     text += `*${profil.namaMadrasah.toUpperCase()}*\n`;
     text += `----------------------------------------\n\n`;
 
-    text += `*1. Pembayaran Administrasi keuangan:*\n`;
-    KATEGORI_OPSI_ADMINISTRASI.forEach((item, idx) => {
-      const char = String.fromCharCode(97 + idx); // a, b, c...
-      text += `   ${char}. ${item}\n`;
+    groupedCategories.forEach((grp, catIdx) => {
+      text += `*${catIdx + 1}. ${grp.kategoriName}*\n`;
+      grp.items.forEach((item, itemIdx) => {
+        const char = String.fromCharCode(97 + itemIdx); // a, b, c...
+        const rincianName = item.kategori || item.namaKomponen;
+        if (item.nominalPutra === item.nominalPutri) {
+          text += `   ${char}. ${rincianName.padEnd(38, ' ')} Rp ${item.nominalPutra.toLocaleString('id-ID')}\n`;
+        } else {
+          text += `   ${char}. ${rincianName.padEnd(38, ' ')} Putra: Rp ${item.nominalPutra.toLocaleString('id-ID')} | Putri: Rp ${item.nominalPutri.toLocaleString('id-ID')}\n`;
+        }
+      });
+      text += `   *(Subtotal ${grp.kategoriName}: Putra Rp ${grp.subtotalPutra.toLocaleString('id-ID')} | Putri Rp ${grp.subtotalPutri.toLocaleString('id-ID')})*\n\n`;
     });
 
-    text += `\n*2. Pembelian Pakaian Seragam:*\n`;
-    KATEGORI_OPSI_SERAGAM.forEach((item, idx) => {
-      const char = String.fromCharCode(97 + idx);
-      text += `   ${char}. ${item}\n`;
-    });
-
-    text += `\n----------------------------------------\n`;
-    text += `*ESTIMASI TOTAL BIAYA:*\n`;
-    text += `• Total Biaya Putra : Rp ${totalBiayaPutra.toLocaleString('id-ID')}\n`;
-    text += `• Total Biaya Putri : Rp ${totalBiayaPutri.toLocaleString('id-ID')}\n`;
-    text += `*(Selisih Rp ${selisihBiaya.toLocaleString('id-ID')} untuk seragam & kerudung putri)*\n\n`;
+    text += `----------------------------------------\n`;
+    text += `*ESTIMASI TOTAL BIAYA KESELURUHAN:*\n`;
+    text += `• Total Biaya Putra (Laki-laki) : Rp ${totalBiayaPutra.toLocaleString('id-ID')}\n`;
+    text += `• Total Biaya Putri (Perempuan) : Rp ${totalBiayaPutri.toLocaleString('id-ID')}\n`;
+    text += `*(Selisih Rp ${selisihBiaya.toLocaleString('id-ID')} untuk seragam rok & kerudung putri)*\n\n`;
     text += `Informasi Sekretariat: ${profil.alamat}, ${profil.kabupatenKota}\n`;
     text += `Kontak Layanan: ${profil.telepon} / ${profil.email}\n`;
 
@@ -108,13 +116,13 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-sm text-white flex items-center gap-2">
-                <span>Tampilan Hasil Rincian Biaya PPDB</span>
+                <span>Rincian Biaya PPDB Format Resmi</span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
                   T.A. {pengaturan.tahunAjaran}
                 </span>
               </h3>
               <p className="text-[11px] text-slate-400">
-                Format resmi struktur komponen administrasi keuangan & seragam madrasah
+                Format berjenjang: 1. Kategori &nbsp;➔&nbsp; a. Rincian & Nominal Rp.......
               </p>
             </div>
           </div>
@@ -221,61 +229,80 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
             </div>
           </div>
 
-          {/* VIEW MODE 1: FORMAT STANDAR (MATCHING EXACT USER SCREENSHOT) */}
+          {/* VIEW MODE 1: FORMAT STANDAR BERJENJANG (1. Kategori, a. rincian Rp...) */}
           {viewMode === 'standar' && (
             <div className="space-y-6">
-              
-              {/* SECTION 1: PEMBAYARAN ADMINISTRASI KEUANGAN */}
-              <div className="border border-slate-900 rounded-lg overflow-hidden bg-white shadow-sm">
-                <div className="bg-slate-100 border-b border-slate-900 px-4 py-2.5">
-                  <h4 className="text-sm font-black text-slate-900">
-                    1. Pembayaran Administrasi keuangan
-                  </h4>
-                </div>
-                <table className="w-full text-xs text-left border-collapse">
-                  <tbody>
-                    {KATEGORI_OPSI_ADMINISTRASI.map((item, idx) => {
-                      const char = String.fromCharCode(97 + idx); // a, b, c...
-                      return (
-                        <tr key={idx} className="border-b border-slate-300 last:border-b-0 hover:bg-slate-50/80">
-                          <td className="w-10 py-2.5 pl-6 pr-2 font-bold text-slate-800 align-top">
-                            {char}.
-                          </td>
-                          <td className="py-2.5 pr-4 font-semibold text-slate-800">
-                            {item}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              {groupedCategories.map((grp, catIdx) => (
+                <div key={catIdx} className="border border-slate-900 rounded-lg overflow-hidden bg-white shadow-sm">
+                  {/* Category Header */}
+                  <div className="bg-slate-100 border-b border-slate-900 px-4 py-2.5 flex items-center justify-between">
+                    <h4 className="text-sm font-black text-slate-900">
+                      {catIdx + 1}. {grp.kategoriName}
+                    </h4>
+                    <div className="hidden sm:flex items-center gap-3 text-[11px] font-bold text-slate-600">
+                      <span className="text-blue-900">Putra: Rp {grp.subtotalPutra.toLocaleString('id-ID')}</span>
+                      <span>|</span>
+                      <span className="text-pink-900">Putri: Rp {grp.subtotalPutri.toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
 
-              {/* SECTION 2: PEMBELIAN PAKAIAN SERAGAM */}
-              <div className="border border-slate-900 rounded-lg overflow-hidden bg-white shadow-sm">
-                <div className="bg-slate-100 border-b border-slate-900 px-4 py-2.5">
-                  <h4 className="text-sm font-black text-slate-900">
-                    2. Pembelian Pakaian Seragam
-                  </h4>
+                  {/* Items Sub-list Table */}
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold">
+                        <th className="w-10 py-1.5 pl-6 pr-2">No</th>
+                        <th className="py-1.5 pr-4">Rincian Komponen</th>
+                        <th className="py-1.5 px-3 text-right w-36 text-blue-900">Biaya Putra</th>
+                        <th className="py-1.5 pr-6 pl-3 text-right w-36 text-pink-900">Biaya Putri</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {grp.items.map((item, itemIdx) => {
+                        const char = String.fromCharCode(97 + itemIdx); // a, b, c...
+                        const isSame = item.nominalPutra === item.nominalPutri;
+                        return (
+                          <tr key={item.id} className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/80">
+                            <td className="w-10 py-2.5 pl-6 pr-2 font-bold text-slate-800 align-top">
+                              {char}.
+                            </td>
+                            <td className="py-2.5 pr-4 font-semibold text-slate-800">
+                              <div>{item.kategori || item.namaKomponen}</div>
+                              {item.keteranganPutra && item.keteranganPutra !== item.kategori && (
+                                <div className="text-[10px] text-slate-500 font-normal mt-0.5">
+                                  {item.keteranganPutra}
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-3 text-right font-mono font-bold text-blue-950 align-top">
+                              Rp {item.nominalPutra.toLocaleString('id-ID')}
+                            </td>
+                            <td className="py-2.5 pr-6 pl-3 text-right font-mono font-bold text-pink-950 align-top">
+                              {item.nominalPutri > 0 ? (
+                                `Rp ${item.nominalPutri.toLocaleString('id-ID')}`
+                              ) : (
+                                <span className="text-slate-400 font-sans font-normal text-[11px]">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-100/80 font-black text-slate-900 border-t border-slate-300">
+                        <td colSpan={2} className="py-2.5 pl-6 pr-4 text-right uppercase text-[11px]">
+                          Subtotal {grp.kategoriName}:
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono text-xs text-blue-950">
+                          Rp {grp.subtotalPutra.toLocaleString('id-ID')}
+                        </td>
+                        <td className="py-2.5 pr-6 pl-3 text-right font-mono text-xs text-pink-950">
+                          Rp {grp.subtotalPutri.toLocaleString('id-ID')}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
-                <table className="w-full text-xs text-left border-collapse">
-                  <tbody>
-                    {KATEGORI_OPSI_SERAGAM.map((item, idx) => {
-                      const char = String.fromCharCode(97 + idx); // a, b, c...
-                      return (
-                        <tr key={idx} className="border-b border-slate-300 last:border-b-0 hover:bg-slate-50/80">
-                          <td className="w-10 py-2.5 pl-6 pr-2 font-bold text-slate-800 align-top">
-                            {char}.
-                          </td>
-                          <td className="py-2.5 pr-4 font-semibold text-slate-800">
-                            {item}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              ))}
 
               {/* ESTIMASI NOMINAL REKAPITULASI BIAYA */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -311,70 +338,85 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
 
           {/* VIEW MODE 2: TABEL KOMPARASI LENGKAP */}
           {viewMode === 'lengkap' && (
-            <div className="space-y-4">
-              <div className="border border-slate-300 rounded-xl overflow-hidden shadow-sm">
-                <table className="w-full text-xs text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-900 text-white font-bold text-[11px] uppercase tracking-wider">
-                      <th className="p-3 w-12 text-center">No</th>
-                      <th className="p-3">Kategori</th>
-                      <th className="p-3">Rincian</th>
-                      <th className="p-3 text-right bg-blue-900/60 w-36">Putra (Rp)</th>
-                      <th className="p-3 text-right bg-pink-900/60 w-36">Putri (Rp)</th>
-                      <th className="p-3 text-center w-20">Sifat</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 font-medium">
-                    {itemBiayaList.map((item, idx) => (
-                      <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="p-3 text-center font-bold text-slate-500">{idx + 1}</td>
-                        <td className="p-3 font-bold text-slate-900">
-                          {item.namaKomponen}
-                        </td>
-                        <td className="p-3">
-                          <span className="font-semibold text-slate-800">
-                            {item.kategori}
-                          </span>
-                        </td>
-                        <td className="p-3 text-right font-mono font-bold text-blue-900 bg-blue-50/30">
-                          Rp {item.nominalPutra.toLocaleString('id-ID')}
-                        </td>
-                        <td className="p-3 text-right font-mono font-bold text-pink-900 bg-pink-50/30">
-                          Rp {item.nominalPutri.toLocaleString('id-ID')}
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            item.sifat === 'Wajib' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            {item.sifat}
-                          </span>
-                        </td>
+            <div className="space-y-6">
+              {groupedCategories.map((grp, catIdx) => (
+                <div key={catIdx} className="border border-slate-300 rounded-xl overflow-hidden shadow-sm">
+                  <div className="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between">
+                    <h4 className="font-bold text-xs uppercase tracking-wider">
+                      {catIdx + 1}. {grp.kategoriName}
+                    </h4>
+                    <span className="text-[11px] font-mono text-emerald-300 font-bold">
+                      {grp.items.length} Item Rincian
+                    </span>
+                  </div>
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100 text-slate-700 font-bold text-[11px] uppercase tracking-wider border-b border-slate-200">
+                        <th className="p-3 w-12 text-center">No</th>
+                        <th className="p-3">Rincian Komponen</th>
+                        <th className="p-3 text-right bg-blue-50 text-blue-900 w-36">Putra (Rp)</th>
+                        <th className="p-3 text-right bg-pink-50 text-pink-900 w-36">Putri (Rp)</th>
+                        <th className="p-3 text-center w-20">Sifat</th>
                       </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-300">
-                      <td colSpan={3} className="p-3 text-right uppercase text-xs">
-                        TOTAL BIAYA KESELURUHAN (WAJIB):
-                      </td>
-                      <td className="p-3 text-right font-mono text-sm text-blue-950 bg-blue-100/60">
-                        Rp {totalBiayaPutra.toLocaleString('id-ID')}
-                      </td>
-                      <td className="p-3 text-right font-mono text-sm text-pink-950 bg-pink-100/60">
-                        Rp {totalBiayaPutri.toLocaleString('id-ID')}
-                      </td>
-                      <td></td>
-                    </tr>
-                  </tfoot>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 font-medium">
+                      {grp.items.map((item, itemIdx) => {
+                        const char = String.fromCharCode(97 + itemIdx);
+                        return (
+                          <tr key={item.id} className="hover:bg-slate-50">
+                            <td className="p-3 text-center font-bold text-slate-500">{char}.</td>
+                            <td className="p-3 font-semibold text-slate-800">
+                              {item.kategori || item.namaKomponen}
+                            </td>
+                            <td className="p-3 text-right font-mono font-bold text-blue-900 bg-blue-50/30">
+                              Rp {item.nominalPutra.toLocaleString('id-ID')}
+                            </td>
+                            <td className="p-3 text-right font-mono font-bold text-pink-900 bg-pink-50/30">
+                              Rp {item.nominalPutri.toLocaleString('id-ID')}
+                            </td>
+                            <td className="p-3 text-center">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                item.sifat === 'Wajib' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
+                              }`}>
+                                {item.sifat}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-300">
+                        <td colSpan={2} className="p-3 text-right uppercase text-xs">
+                          SUBTOTAL {grp.kategoriName}:
+                        </td>
+                        <td className="p-3 text-right font-mono text-sm text-blue-950 bg-blue-100/60">
+                          Rp {grp.subtotalPutra.toLocaleString('id-ID')}
+                        </td>
+                        <td className="p-3 text-right font-mono text-sm text-pink-950 bg-pink-100/60">
+                          Rp {grp.subtotalPutri.toLocaleString('id-ID')}
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              ))}
+
+              <div className="p-4 bg-slate-900 text-white rounded-xl flex items-center justify-between font-black text-sm">
+                <span>TOTAL BIAYA KESELURUHAN (WAJIB):</span>
+                <div className="flex items-center gap-6 font-mono text-base">
+                  <span className="text-blue-300">Putra: Rp {totalBiayaPutra.toLocaleString('id-ID')}</span>
+                  <span className="text-pink-300">Putri: Rp {totalBiayaPutri.toLocaleString('id-ID')}</span>
+                </div>
               </div>
             </div>
           )}
 
-          {/* VIEW MODE 3: KHUSUS PUTRA */}
+          {/* VIEW MODE 3: KHUSUS PUTRA (1. Kategori -> a. rincian Rp...) */}
           {viewMode === 'putra' && (
-            <div className="space-y-4">
-              <div className="p-3 bg-blue-900 text-white rounded-xl flex items-center justify-between">
+            <div className="space-y-6">
+              <div className="p-3.5 bg-blue-900 text-white rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <User className="w-5 h-5 text-blue-300" />
                   <span className="font-bold text-sm">RINCIAN KHUSUS SISWA PUTRA (LAKI-LAKI)</span>
@@ -384,89 +426,99 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                 </span>
               </div>
 
-              <div className="border border-slate-300 rounded-xl overflow-hidden">
-                <table className="w-full text-xs text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-100 text-slate-800 font-bold border-b">
-                      <th className="p-3 w-12 text-center">No</th>
-                      <th className="p-3">Kategori</th>
-                      <th className="p-3">Rincian</th>
-                      <th className="p-3 text-right w-36">Nominal (Rp)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {itemBiayaList.map((item, idx) => (
-                      <tr key={item.id} className="hover:bg-blue-50/40">
-                        <td className="p-3 text-center font-bold text-slate-400">{idx + 1}</td>
-                        <td className="p-3 font-bold text-slate-800">
-                          {item.namaKomponen}
-                        </td>
-                        <td className="p-3 font-semibold text-slate-700">{item.kategori}</td>
-                        <td className="p-3 text-right font-mono font-bold text-blue-900">
-                          Rp {item.nominalPutra.toLocaleString('id-ID')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-blue-50 font-black text-blue-950 border-t">
-                      <td colSpan={3} className="p-3 text-right uppercase">TOTAL BIAYA PUTRA:</td>
-                      <td className="p-3 text-right font-mono text-sm">
-                        Rp {totalBiayaPutra.toLocaleString('id-ID')}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
+              {groupedCategories.map((grp, catIdx) => (
+                <div key={catIdx} className="border border-blue-300 rounded-xl overflow-hidden bg-white shadow-sm">
+                  <div className="bg-blue-50/80 border-b border-blue-200 px-4 py-2.5 flex items-center justify-between">
+                    <h4 className="font-black text-xs text-blue-950 uppercase tracking-wide">
+                      {catIdx + 1}. {grp.kategoriName}
+                    </h4>
+                    <span className="text-xs font-mono font-bold text-blue-900">
+                      Subtotal: Rp {grp.subtotalPutra.toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                  <table className="w-full text-xs text-left border-collapse">
+                    <tbody className="divide-y divide-slate-100">
+                      {grp.items.map((item, itemIdx) => {
+                        const char = String.fromCharCode(97 + itemIdx);
+                        return (
+                          <tr key={item.id} className="hover:bg-blue-50/40">
+                            <td className="w-10 py-2.5 pl-6 pr-2 font-bold text-blue-900 align-top">
+                              {char}.
+                            </td>
+                            <td className="py-2.5 pr-4 font-semibold text-slate-800">
+                              {item.kategori || item.namaKomponen}
+                            </td>
+                            <td className="py-2.5 pr-6 text-right font-mono font-bold text-blue-950 w-44">
+                              Rp {item.nominalPutra.toLocaleString('id-ID')}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+
+              <div className="p-4 bg-blue-100 border border-blue-300 rounded-xl flex items-center justify-between font-black text-blue-950">
+                <span className="text-xs uppercase">TOTAL BIAYA KESELURUHAN PUTRA:</span>
+                <span className="font-mono text-base text-blue-900">
+                  Rp {totalBiayaPutra.toLocaleString('id-ID')}
+                </span>
               </div>
             </div>
           )}
 
-          {/* VIEW MODE 4: KHUSUS PUTRI */}
+          {/* VIEW MODE 4: KHUSUS PUTRI (1. Kategori -> a. rincian Rp...) */}
           {viewMode === 'putri' && (
-            <div className="space-y-4">
-              <div className="p-3 bg-pink-800 text-white rounded-xl flex items-center justify-between">
+            <div className="space-y-6">
+              <div className="p-3.5 bg-pink-900 text-white rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <User className="w-5 h-5 text-pink-200" />
                   <span className="font-bold text-sm">RINCIAN KHUSUS SISWI PUTRI (PEREMPUAN)</span>
                 </div>
-                <span className="font-mono font-bold text-sm bg-pink-900 px-3 py-1 rounded-lg">
+                <span className="font-mono font-bold text-sm bg-pink-800 px-3 py-1 rounded-lg">
                   Total: Rp {totalBiayaPutri.toLocaleString('id-ID')}
                 </span>
               </div>
 
-              <div className="border border-slate-300 rounded-xl overflow-hidden">
-                <table className="w-full text-xs text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-100 text-slate-800 font-bold border-b">
-                      <th className="p-3 w-12 text-center">No</th>
-                      <th className="p-3">Kategori</th>
-                      <th className="p-3">Rincian</th>
-                      <th className="p-3 text-right w-36">Nominal (Rp)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {itemBiayaList.map((item, idx) => (
-                      <tr key={item.id} className="hover:bg-pink-50/40">
-                        <td className="p-3 text-center font-bold text-slate-400">{idx + 1}</td>
-                        <td className="p-3 font-bold text-slate-800">
-                          {item.namaKomponen}
-                        </td>
-                        <td className="p-3 font-semibold text-slate-700">{item.kategori}</td>
-                        <td className="p-3 text-right font-mono font-bold text-pink-900">
-                          Rp {item.nominalPutri.toLocaleString('id-ID')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-pink-50 font-black text-pink-950 border-t">
-                      <td colSpan={3} className="p-3 text-right uppercase">TOTAL BIAYA PUTRI:</td>
-                      <td className="p-3 text-right font-mono text-sm">
-                        Rp {totalBiayaPutri.toLocaleString('id-ID')}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
+              {groupedCategories.map((grp, catIdx) => (
+                <div key={catIdx} className="border border-pink-300 rounded-xl overflow-hidden bg-white shadow-sm">
+                  <div className="bg-pink-50/80 border-b border-pink-200 px-4 py-2.5 flex items-center justify-between">
+                    <h4 className="font-black text-xs text-pink-950 uppercase tracking-wide">
+                      {catIdx + 1}. {grp.kategoriName}
+                    </h4>
+                    <span className="text-xs font-mono font-bold text-pink-900">
+                      Subtotal: Rp {grp.subtotalPutri.toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                  <table className="w-full text-xs text-left border-collapse">
+                    <tbody className="divide-y divide-slate-100">
+                      {grp.items.map((item, itemIdx) => {
+                        const char = String.fromCharCode(97 + itemIdx);
+                        return (
+                          <tr key={item.id} className="hover:bg-pink-50/40">
+                            <td className="w-10 py-2.5 pl-6 pr-2 font-bold text-pink-900 align-top">
+                              {char}.
+                            </td>
+                            <td className="py-2.5 pr-4 font-semibold text-slate-800">
+                              {item.kategori || item.namaKomponen}
+                            </td>
+                            <td className="py-2.5 pr-6 text-right font-mono font-bold text-pink-950 w-44">
+                              Rp {item.nominalPutri.toLocaleString('id-ID')}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+
+              <div className="p-4 bg-pink-100 border border-pink-300 rounded-xl flex items-center justify-between font-black text-pink-950">
+                <span className="text-xs uppercase">TOTAL BIAYA KESELURUHAN PUTRI:</span>
+                <span className="font-mono text-base text-pink-900">
+                  Rp {totalBiayaPutri.toLocaleString('id-ID')}
+                </span>
               </div>
             </div>
           )}
@@ -524,3 +576,4 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
     </div>
   );
 };
+

@@ -529,27 +529,49 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                   </span>
                 </div>
 
-                <div className="p-4 divide-y divide-slate-100 text-xs">
-                  {itemBiayaList.map((item, idx) => (
-                    <div key={item.id} className="py-2.5 space-y-1">
-                      <div className="flex items-center justify-between font-bold text-slate-800">
-                        <span className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold flex items-center justify-center">
-                            {idx + 1}
+                <div className="p-4 space-y-4 text-xs">
+                  {Array.from(new Set(itemBiayaList.map((i) => i.namaKomponen || 'Lain-lain'))).map((catName, catIdx) => {
+                    const catItems = itemBiayaList.filter((i) => (i.namaKomponen || 'Lain-lain') === catName);
+                    const catSubtotal = catItems.filter((i) => i.sifat === 'Wajib').reduce((sum, i) => sum + i.nominalPutra, 0);
+
+                    return (
+                      <div key={catIdx} className="border border-blue-100 rounded-xl overflow-hidden bg-blue-50/20">
+                        <div className="bg-blue-100/70 px-3.5 py-2 flex items-center justify-between font-black text-blue-950">
+                          <span className="text-[11px] uppercase tracking-wide">
+                            {catIdx + 1}. {catName}
                           </span>
-                          <span>{item.kategori || item.namaKomponen}</span>
-                        </span>
-                        <span className="font-mono text-blue-900 font-bold">
-                          Rp {item.nominalPutra.toLocaleString('id-ID')}
-                        </span>
+                          <span className="text-[11px] font-mono text-blue-900">
+                            Subtotal: Rp {catSubtotal.toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                        <div className="p-3 divide-y divide-blue-50 space-y-1">
+                          {catItems.map((item, itemIdx) => {
+                            const char = String.fromCharCode(97 + itemIdx);
+                            return (
+                              <div key={item.id} className="pt-2 first:pt-0 flex items-start justify-between gap-2">
+                                <div className="flex items-start gap-2">
+                                  <span className="font-bold text-blue-800 text-[11px] w-4 shrink-0">
+                                    {char}.
+                                  </span>
+                                  <div>
+                                    <span className="font-semibold text-slate-800">
+                                      {item.kategori || item.namaKomponen}
+                                    </span>
+                                    {item.keteranganPutra && item.keteranganPutra !== item.kategori && (
+                                      <p className="text-[10px] text-slate-500">{item.keteranganPutra}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                <span className="font-mono text-blue-950 font-bold shrink-0">
+                                  Rp {item.nominalPutra.toLocaleString('id-ID')}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-500 pl-7 leading-relaxed">
-                        <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded font-semibold mr-1.5">
-                          {item.namaKomponen}
-                        </span>
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -583,27 +605,49 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                   </span>
                 </div>
 
-                <div className="p-4 divide-y divide-slate-100 text-xs">
-                  {itemBiayaList.map((item, idx) => (
-                    <div key={item.id} className="py-2.5 space-y-1">
-                      <div className="flex items-center justify-between font-bold text-slate-800">
-                        <span className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-pink-100 text-pink-800 text-[10px] font-bold flex items-center justify-center">
-                            {idx + 1}
+                <div className="p-4 space-y-4 text-xs">
+                  {Array.from(new Set(itemBiayaList.map((i) => i.namaKomponen || 'Lain-lain'))).map((catName, catIdx) => {
+                    const catItems = itemBiayaList.filter((i) => (i.namaKomponen || 'Lain-lain') === catName);
+                    const catSubtotal = catItems.filter((i) => i.sifat === 'Wajib').reduce((sum, i) => sum + i.nominalPutri, 0);
+
+                    return (
+                      <div key={catIdx} className="border border-pink-100 rounded-xl overflow-hidden bg-pink-50/20">
+                        <div className="bg-pink-100/70 px-3.5 py-2 flex items-center justify-between font-black text-pink-950">
+                          <span className="text-[11px] uppercase tracking-wide">
+                            {catIdx + 1}. {catName}
                           </span>
-                          <span>{item.kategori || item.namaKomponen}</span>
-                        </span>
-                        <span className="font-mono text-pink-900 font-bold">
-                          Rp {item.nominalPutri.toLocaleString('id-ID')}
-                        </span>
+                          <span className="text-[11px] font-mono text-pink-900">
+                            Subtotal: Rp {catSubtotal.toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                        <div className="p-3 divide-y divide-pink-50 space-y-1">
+                          {catItems.map((item, itemIdx) => {
+                            const char = String.fromCharCode(97 + itemIdx);
+                            return (
+                              <div key={item.id} className="pt-2 first:pt-0 flex items-start justify-between gap-2">
+                                <div className="flex items-start gap-2">
+                                  <span className="font-bold text-pink-800 text-[11px] w-4 shrink-0">
+                                    {char}.
+                                  </span>
+                                  <div>
+                                    <span className="font-semibold text-slate-800">
+                                      {item.kategori || item.namaKomponen}
+                                    </span>
+                                    {item.keteranganPutri && item.keteranganPutri !== item.kategori && (
+                                      <p className="text-[10px] text-slate-500">{item.keteranganPutri}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                <span className="font-mono text-pink-950 font-bold shrink-0">
+                                  {item.nominalPutri > 0 ? `Rp ${item.nominalPutri.toLocaleString('id-ID')}` : '—'}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-500 pl-7 leading-relaxed">
-                        <span className="text-[10px] bg-pink-50 text-pink-700 border border-pink-200 px-1.5 py-0.5 rounded font-semibold mr-1.5">
-                          {item.namaKomponen}
-                        </span>
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -646,7 +690,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                   Kelola Master Data Komponen Biaya
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  Kelola kategori, rincian biaya, serta nominal untuk calon siswa Putra dan Putri.
+                  Kelola kategori (1, 2...), rincian biaya (a, b...), serta nominal untuk calon siswa Putra dan Putri.
                 </p>
               </div>
 
@@ -663,9 +707,9 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200 text-[11px]">
-                    <th className="p-3">No</th>
+                    <th className="p-3 w-16">No</th>
                     <th className="p-3">Kategori</th>
-                    <th className="p-3">Rincian</th>
+                    <th className="p-3">Rincian Komponen</th>
                     <th className="p-3 text-right text-blue-900 bg-blue-50/50">Putra (Rp)</th>
                     <th className="p-3 text-right text-pink-900 bg-pink-50/50">Putri (Rp)</th>
                     <th className="p-3">Sifat</th>
@@ -673,48 +717,65 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-medium">
-                  {itemBiayaList.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3 font-bold text-slate-400">{idx + 1}</td>
-                      <td className="p-3 font-bold text-slate-800">
-                        {item.namaKomponen}
-                      </td>
-                      <td className="p-3">
-                        <span className="font-semibold text-slate-800">
-                          {item.kategori}
-                        </span>
-                      </td>
-                      <td className="p-3 text-right font-mono font-bold text-blue-900 bg-blue-50/20">
-                        Rp {item.nominalPutra.toLocaleString('id-ID')}
-                      </td>
-                      <td className="p-3 text-right font-mono font-bold text-pink-900 bg-pink-50/20">
-                        Rp {item.nominalPutri.toLocaleString('id-ID')}
-                      </td>
-                      <td className="p-3">
-                        <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${item.sifat === 'Wajib' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
-                          {item.sifat}
-                        </span>
-                      </td>
-                      <td className="p-3 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button
-                            onClick={() => handleOpenEditComponent(item)}
-                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit Rincian Biaya"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteComponent(item.id, item.kategori || item.namaKomponen)}
-                            className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Hapus Rincian Biaya"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {Array.from(new Set(itemBiayaList.map((i) => i.namaKomponen || 'Lain-lain'))).map((catName, catIdx) => {
+                    const catItems = itemBiayaList.filter((i) => (i.namaKomponen || 'Lain-lain') === catName);
+                    return catItems.map((item, itemIdx) => {
+                      const char = String.fromCharCode(97 + itemIdx);
+                      return (
+                        <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="p-3 font-bold text-slate-700">
+                            {catIdx + 1}.{char}
+                          </td>
+                          <td className="p-3 font-bold text-slate-800">
+                            {itemIdx === 0 ? (
+                              <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-bold text-[11px]">
+                                {catIdx + 1}. {catName}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-[11px]">—</span>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <span className="font-bold text-slate-800 mr-1.5 text-blue-700">
+                              {char}.
+                            </span>
+                            <span className="font-semibold text-slate-800">
+                              {item.kategori || item.namaKomponen}
+                            </span>
+                          </td>
+                          <td className="p-3 text-right font-mono font-bold text-blue-900 bg-blue-50/20">
+                            Rp {item.nominalPutra.toLocaleString('id-ID')}
+                          </td>
+                          <td className="p-3 text-right font-mono font-bold text-pink-900 bg-pink-50/20">
+                            Rp {item.nominalPutri.toLocaleString('id-ID')}
+                          </td>
+                          <td className="p-3">
+                            <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${item.sifat === 'Wajib' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                              {item.sifat}
+                            </span>
+                          </td>
+                          <td className="p-3 text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              <button
+                                onClick={() => handleOpenEditComponent(item)}
+                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit Rincian Biaya"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteComponent(item.id, item.kategori || item.namaKomponen)}
+                                className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                title="Hapus Rincian Biaya"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    });
+                  })}
                 </tbody>
               </table>
             </div>
