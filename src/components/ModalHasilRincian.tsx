@@ -139,7 +139,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
   };
 
   const handleCopyText = () => {
-    let text = `*FORMULIR DAFTAR ULANG PESERTA DIDIK BARU*\n`;
+    let text = `*FORMULIR DAFTAR ULANG SPMB*\n`;
     text += `*${profil.namaMadrasah.toUpperCase()}*\n`;
     text += `*TAHUN PELAJARAN ${pengaturan.tahunAjaran.toUpperCase()}*\n`;
     text += `========================================\n\n`;
@@ -203,7 +203,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
     year: 'numeric'
   });
 
-  const lokasiKota = profil.kecamatan || profil.kabKota || 'Jatibarang';
+  const lokasiKota = profil.kecamatan || profil.kabKota || 'Jakarta';
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:bg-white print:static print:overflow-visible">
@@ -315,27 +315,45 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
           {viewMode === 'formulir_resmi' && (
             <div className="space-y-4 max-w-3xl mx-auto">
               
-              {/* TOP HEADER SECTION (TANPA NO PMBM & NO DAFTAR ULANG) */}
-              <div className="flex justify-between items-start pt-1">
-                <div className="space-y-0.5">
-                  <h2 className="font-bold text-[15px] underline uppercase tracking-tight text-black">
-                    FORMULIR DAFTAR ULANG PESERTA DIDIK BARU
-                  </h2>
-                  <h3 className="font-bold text-[14px] uppercase text-black">
-                    {profil.namaMadrasah.toUpperCase()}
-                  </h3>
-                  <h4 className="font-bold text-[13px] underline uppercase text-black">
-                    TAHUN PELAJARAN {pengaturan.tahunAjaran.replace('/', ' – ')}
-                  </h4>
-                </div>
-              </div>
+              {/* TOP HEADER SECTION: LOGO + JUDUL (KIRI) & TUJUAN KEPALA MADRASAH (KANAN SEJAJAR) */}
+              <div className="flex justify-between items-center pt-1 pb-1 gap-4 border-b-2 border-black/80 pb-3">
+                {/* Header Kiri: Logo Sekolah & Judul */}
+                <div className="flex items-center gap-3.5">
+                  {/* Logo Sekolah Sesuai Ukuran Judul */}
+                  <div className="w-16 h-16 shrink-0 flex items-center justify-center">
+                    {profil.logoUrl ? (
+                      <img
+                        src={profil.logoUrl}
+                        alt="Logo Sekolah"
+                        className="w-16 h-16 object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-xs shadow-sm border border-emerald-800">
+                        MTS
+                      </div>
+                    )}
+                  </div>
 
-              {/* TUJUAN SURAT (KEPADA YTH KEPALA) */}
-              <div className="flex justify-end pt-1 text-[13px] leading-relaxed">
-                <div className="w-64 text-left">
-                  <p className="text-black">Kepada Yth. Kepala</p>
-                  <p className="text-black">{profil.namaMadrasah}</p>
-                  <p className="text-black">{profil.kecamatan || 'Jatibarang'}-{profil.kabKota || 'Brebes'}</p>
+                  {/* Teks Judul */}
+                  <div className="space-y-0.5">
+                    <h2 className="font-bold text-[15px] underline uppercase tracking-tight text-black leading-tight">
+                      FORMULIR DAFTAR ULANG SPMB
+                    </h2>
+                    <h3 className="font-bold text-[13.5px] uppercase text-black leading-tight">
+                      {profil.namaMadrasah ? profil.namaMadrasah.toUpperCase() : "MTs ASY-SYAFI'IYYAH"}
+                    </h3>
+                    <h4 className="font-bold text-[12.5px] underline uppercase text-black leading-tight">
+                      TAHUN PELAJARAN {pengaturan.tahunAjaran.replace('/', ' – ')}
+                    </h4>
+                  </div>
+                </div>
+
+                {/* Header Kanan: Kepada Yth. Kepala (Sejajar dengan Judul) */}
+                <div className="text-left shrink-0 text-[12.5px] leading-snug min-w-[200px]">
+                  <p className="text-black font-normal">Kepada Yth. Kepala</p>
+                  <p className="font-bold text-black">{profil.namaMadrasah || "MTs ASY-SYAFI'IYYAH"}</p>
+                  <p className="text-black">{profil.kecamatan || 'Cilandak'}-{profil.kabKota || 'Jakarta Selatan'}</p>
                 </div>
               </div>
 
