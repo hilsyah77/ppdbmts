@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserAccount, ProfilMadrasahData, PengaturanSPMBData, UserRole } from '../types';
+import { UserAccount, ProfilMadrasahData, PengaturanSPMBData } from '../types';
 import {
   Lock,
   User,
@@ -7,18 +7,16 @@ import {
   AlertCircle,
   School,
   Key,
-  Users,
-  CreditCard,
-  GraduationCap,
-  Sparkles,
   ArrowRight,
   Eye,
   EyeOff,
-  CheckCircle2,
-  Calendar,
   Building,
   Phone,
-  Mail
+  Mail,
+  CheckCircle,
+  FileText,
+  CreditCard,
+  UserCheck
 } from 'lucide-react';
 
 interface LoginPageProps {
@@ -38,83 +36,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [selectedRoleFilter, setSelectedRoleFilter] = useState<UserRole | 'all'>('all');
   const [isLoading, setIsLoading] = useState(false);
 
   const namaMadrasah = profil.namaMadrasah || 'MTs Negeri 1 Model';
   const logoUrl = profil.logoUrl || '';
   const tahunAjaran = pengaturan.tahunAjaran || '2025/2026';
   const gelombangActive = pengaturan.gelombangActive || 'Gelombang 1';
-
-  const roleDefinitions = [
-    {
-      role: 'admin' as UserRole,
-      title: 'Administrator',
-      subtitle: 'Kepala Madrasah & Tim IT',
-      badge: 'Akses Penuh',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-      icon: ShieldCheck,
-      iconColor: 'text-emerald-400',
-      bgLight: 'bg-emerald-950/30 border-emerald-800/50 hover:border-emerald-500/60',
-      desc: 'Memiliki kewenangan penuh: kelola data pendaftar, verifikasi berkas, keuangan & kuitansi, profil madrasah, pengaturan SPMB & manajemen akun pengguna.',
-      defaultUser: 'admin',
-      defaultPass: '123'
-    },
-    {
-      role: 'panitia' as UserRole,
-      title: 'Panitia SPMB',
-      subtitle: 'Verifikator & Pelaksana',
-      badge: 'Verifikasi Berkas',
-      badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      icon: Users,
-      iconColor: 'text-blue-400',
-      bgLight: 'bg-blue-950/30 border-blue-800/50 hover:border-blue-500/60',
-      desc: 'Entri pendaftar baru, verifikasi berkas administrasi & fisik, atur jadwal piket panitia, serta cetak formulir pendaftaran dan daftar ulang resmi.',
-      defaultUser: 'panitia',
-      defaultPass: '123'
-    },
-    {
-      role: 'bendahara' as UserRole,
-      title: 'Bendahara Keuangan',
-      subtitle: 'Kasir & Pembayaran',
-      badge: 'Kasir & Kuitansi',
-      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-      icon: CreditCard,
-      iconColor: 'text-amber-400',
-      bgLight: 'bg-amber-950/30 border-amber-800/50 hover:border-amber-500/60',
-      desc: 'Penerimaan pembayaran SPMB, pengelolaan rincian biaya seragam & infak madrasah, pencatatan transaksi kasir, serta cetak kuitansi resmi.',
-      defaultUser: 'bendahara',
-      defaultPass: '123'
-    },
-    {
-      role: 'siswa' as UserRole,
-      title: 'Calon Murid / Wali',
-      subtitle: 'Portal Calon Siswa',
-      badge: 'Portal Mandiri',
-      badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-      icon: GraduationCap,
-      iconColor: 'text-purple-400',
-      bgLight: 'bg-purple-950/30 border-purple-800/50 hover:border-purple-500/60',
-      desc: 'Portal pendaftar untuk mengecek status seleksi & pengumuman kelulusan, melihat rincian biaya daftar ulang, dan mengunduh bukti formulir pendaftaran.',
-      defaultUser: 'siswa',
-      defaultPass: '123'
-    }
-  ];
-
-  const handleQuickSelect = (userRole: UserRole) => {
-    const found = usersList.find((u) => u.role === userRole && u.isAktif);
-    if (found) {
-      setUsernameInput(found.username);
-      setPasswordInput(found.password || '123');
-      setErrorMessage('');
-    } else {
-      const def = roleDefinitions.find((r) => r.role === userRole);
-      if (def) {
-        setUsernameInput(def.defaultUser);
-        setPasswordInput(def.defaultPass);
-      }
-    }
-  };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,14 +129,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex items-center justify-center">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 w-full items-center">
           
-          {/* Left Column: Madrasah Branding, System Overview & Roles */}
+          {/* Left Column: Madrasah Branding & Information Overview */}
           <div className="lg:col-span-7 space-y-6">
             
             {/* Main Greeting / Title */}
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Portal Autentikasi Resmi & Hak Akses Berjenjang</span>
+                <span>Portal Autentikasi Pengguna Terintegrasi</span>
               </div>
 
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
@@ -217,74 +144,50 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </h2>
 
               <p className="text-sm text-slate-300 leading-relaxed max-w-2xl">
-                Aplikasi Sistem Penerimaan Murid Baru (SPMB) Tahun Ajaran {tahunAjaran}. Seluruh pengguna wajib melakukan login menggunakan akun resmi sesuai peran (role) yang telah didaftarkan.
+                Sistem Penerimaan Murid Baru (SPMB) Tahun Ajaran {tahunAjaran}. Silakan masukkan username dan kata sandi akun resmi Anda untuk mengakses sistem pengelolaan, pendaftaran, dan informasi SPMB.
               </p>
             </div>
 
-            {/* Role Cards List */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Pilih Role Akun untuk Login Langsung:</span>
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  Klik kartu untuk isi otomatis
-                </span>
+            {/* Information Feature Highlights */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="p-4 rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm space-y-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                  <UserCheck className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-200">Hak Akses Berjenjang</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Pengelolaan sistem aman dengan pembagian peran Admin, Panitia SPMB, Bendahara, dan Calon Siswa.
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {roleDefinitions.map((item) => {
-                  const Icon = item.icon;
-                  const isFilled = usernameInput === item.defaultUser;
-                  return (
-                    <button
-                      key={item.role}
-                      type="button"
-                      onClick={() => handleQuickSelect(item.role)}
-                      className={`p-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer ${
-                        item.bgLight
-                      } ${
-                        isFilled
-                          ? 'ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/20 bg-slate-900'
-                          : 'bg-slate-900/80 hover:bg-slate-900'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="p-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300">
-                            <Icon className={`w-4 h-4 ${item.iconColor}`} />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-xs text-slate-100">
-                              {item.title}
-                            </h4>
-                            <p className="text-[10px] text-slate-400">
-                              {item.subtitle}
-                            </p>
-                          </div>
-                        </div>
-                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold border ${item.badgeColor} shrink-0`}>
-                          {item.badge}
-                        </span>
-                      </div>
+              <div className="p-4 rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm space-y-2">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-200">Verifikasi & Formulir Cetak</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Pencatatan berkas fisik pendaftar dan cetak formulir pendaftaran serta rincian daftar ulang resmi.
+                </p>
+              </div>
 
-                      <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                        {item.desc}
-                      </p>
+              <div className="p-4 rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm space-y-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-200">Kasir & Kuitansi Pembayaran</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Pencatatan transaksi pembayaran daftar ulang, biaya seragam, dan penerbitan bukti kuitansi digital.
+                </p>
+              </div>
 
-                      <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[10px]">
-                        <span className="text-slate-500 font-mono">
-                          User: <strong className="text-slate-300">{item.defaultUser}</strong>
-                        </span>
-                        <span className="text-emerald-400 font-medium flex items-center gap-1 group-hover:underline">
-                          <span>Gunakan Akun</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="p-4 rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm space-y-2">
+                <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+                  <CheckCircle className="w-4 h-4" />
+                </div>
+                <h4 className="text-xs font-bold text-slate-200">Data Realtime & Akurat</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Pemantauan kuota jalur pendaftaran, status seleksi siswa, dan jadwal piket panitia secara real-time.
+                </p>
               </div>
             </div>
 
@@ -325,7 +228,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   Login ke Sistem SPMB
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
-                  Masukkan identitas kredensial akun Anda untuk memulai.
+                  Masukkan identitas kredensial akun Anda untuk mengakses aplikasi.
                 </p>
               </div>
 
@@ -351,7 +254,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                       type="text"
                       value={usernameInput}
                       onChange={(e) => setUsernameInput(e.target.value)}
-                      placeholder="Contoh: admin, panitia, bendahara, siswa"
+                      placeholder="Masukkan nama pengguna"
                       className="w-full pl-10 pr-3.5 py-3 bg-slate-800/90 border border-slate-700/80 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all font-medium"
                       autoFocus
                     />
@@ -360,14 +263,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
                 {/* Password Field */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-semibold text-slate-300">
-                      Kata Sandi (Password)
-                    </label>
-                    <span className="text-[11px] text-slate-500">
-                      Default: 123
-                    </span>
-                  </div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Kata Sandi (Password)
+                  </label>
                   <div className="relative">
                     <Key className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
                     <input
@@ -413,18 +311,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
               </form>
 
-              {/* Quick Info Box inside Login Card */}
-              <div className="mt-6 pt-4 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-slate-300 font-semibold">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Kredensial Akun Default SPMB:</span>
-                </div>
-                <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-400 font-mono bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
-                  <div>• Admin: <strong className="text-emerald-400">admin</strong> / 123</div>
-                  <div>• Panitia: <strong className="text-blue-400">panitia</strong> / 123</div>
-                  <div>• Kasir: <strong className="text-amber-400">bendahara</strong> / 123</div>
-                  <div>• Siswa: <strong className="text-purple-400">siswa</strong> / 123</div>
-                </div>
+              {/* Card Footer Note */}
+              <div className="mt-6 pt-4 border-t border-slate-800/80 text-[11px] text-slate-400 text-center">
+                <span>Pastikan Anda menjaga kerahasiaan akun dan kata sandi Anda.</span>
               </div>
 
             </div>
