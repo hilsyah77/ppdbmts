@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { JadwalPiket } from '../types';
+import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
 import {
   CalendarCheck,
   Clock,
@@ -30,11 +31,25 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
   const [newPetugasInput, setNewPetugasInput] = useState('');
   const [newNoKontak, setNewNoKontak] = useState('0812-9988-7766');
   const [newLokasi, setNewLokasi] = useState('Ruang Panitia PPDB (Gedung Utama Lt. 1)');
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
 
   const handleAddJadwal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPetugasInput.trim()) {
-      alert('Masukkan minimal satu nama petugas piket!');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Nama Petugas Wajib Diisi',
+        message: 'Harap masukkan minimal satu nama petugas piket PPDB untuk menyimpan jadwal.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
@@ -62,11 +77,19 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
   };
 
   const handleDeleteJadwal = (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus jadwal piket panitia ini?')) {
-      const updated = list.filter((item) => item.id !== id);
-      setList(updated);
-      onSaveJadwal(updated);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Jadwal Piket',
+      message: 'Apakah Anda yakin ingin menghapus jadwal piket panitia ini dari agenda kegiatan?',
+      type: 'danger',
+      confirmText: 'Ya, Hapus Jadwal',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        const updated = list.filter((item) => item.id !== id);
+        setList(updated);
+        onSaveJadwal(updated);
+      }
+    });
   };
 
   const handleToggleStatus = (id: string) => {
@@ -296,6 +319,12 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Modern Centered Confirm / Alert Dialog */}
+      <ConfirmDialog
+        dialog={confirmDialog}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+      />
 
     </div>
   );

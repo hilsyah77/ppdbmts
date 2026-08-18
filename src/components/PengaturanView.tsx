@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PengaturanPPDBData, JalurPPDB, JadwalPiket, UserAccount, UserRole } from '../types';
+import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
 import {
   Settings,
   Calendar,
@@ -58,6 +59,14 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
   // User Management State
   const [showUserModal, setShowUserModal] = useState<boolean>(false);
   const [editingUser, setEditingUser] = useState<UserAccount | null>(null);
+  const [showAddJalurModal, setShowAddJalurModal] = useState<boolean>(false);
+  const [newJalurNameInput, setNewJalurNameInput] = useState<string>('');
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
   const [userFormData, setUserFormData] = useState<{
     username: string;
     namaLengkap: string;
@@ -96,7 +105,15 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
 
   const handleExecuteDatabaseDeletion = () => {
     if (confirmInputText.trim().toUpperCase() !== 'HAPUS') {
-      alert('Konfirmasi gagal: Ketik kata "HAPUS" dengan benar untuk melanjutkan.');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Konfirmasi Tidak Valid',
+        message: 'Harap ketik kata "HAPUS" dengan tepat pada kotak input konfirmasi untuk melanjutkan penghapusan database.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Kembali',
+        onConfirm: () => {}
+      });
       return;
     }
 
@@ -115,27 +132,53 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
     );
   };
 
-  const handleAddJalur = () => {
-    const namaBaru = prompt('Masukkan Nama Jalur Pendaftaran Baru (misal: Jalur Undangan Alumni):');
-    if (!namaBaru) return;
+  const handleOpenAddJalurModal = () => {
+    setNewJalurNameInput('');
+    setShowAddJalurModal(true);
+  };
+
+  const handleSaveAddJalur = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newJalurNameInput.trim()) {
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Nama Jalur Kosong',
+        message: 'Harap masukkan nama jalur pendaftaran baru sebelum menyimpan.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
+      return;
+    }
 
     const newJalurItem: JalurPPDB = {
       id: `j-${Date.now()}`,
-      namaJalur: namaBaru,
+      namaJalur: newJalurNameInput.trim(),
       kuota: 25,
       terisi: 0,
-      deskripsi: 'Jalur khusus sesuai juknis panitia.',
-      persyaratan: ['Persyaratan sesuai ketentuan panitia'],
+      deskripsi: 'Jalur khusus sesuai juknis panitia PPDB.',
+      persyaratan: ['Persyaratan berkas sesuai ketentuan panitia'],
       warnaBadge: 'bg-indigo-100 text-indigo-800 border-indigo-300'
     };
 
     setJalurs((prev) => [...prev, newJalurItem]);
+    setShowAddJalurModal(false);
   };
 
   const handleDeleteJalur = (id: string, nama: string) => {
-    if (confirm(`Hapus jalur ${nama}?`)) {
-      setJalurs((prev) => prev.filter((j) => j.id !== id));
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Jalur PPDB',
+      message: `Apakah Anda yakin ingin menghapus jalur pendaftaran "${nama}" dari sistem?`,
+      subMessage: 'Pendaftar yang telah terdaftar pada jalur ini tidak akan otomatis terhapus.',
+      type: 'danger',
+      confirmText: 'Ya, Hapus Jalur',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        setJalurs((prev) => prev.filter((j) => j.id !== id));
+      }
+    });
   };
 
   const handleSubmitAll = (e: React.FormEvent) => {
@@ -182,7 +225,15 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
   const handleSaveUserSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!userFormData.username.trim() || !userFormData.namaLengkap.trim()) {
-      alert('Username dan Nama Lengkap wajib diisi!');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Data Belum Lengkap',
+        message: 'Username dan Nama Lengkap pengguna wajib diisi.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
@@ -199,7 +250,15 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
     } else {
       // Check duplicate username
       if (users.some((u) => u.username.toLowerCase() === userFormData.username.trim().toLowerCase())) {
-        alert('Username sudah digunakan! Gunakan username lain.');
+        setConfirmDialog({
+          isOpen: true,
+          title: 'Username Sudah Digunakan',
+          message: `Username "${userFormData.username}" telah terdaftar pada akun lain. Harap gunakan username yang berbeda.`,
+          type: 'warning',
+          isAlertOnly: true,
+          confirmText: 'Mengerti',
+          onConfirm: () => {}
+        });
         return;
       }
 
@@ -229,16 +288,33 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
 
   const handleDeleteUser = (id: string, username: string) => {
     if (users.length <= 1) {
-      alert('Sistem harus memiliki minimal 1 pengguna.');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Tidak Dapat Menghapus Akun',
+        message: 'Sistem PPDB harus memiliki minimal 1 akun pengguna aktif.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
-    if (confirm(`Apakah Anda yakin ingin menghapus akun pengguna "${username}"?`)) {
-      const updatedList = users.filter((u) => u.id !== id);
-      setUsers(updatedList);
-      if (onSaveUsersList) {
-        onSaveUsersList(updatedList);
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Akun Pengguna',
+      message: `Apakah Anda yakin ingin menghapus akun pengguna "${username}" dari sistem?`,
+      subMessage: 'Pengguna ini tidak akan lagi dapat masuk/login ke dalam panel PPDB.',
+      type: 'danger',
+      confirmText: 'Ya, Hapus Akun',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        const updatedList = users.filter((u) => u.id !== id);
+        setUsers(updatedList);
+        if (onSaveUsersList) {
+          onSaveUsersList(updatedList);
+        }
       }
-    }
+    });
   };
 
   return (
@@ -354,7 +430,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
             </h3>
             <button
               type="button"
-              onClick={handleAddJalur}
+              onClick={handleOpenAddJalurModal}
               className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs transition-colors flex items-center gap-1 border border-emerald-200"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -896,6 +972,72 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* MODAL: TAMBAH JALUR PPDB BARU */}
+      {showAddJalurModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-scale-up">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 text-slate-800">
+                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-black text-slate-800">Tambah Jalur PPDB Baru</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddJalurModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveAddJalur} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Nama Jalur Pendaftaran <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={newJalurNameInput}
+                  onChange={(e) => setNewJalurNameInput(e.target.value)}
+                  placeholder="Contoh: Jalur Tahfidz & Prestasi Qur'an"
+                  autoFocus
+                  required
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none text-sm font-semibold text-slate-800"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Kuota awal akan disetel ke 25 kursi dan dapat disesuaikan pada tabel kuota.
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddJalurModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Simpan Jalur Baru</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Global Centered CSS Confirm / Notification Dialog */}
+      <ConfirmDialog
+        dialog={confirmDialog}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+      />
 
     </div>
   );

@@ -35,6 +35,7 @@ import {
 import { ModalKuitansi } from './ModalKuitansi';
 import { ModalBayar } from './ModalBayar';
 import { ModalHasilRincian } from './ModalHasilRincian';
+import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
 
 // Opsi Kategori Berdasarkan Nama Komponen Biaya
 export const KATEGORI_OPSI_ADMINISTRASI = [
@@ -100,6 +101,12 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
   const [isCustomEditName, setIsCustomEditName] = useState<boolean>(false);
   const [isCustomAddKategori, setIsCustomAddKategori] = useState<boolean>(false);
   const [isCustomEditKategori, setIsCustomEditKategori] = useState<boolean>(false);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
   const [newItemForm, setNewItemForm] = useState<Omit<ItemBiayaPembayaran, 'id'>>({
     namaKomponen: 'Pembayaran Administrasi keuangan',
     kategori: 'Titipan SPP',
@@ -330,9 +337,18 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
   };
 
   const handleDeleteComponent = (id: string, nama: string) => {
-    if (confirm(`Hapus komponen biaya "${nama}" dari daftar rincian?`)) {
-      setItemBiayaList((prev) => prev.filter((i) => i.id !== id));
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Komponen Biaya',
+      message: `Apakah Anda yakin ingin menghapus komponen biaya "${nama}" dari daftar rincian PPDB?`,
+      subMessage: 'Komponen ini tidak akan lagi muncul dalam kalkulasi daftar ulang calon siswa baru.',
+      type: 'danger',
+      confirmText: 'Ya, Hapus Komponen',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        setItemBiayaList((prev) => prev.filter((i) => i.id !== id));
+      }
+    });
   };
 
   return (
@@ -1518,6 +1534,12 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
           }}
         />
       )}
+
+      {/* Confirm / Alert Dialog */}
+      <ConfirmDialog
+        dialog={confirmDialog}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+      />
 
     </div>
   );

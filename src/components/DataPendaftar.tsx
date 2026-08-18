@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Pendaftar, JalurPPDB, StatusPendaftar } from '../types';
+import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
 import {
   Users,
   Search,
@@ -48,6 +49,13 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJalur, setSelectedJalur] = useState<string>(initialFilterJalur);
   const [selectedStatus, setSelectedStatus] = useState<string>(initialFilterStatus);
+  const [alertDialog, setAlertDialog] = useState<ConfirmDialogState>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
   // Filtering Logic
   const filteredData = useMemo(() => {
     return pendaftarList.filter((p) => {
@@ -72,7 +80,15 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
   // Export to CSV Functionality
   const exportToCSV = () => {
     if (filteredData.length === 0) {
-      alert('Tidak ada data pendaftar untuk diekspor!');
+      setAlertDialog({
+        isOpen: true,
+        title: 'Data Pendaftar Kosong',
+        message: 'Tidak ada data calon siswa yang cocok dengan filter saat ini untuk diekspor ke format CSV/Excel.',
+        type: 'info',
+        isAlertOnly: true,
+        confirmText: 'Tutup',
+        onConfirm: () => {}
+      });
       return;
     }
 
@@ -487,6 +503,11 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
           </table>
         </div>
       </div>
+
+      <ConfirmDialog
+        dialog={alertDialog}
+        onClose={() => setAlertDialog((prev) => ({ ...prev, isOpen: false }))}
+      />
 
     </div>
   );

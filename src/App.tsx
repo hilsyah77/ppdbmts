@@ -43,6 +43,7 @@ import { ModalVerifikasi } from './components/ModalVerifikasi';
 import { ModalTambahPendaftar } from './components/ModalTambahPendaftar';
 import { ModalLogin } from './components/ModalLogin';
 import { ModalHasilRincian } from './components/ModalHasilRincian';
+import { ConfirmDialog, ConfirmDialogState } from './components/ConfirmDialog';
 
 export default function App() {
   // Navigation State
@@ -105,6 +106,12 @@ export default function App() {
   });
   const [verifikasiModalItem, setVerifikasiModalItem] = useState<Pendaftar | null>(null);
   const [isTambahModalOpen, setIsTambahModalOpen] = useState<boolean>(false);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
 
   // Sync Users to LocalStorage
   useEffect(() => {
@@ -171,13 +178,22 @@ export default function App() {
   };
 
   const handleDeletePendaftar = (id: string, nama: string) => {
-    if (confirm(`Apakah Anda yakin ingin menghapus data pendaftar "${nama}" dari sistem?`)) {
-      setPendaftarList((prev) => {
-        const filtered = prev.filter((p) => p.id !== id);
-        // Recalculate No Urut
-        return filtered.map((p, idx) => ({ ...p, noUrut: idx + 1 }));
-      });
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Data Pendaftar',
+      message: `Apakah Anda yakin ingin menghapus data pendaftar "${nama}" dari sistem?`,
+      subMessage: 'Tindakan ini permanen dan akan menghapus seluruh rekaman pendaftaran serta pembayaran terkait.',
+      type: 'danger',
+      confirmText: 'Ya, Hapus Data',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        setPendaftarList((prev) => {
+          const filtered = prev.filter((p) => p.id !== id);
+          // Recalculate No Urut
+          return filtered.map((p, idx) => ({ ...p, noUrut: idx + 1 }));
+        });
+      }
+    });
   };
 
   const handleAddPendaftar = (
@@ -210,32 +226,41 @@ export default function App() {
   };
 
   const handleResetData = () => {
-    if (
-      confirm(
-        'PERINGATAN DANGER ZONE:\nApakah Anda yakin ingin MENGHAPUS SELURUH DATABASE dan mengembalikan data pendaftar, profil, biaya, dan jadwal piket ke kondisi awal sistem?'
-      )
-    ) {
-      localStorage.clear();
-      setPendaftarList(initialPendaftar);
-      setJalurList(initialJalurPPDB);
-      setJadwalPiketList(initialJadwalPiket);
-      setProfilMadrasah(initialProfilMadrasah);
-      setPengaturan(initialPengaturan);
-      setItemBiayaList(initialItemBiayaPembayaran);
-      setActiveTab('dashboard');
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Reset Seluruh Database Sistem',
+      message: 'Apakah Anda yakin ingin MENGHAPUS SELURUH DATABASE dan mengembalikan data pendaftar, profil, biaya, dan jadwal piket ke kondisi awal sistem?',
+      subMessage: 'Peringatan: Seluruh data perubahan yang tersimpan di perangkat ini akan digantikan dengan data bawaan standar.',
+      type: 'danger',
+      confirmText: 'Ya, Reset Database',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        localStorage.clear();
+        setPendaftarList(initialPendaftar);
+        setJalurList(initialJalurPPDB);
+        setJadwalPiketList(initialJadwalPiket);
+        setProfilMadrasah(initialProfilMadrasah);
+        setPengaturan(initialPengaturan);
+        setItemBiayaList(initialItemBiayaPembayaran);
+        setActiveTab('dashboard');
+      }
+    });
   };
 
   const handleClearPendaftarOnly = () => {
-    if (
-      confirm(
-        'MENGOSONGKAN DATA PENDAFTAR:\nApakah Anda yakin ingin MENGHAPUS SEMUA DATA SISWA PENDAFTAR & RIWAYAT PEMBAYARAN?\n\nSemua data pendaftar akan menjadi 0 (kosong) untuk periode pendaftaran baru.'
-      )
-    ) {
-      setPendaftarList([]);
-      localStorage.setItem('ppdb_mts_pendaftar', JSON.stringify([]));
-      alert('Seluruh data pendaftar dan riwayat pembayaran berhasil dikosongkan!');
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Kosongkan Data Siswa Pendaftar',
+      message: 'Apakah Anda yakin ingin MENGHAPUS SEMUA DATA SISWA PENDAFTAR & RIWAYAT PEMBAYARAN?\n\nSemua data pendaftar akan menjadi 0 (kosong) untuk periode pendaftaran baru.',
+      subMessage: 'Data profil madrasah, jadwal piket, master rincian biaya, dan akun pengguna akan tetap aman.',
+      type: 'danger',
+      confirmText: 'Ya, Kosongkan Data Siswa',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        setPendaftarList([]);
+        localStorage.setItem('ppdb_mts_pendaftar', JSON.stringify([]));
+      }
+    });
   };
 
   const handleLoginSuccess = (user: UserAccount) => {
@@ -420,6 +445,12 @@ export default function App() {
           onClose={() => setHasilRincianModalItem({ isOpen: false, pendaftar: null })}
         />
       )}
+
+      {/* Global Modern Centered CSS Confirm / Notification Dialog */}
+      <ConfirmDialog
+        dialog={confirmDialog}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+      />
 
     </div>
   );

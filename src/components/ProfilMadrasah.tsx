@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { ProfilMadrasahData } from '../types';
+import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
 import {
   School,
   Building,
@@ -30,6 +31,12 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
   const [formData, setFormData] = useState<ProfilMadrasahData>(profil);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isKopDragOver, setIsKopDragOver] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const kopInputRef = useRef<HTMLInputElement>(null);
@@ -44,12 +51,28 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Harap pilih file gambar (PNG, JPG, SVG, WebP)');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Format File Tidak Sesuai',
+        message: 'Harap pilih berkas gambar yang valid (format PNG, JPG, SVG, atau WebP).',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
     if (file.size > 3 * 1024 * 1024) {
-      alert('Ukuran file gambar maksimal 3 MB');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Ukuran File Terlalu Besar',
+        message: 'Ukuran berkas logo madrasah maksimal 3 MB.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
@@ -67,12 +90,28 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Harap pilih file gambar (PNG, JPG, WebP)');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Format File Tidak Sesuai',
+        message: 'Harap pilih berkas gambar banner yang valid (format PNG, JPG, atau WebP).',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Ukuran file banner maksimal 5 MB');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Ukuran File Terlalu Besar',
+        message: 'Ukuran berkas banner website maksimal 5 MB.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
@@ -87,12 +126,28 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
 
   const processKopFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('Harap pilih file gambar (JPG, PNG, atau WebP)');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Format File Tidak Sesuai',
+        message: 'Harap pilih berkas gambar kop surat yang valid (format JPG, PNG, atau WebP).',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Ukuran file kop surat maksimal 5 MB');
+      setConfirmDialog({
+        isOpen: true,
+        title: 'Ukuran File Terlalu Besar',
+        message: 'Ukuran berkas gambar scan kop surat resmi maksimal 5 MB.',
+        type: 'warning',
+        isAlertOnly: true,
+        confirmText: 'Mengerti',
+        onConfirm: () => {}
+      });
       return;
     }
 
@@ -796,6 +851,12 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
         </div>
 
       </form>
+
+      {/* Global CSS Centered Confirm/Notification Dialog */}
+      <ConfirmDialog
+        dialog={confirmDialog}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+      />
 
     </div>
   );
