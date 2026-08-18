@@ -214,7 +214,50 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
   const lokasiKota = profil.kecamatan || profil.kabKota || 'Jakarta';
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:bg-white print:static print:overflow-visible">
+    <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:m-0 print:bg-white print:fixed print:inset-0 print:overflow-visible">
+      {/* Embedded Print Styles for Formulir Daftar Ulang (Margin: Atas 1cm, Kiri 1.5cm, Kanan 1.5cm, Bawah 1cm) */}
+      <style>{`
+        @page {
+          size: A4 portrait;
+          margin-top: 1cm;
+          margin-bottom: 1cm;
+          margin-left: 1.5cm;
+          margin-right: 1.5cm;
+        }
+        @media print {
+          *, *::before, *::after {
+            box-sizing: border-box !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          html, body {
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            overflow: visible !important;
+          }
+          body * {
+            visibility: hidden !important;
+          }
+          #printable-formulir-daftar-ulang, #printable-formulir-daftar-ulang * {
+            visibility: visible !important;
+          }
+          #printable-formulir-daftar-ulang {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            display: block !important;
+          }
+        }
+      `}</style>
+
       <div className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col max-h-[96vh] print:max-h-none print:shadow-none print:border-none print:rounded-none print:m-0 print:w-full print:static">
         
         {/* MODAL CONTROLS HEADER (HIDDEN ON PRINT) */}
@@ -321,7 +364,12 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
         <div className="p-6 sm:p-10 overflow-y-auto space-y-6 print:p-0 print:m-0 print:overflow-visible text-slate-900 bg-white text-[13px] leading-normal font-serif">
           
           {/* VIEW MODE 1: FORMULIR DAFTAR ULANG PESERTA DIDIK BARU (SESUAI GAMBAR SCAN ASLI - SELALU DICETAK DI PRINT) */}
-          <div className={`space-y-4 max-w-3xl mx-auto ${viewMode === 'formulir_resmi' ? 'block' : 'hidden print:block'}`}>
+          <div
+            id="printable-formulir-daftar-ulang"
+            className={`space-y-3.5 max-w-3xl mx-auto text-black font-serif text-[12.5px] leading-normal print:w-full print:max-w-none print:m-0 print:p-0 ${
+              viewMode === 'formulir_resmi' ? 'block' : 'hidden print:block'
+            }`}
+          >
             
             {/* TOP HEADER SECTION: LOGO + JUDUL (KIRI) & TUJUAN KEPALA MADRASAH (KANAN SEJAJAR) */}
             <div className="flex justify-between items-center pt-1 pb-1 gap-4">
@@ -593,12 +641,12 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
               </div>
 
               {/* SALAM PENUTUP & TANDA TANGAN (PETUGAS PIKET & NAMA AYAH) */}
-              <div className="pt-2 space-y-3 text-[13px]">
+              <div className="pt-2 space-y-2 text-[12.5px] break-inside-avoid">
                 <p className="text-black">Wassalamualaikum Wr. Wb</p>
 
-                <div className="pt-2 grid grid-cols-2 gap-12 text-left">
+                <div className="pt-1 grid grid-cols-2 gap-12 text-left">
                   {/* TTD KIRI: PETUGAS PIKET */}
-                  <div className="space-y-16">
+                  <div className="space-y-12">
                     <p className="text-black leading-tight">
                       Mengetahui,<br />
                       Petugas Piket PPDB
@@ -611,7 +659,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                   </div>
 
                   {/* TTD KANAN: ORANG TUA (NAMA AYAH) */}
-                  <div className="space-y-16">
+                  <div className="space-y-12">
                     <p className="text-black leading-tight">
                       {lokasiKota}, {tanggalHariIni}<br />
                       Orang Tua / Wali (Ayah)
