@@ -4,7 +4,8 @@ import {
   JalurPPDB,
   JadwalPiket,
   ProfilMadrasahData,
-  PengaturanPPDBData
+  PengaturanSPMBData,
+  UserAccount
 } from '../types';
 import {
   Users,
@@ -45,7 +46,8 @@ interface DashboardProps {
   jalurList: JalurPPDB[];
   jadwalPiketList: JadwalPiket[];
   profil: ProfilMadrasahData;
-  pengaturan: PengaturanPPDBData;
+  pengaturan: PengaturanSPMBData;
+  currentUser?: UserAccount | null;
   onNavigateToPendaftar: (filterJalur?: string, filterStatus?: string) => void;
   onNavigateToPiket: () => void;
   onNavigateToJalurSettings: () => void;
@@ -57,6 +59,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   jadwalPiketList,
   profil,
   pengaturan,
+  currentUser,
   onNavigateToPendaftar,
   onNavigateToPiket,
   onNavigateToJalurSettings

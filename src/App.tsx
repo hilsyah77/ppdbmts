@@ -36,7 +36,8 @@ import { JadwalPiketView } from './components/JadwalPiketView';
 import { PengaturanView } from './components/PengaturanView';
 import { PembayaranView } from './components/PembayaranView';
 
-// Modals
+// Modals & Pages
+import { LoginPage } from './components/LoginPage';
 import { ModalDetailPendaftar } from './components/ModalDetailPendaftar';
 import { ModalCetakFormulir } from './components/ModalCetakFormulir';
 import { ModalVerifikasi } from './components/ModalVerifikasi';
@@ -45,7 +46,7 @@ import { ModalLogin } from './components/ModalLogin';
 import { ModalHasilRincian } from './components/ModalHasilRincian';
 import { ConfirmDialog, ConfirmDialogState } from './components/ConfirmDialog';
 import { ToastNotification, ToastMessage } from './components/ToastNotification';
-import { subscribeNotification } from './utils/notification';
+import { subscribeNotification, showNotification } from './utils/notification';
 
 export default function App() {
   // Navigation State
@@ -59,7 +60,7 @@ export default function App() {
 
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
     const saved = localStorage.getItem('ppdb_mts_current_user');
-    return saved ? JSON.parse(saved) : initialUsers[0]; // Default to Admin
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
@@ -285,14 +286,59 @@ export default function App() {
 
   const handleLoginSuccess = (user: UserAccount) => {
     setCurrentUser(user);
+    localStorage.setItem('ppdb_mts_current_user', JSON.stringify(user));
     setIsLoginModalOpen(false);
     setActiveTab('dashboard');
+    showNotification(
+      'Login Berhasil',
+      `Selamat datang, ${user.namaLengkap} (${user.role.toUpperCase()})`,
+      'success'
+    );
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    setIsLoginModalOpen(true);
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Konfirmasi Keluar / Logout',
+      message: `Apakah Anda yakin ingin keluar dari akun "${currentUser?.namaLengkap || 'Pengguna'}"?`,
+      subMessage: 'Anda akan dialihkan kembali ke Halaman Login Utama SPMB.',
+      type: 'warning',
+      confirmText: 'Ya, Keluar Akun',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        setCurrentUser(null);
+        localStorage.removeItem('ppdb_mts_current_user');
+        setIsLoginModalOpen(false);
+        showNotification('Sesi Berakhir', 'Anda telah berhasil keluar dari sistem SPMB.', 'info');
+      }
+    });
   };
+
+  // If not logged in, enforce mandatory Login Page as the primary view
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-950 font-sans text-slate-100 antialiased selection:bg-emerald-500 selection:text-white">
+        <LoginPage
+          profil={profilMadrasah}
+          pengaturan={pengaturan}
+          usersList={usersList}
+          onLogin={handleLoginSuccess}
+        />
+        
+        {/* Global Modern Bottom-Center CSS Floating Toast Notifications */}
+        <ToastNotification
+          toasts={toasts}
+          onDismiss={handleDismissToast}
+        />
+
+        {/* Global Modern Centered CSS Confirm / Notification Dialog */}
+        <ConfirmDialog
+          dialog={confirmDialog}
+          onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100/90 font-sans text-slate-800 antialiased flex flex-col selection:bg-emerald-500 selection:text-white">
@@ -334,6 +380,7 @@ export default function App() {
               jadwalPiketList={jadwalPiketList}
               profil={profilMadrasah}
               pengaturan={pengaturan}
+              currentUser={currentUser}
               onNavigateToPendaftar={handleNavigateToPendaftar}
               onNavigateToPiket={() => setActiveTab('piket')}
               onNavigateToJalurSettings={() => setActiveTab('pengaturan')}
@@ -353,6 +400,7 @@ export default function App() {
               jalurList={jalurList}
               initialFilterJalur={filterJalurParam}
               initialFilterStatus={filterStatusParam}
+              currentUser={currentUser}
               onOpenDetail={(p) => setDetailModalItem(p)}
               onOpenCetak={(p) => setCetakModalItem(p)}
               onOpenCetakDaftarUlang={(p) => setHasilRincianModalItem({ isOpen: true, pendaftar: p || null })}
@@ -400,7 +448,7 @@ export default function App() {
       </div>
 
       {/* Global Modals */}
-      {(isLoginModalOpen || !currentUser) && (
+      {isLoginModalOpen && (
         <ModalLogin
           profil={profilMadrasah}
           pengaturan={pengaturan}

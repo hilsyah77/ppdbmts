@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Pendaftar, JalurPPDB, StatusPendaftar } from '../types';
+import { Pendaftar, JalurPPDB, StatusPendaftar, UserAccount } from '../types';
 import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
 import {
   Users,
@@ -26,6 +26,7 @@ interface DataPendaftarProps {
   jalurList: JalurPPDB[];
   initialFilterJalur?: string;
   initialFilterStatus?: string;
+  currentUser?: UserAccount | null;
   onOpenDetail: (pendaftar: Pendaftar) => void;
   onOpenCetak: (pendaftar: Pendaftar) => void;
   onOpenCetakDaftarUlang?: (pendaftar?: Pendaftar) => void;
@@ -39,6 +40,7 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
   jalurList,
   initialFilterJalur = '',
   initialFilterStatus = '',
+  currentUser,
   onOpenDetail,
   onOpenCetak,
   onOpenCetakDaftarUlang,
@@ -232,24 +234,28 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
             <span>Formulir Daftar Ulang</span>
           </button>
 
-          {/* Export CSV Button */}
-          <button
-            onClick={exportToCSV}
-            className="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition-colors shadow-sm flex items-center gap-2"
-            title="Download file CSV dari data tabel pendaftar"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-            <span>Ekspor CSV</span>
-          </button>
+          {/* Export CSV Button (Admin, Panitia, Bendahara) */}
+          {currentUser?.role !== 'siswa' && (
+            <button
+              onClick={exportToCSV}
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition-colors shadow-sm flex items-center gap-2"
+              title="Download file CSV dari data tabel pendaftar"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+              <span>Ekspor CSV</span>
+            </button>
+          )}
 
-          {/* Add New Registrant Button */}
-          <button
-            onClick={onOpenTambahModal}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors shadow-md flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tambah Pendaftar Baru</span>
-          </button>
+          {/* Add New Registrant Button (Admin, Panitia) */}
+          {(currentUser?.role === 'admin' || currentUser?.role === 'panitia') && (
+            <button
+              onClick={onOpenTambahModal}
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors shadow-md flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambah Pendaftar Baru</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -473,24 +479,28 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
                             <span className="hidden sm:inline">Daftar Ulang</span>
                           </button>
 
-                          {/* Verifikasi */}
-                          <button
-                            onClick={() => onOpenVerifikasi(pendaftar)}
-                            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg font-semibold transition-colors flex items-center gap-1 text-[11px] border border-blue-200"
-                            title="Ubah Status Verifikasi"
-                          >
-                            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                            <span className="hidden sm:inline">Verifikasi</span>
-                          </button>
+                          {/* Verifikasi (Admin & Panitia only) */}
+                          {(currentUser?.role === 'admin' || currentUser?.role === 'panitia') && (
+                            <button
+                              onClick={() => onOpenVerifikasi(pendaftar)}
+                              className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg font-semibold transition-colors flex items-center gap-1 text-[11px] border border-blue-200"
+                              title="Ubah Status Verifikasi"
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                              <span className="hidden sm:inline">Verifikasi</span>
+                            </button>
+                          )}
 
-                          {/* Hapus */}
-                          <button
-                            onClick={() => onDeletePendaftar(pendaftar.id, pendaftar.namaLengkap)}
-                            className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-semibold transition-colors flex items-center gap-1 text-[11px] border border-rose-200"
-                            title="Hapus Data Pendaftar Ini"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-rose-600" />
-                          </button>
+                          {/* Hapus (Admin only) */}
+                          {currentUser?.role === 'admin' && (
+                            <button
+                              onClick={() => onDeletePendaftar(pendaftar.id, pendaftar.namaLengkap)}
+                              className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-semibold transition-colors flex items-center gap-1 text-[11px] border border-rose-200"
+                              title="Hapus Data Pendaftar Ini"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                            </button>
+                          )}
 
                         </div>
                       </td>

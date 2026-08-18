@@ -3,7 +3,7 @@ import {
   Pendaftar,
   ItemBiayaPembayaran,
   ProfilMadrasahData,
-  PengaturanPPDBData,
+  PengaturanSPMBData,
   RiwayatPembayaranItem,
   JadwalPiket
 } from '../types';
@@ -65,7 +65,7 @@ interface PembayaranViewProps {
   itemBiayaList: ItemBiayaPembayaran[];
   setItemBiayaList: React.Dispatch<React.SetStateAction<ItemBiayaPembayaran[]>>;
   profil: ProfilMadrasahData;
-  pengaturan: PengaturanPPDBData;
+  pengaturan: PengaturanSPMBData;
   jadwalPiketList?: JadwalPiket[];
 }
 
