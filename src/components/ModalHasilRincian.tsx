@@ -135,7 +135,10 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
   const [selectedPetugas, setSelectedPetugas] = useState<string>(defaultPetugas);
 
   const handlePrint = () => {
-    window.print();
+    setViewMode('formulir_resmi');
+    setTimeout(() => {
+      window.print();
+    }, 150);
   };
 
   const handleCopyText = () => {
@@ -159,7 +162,12 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
       text += `*${catIdx + 1}. ${grp.kategoriName}*\n`;
       grp.items.forEach((item, itemIdx) => {
         const char = String.fromCharCode(97 + itemIdx); // a, b, c...
-        const rincianName = item.kategori || item.namaKomponen;
+        let rincianName = item.kategori || item.namaKomponen;
+        if (grp.kategoriName.toLowerCase().includes('seragam') || item.namaKomponen.toLowerCase().includes('seragam')) {
+          if (!/^seragam/i.test(rincianName.trim())) {
+            rincianName = `Seragam ${rincianName}`;
+          }
+        }
         const putrStr = item.nominalPutra > 0 ? `Rp ${item.nominalPutra.toLocaleString('id-ID')}` : '----------';
         const putrIStr = item.nominalPutri > 0 ? `Rp ${item.nominalPutri.toLocaleString('id-ID')}` : '----------';
         text += `   ${char}. ${rincianName.padEnd(38, ' ')} Putra: ${putrStr} | Putri: ${putrIStr}\n`;
@@ -293,10 +301,11 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
 
             <button
               onClick={handlePrint}
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+              title="Cetak Formulir Daftar Ulang Sesuai Format Scan Resmi"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Cetak / Print</span>
+              <Printer className="w-4 h-4" />
+              <span>Cetak Formulir Scan Resmi</span>
             </button>
 
             <button
@@ -311,12 +320,11 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
         {/* MODAL CONTENT BODY (PRINTABLE AREA) */}
         <div className="p-6 sm:p-10 overflow-y-auto space-y-6 print:p-0 print:m-0 print:overflow-visible text-slate-900 bg-white text-[13px] leading-normal font-serif">
           
-          {/* VIEW MODE 1: FORMULIR DAFTAR ULANG PESERTA DIDIK BARU (SESUAI GAMBAR SCAN ASLI) */}
-          {viewMode === 'formulir_resmi' && (
-            <div className="space-y-4 max-w-3xl mx-auto">
-              
-              {/* TOP HEADER SECTION: LOGO + JUDUL (KIRI) & TUJUAN KEPALA MADRASAH (KANAN SEJAJAR) */}
-              <div className="flex justify-between items-center pt-1 pb-1 gap-4 border-b-2 border-black/80 pb-3">
+          {/* VIEW MODE 1: FORMULIR DAFTAR ULANG PESERTA DIDIK BARU (SESUAI GAMBAR SCAN ASLI - SELALU DICETAK DI PRINT) */}
+          <div className={`space-y-4 max-w-3xl mx-auto ${viewMode === 'formulir_resmi' ? 'block' : 'hidden print:block'}`}>
+            
+            {/* TOP HEADER SECTION: LOGO + JUDUL (KIRI) & TUJUAN KEPALA MADRASAH (KANAN SEJAJAR) */}
+            <div className="flex justify-between items-center pt-1 pb-1 gap-4">
                 {/* Header Kiri: Logo Sekolah & Judul */}
                 <div className="flex items-center gap-3.5">
                   {/* Logo Sekolah Sesuai Ukuran Judul */}
@@ -475,7 +483,13 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                                 {char}.
                               </td>
                               <td className="border-r border-black py-0.5 px-2 text-left">
-                                {item.kategori || item.namaKomponen}
+                                {(() => {
+                                  const rawName = item.kategori || item.namaKomponen;
+                                  if (grp.kategoriName.toLowerCase().includes('seragam') || item.namaKomponen.toLowerCase().includes('seragam')) {
+                                    return /^seragam/i.test(rawName.trim()) ? rawName : `Seragam ${rawName}`;
+                                  }
+                                  return rawName;
+                                })()}
                               </td>
                               <td className="border-r border-black py-0.5 px-2 text-right font-mono">
                                 {isPutraDash ? (
@@ -612,11 +626,10 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
               </div>
 
             </div>
-          )}
 
           {/* VIEW MODE 2: TABEL KHUSUS PUTRA */}
           {viewMode === 'putra' && (
-            <div className="space-y-6 font-sans">
+            <div className="space-y-6 font-sans print:hidden">
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
                 <div>
                   <h4 className="font-bold text-sm text-blue-950">Rincian Biaya Khusus Calon Siswa Putra (Laki-laki)</h4>
@@ -636,10 +649,13 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                     <tbody className="divide-y divide-slate-100">
                       {grp.items.map((item, itemIdx) => {
                         const char = String.fromCharCode(97 + itemIdx);
+                        const displayName = grp.kategoriName.toLowerCase().includes('seragam') && !/^seragam/i.test((item.kategori || item.namaKomponen).trim())
+                          ? `Seragam ${item.kategori || item.namaKomponen}`
+                          : item.kategori || item.namaKomponen;
                         return (
                           <tr key={item.id} className="hover:bg-blue-50/40">
                             <td className="w-10 py-2.5 pl-4 font-bold text-blue-800">{char}.</td>
-                            <td className="py-2.5 font-semibold text-slate-800">{item.kategori || item.namaKomponen}</td>
+                            <td className="py-2.5 font-semibold text-slate-800">{displayName}</td>
                             <td className="py-2.5 pr-4 text-right font-mono font-bold text-blue-950">
                               Rp {item.nominalPutra.toLocaleString('id-ID')}
                             </td>
@@ -670,7 +686,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
 
           {/* VIEW MODE 3: TABEL KHUSUS PUTRI */}
           {viewMode === 'putri' && (
-            <div className="space-y-6 font-sans">
+            <div className="space-y-6 font-sans print:hidden">
               <div className="p-4 bg-pink-50 border border-pink-200 rounded-xl flex items-center justify-between">
                 <div>
                   <h4 className="font-bold text-sm text-pink-950">Rincian Biaya Khusus Calon Siswi Putri (Perempuan)</h4>
@@ -690,10 +706,13 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                     <tbody className="divide-y divide-slate-100">
                       {grp.items.map((item, itemIdx) => {
                         const char = String.fromCharCode(97 + itemIdx);
+                        const displayName = grp.kategoriName.toLowerCase().includes('seragam') && !/^seragam/i.test((item.kategori || item.namaKomponen).trim())
+                          ? `Seragam ${item.kategori || item.namaKomponen}`
+                          : item.kategori || item.namaKomponen;
                         return (
                           <tr key={item.id} className="hover:bg-pink-50/40">
                             <td className="w-10 py-2.5 pl-4 font-bold text-pink-800">{char}.</td>
-                            <td className="py-2.5 font-semibold text-slate-800">{item.kategori || item.namaKomponen}</td>
+                            <td className="py-2.5 font-semibold text-slate-800">{displayName}</td>
                             <td className="py-2.5 pr-4 text-right font-mono font-bold text-pink-950">
                               {item.nominalPutri > 0 ? `Rp ${item.nominalPutri.toLocaleString('id-ID')}` : '—'}
                             </td>
