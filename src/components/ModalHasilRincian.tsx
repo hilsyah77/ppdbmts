@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ItemBiayaPembayaran, ProfilMadrasahData, PengaturanPPDBData, Pendaftar, JadwalPiket } from '../types';
+import { ItemBiayaPembayaran, ProfilMadrasahData, PengaturanSPMBData, Pendaftar, JadwalPiket } from '../types';
 import { initialJadwalPiket } from '../data/mockData';
 import { 
   Printer, 
@@ -15,7 +15,7 @@ import {
 interface ModalHasilRincianProps {
   itemBiayaList: ItemBiayaPembayaran[];
   profil: ProfilMadrasahData;
-  pengaturan: PengaturanPPDBData;
+  pengaturan: PengaturanSPMBData;
   pendaftar?: Pendaftar | null;
   jadwalPiketList?: JadwalPiket[];
   onClose: () => void;
@@ -129,7 +129,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
     if (todayPiket && todayPiket.petugas.length > 0) {
       return todayPiket.petugas[0];
     }
-    return allPetugasNames[0] || 'Petugas Piket PPDB';
+    return allPetugasNames[0] || 'Petugas Piket SPMB';
   }, [piketList, allPetugasNames]);
 
   const [selectedPetugas, setSelectedPetugas] = useState<string>(defaultPetugas);
@@ -215,10 +215,13 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:m-0 print:bg-white print:fixed print:inset-0 print:overflow-visible">
-      {/* Embedded Print Styles for Formulir Daftar Ulang (Margin: Atas 1cm, Kiri 1.5cm, Kanan 1.5cm, Bawah 1cm) */}
+      {/* Embedded Print Styles for Formulir Daftar Ulang:
+          Ukuran kertas menyesuaikan isi formulir daftar ulang (auto/A4),
+          Margin atas: 1cm, Margin kiri: 1.5cm, Margin kanan: 1.5cm, Margin bawah: 1cm,
+          Hasil cetakan hanya formulirnya saja (#printable-formulir-daftar-ulang) */}
       <style>{`
         @page {
-          size: A4 portrait;
+          size: auto;
           margin-top: 1cm;
           margin-bottom: 1cm;
           margin-left: 1.5cm;
@@ -254,6 +257,11 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
             padding: 0 !important;
             background: #ffffff !important;
             display: block !important;
+            box-shadow: none !important;
+            border: none !important;
+          }
+          .no-print {
+            display: none !important;
           }
         }
       `}</style>
@@ -268,7 +276,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-sm text-white flex items-center gap-2">
-                <span>Formulir Daftar Ulang & Rincian Biaya PPDB</span>
+                <span>Formulir Daftar Ulang & Rincian Biaya SPMB</span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
                   T.A. {pengaturan.tahunAjaran}
                 </span>
@@ -280,7 +288,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                     {pendaftar.namaLengkap} ({pendaftar.jenisKelamin}) • Reg: {pendaftar.noRegistrasi}
                   </span>
                 ) : (
-                  <span>Format resmi cetak dokumen sesuai berkas formulir pendaftaran PPDB</span>
+                  <span>Format resmi cetak dokumen sesuai berkas formulir pendaftaran SPMB</span>
                 )}
               </p>
             </div>
@@ -649,7 +657,7 @@ export const ModalHasilRincian: React.FC<ModalHasilRincianProps> = ({
                   <div className="space-y-12">
                     <p className="text-black leading-tight">
                       Mengetahui,<br />
-                      Petugas Piket PPDB
+                      Petugas Piket SPMB
                     </p>
                     <div>
                       <p className="font-bold underline text-black">

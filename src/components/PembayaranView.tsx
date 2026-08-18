@@ -112,8 +112,8 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
     kategori: 'Titipan SPP',
     nominalPutra: 0,
     nominalPutri: 0,
-    keteranganPutra: 'Administrasi Keuangan PPDB & Layanan Madrasah',
-    keteranganPutri: 'Administrasi Keuangan PPDB & Layanan Madrasah',
+    keteranganPutra: 'Administrasi Keuangan SPMB & Layanan Madrasah',
+    keteranganPutri: 'Administrasi Keuangan SPMB & Layanan Madrasah',
     sifat: 'Wajib'
   });
 
@@ -198,7 +198,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
   const handleSavePayment = (
     pendaftarId: string,
     jumlah: number,
-    metode: 'Tunai / Kasir PPDB' | 'Transfer Bank' | 'QRIS' | 'Lainnya',
+    metode: 'Tunai / Kasir SPMB' | 'Transfer Bank' | 'QRIS' | 'Lainnya',
     catatan: string,
     penerima: string,
     diskonBaru?: number,
@@ -226,7 +226,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
             }) + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
             jumlah,
             metode,
-            penerima: penerima || 'Bendahara PPDB',
+            penerima: penerima || 'Bendahara SPMB',
             catatan
           };
         }
@@ -340,7 +340,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
     setConfirmDialog({
       isOpen: true,
       title: 'Hapus Komponen Biaya',
-      message: `Apakah Anda yakin ingin menghapus komponen biaya "${nama}" dari daftar rincian PPDB?`,
+      message: `Apakah Anda yakin ingin menghapus komponen biaya "${nama}" dari daftar rincian SPMB?`,
       subMessage: 'Komponen ini tidak akan lagi muncul dalam kalkulasi daftar ulang calon siswa baru.',
       type: 'danger',
       confirmText: 'Ya, Hapus Komponen',
@@ -360,14 +360,14 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold text-[10px] tracking-wider uppercase border border-white/30">
-                Keuangan PPDB Online
+                Keuangan SPMB Online
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 font-bold text-[10px] tracking-wider uppercase border border-amber-300/30">
                 Tahun Ajaran {pengaturan.tahunAjaran}
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black tracking-tight">
-              Rincian & Sistem Pembayaran PPDB
+              Rincian & Sistem Pembayaran SPMB
             </h1>
             <p className="text-xs text-emerald-100 max-w-2xl leading-relaxed">
               Pengelolaan rincian biaya terpisah antara siswa **Laki-Laki (Putra)** dan **Perempuan (Putri)**, transaksi kasir pembayaran, serta pencetakan kuitansi resmi madrasah.
@@ -498,7 +498,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
             <div>
               <h3 className="text-base font-bold flex items-center gap-2">
                 <Receipt className="w-5 h-5 text-emerald-400" />
-                <span>Rincian Komponen Biaya PPDB (Perbandingan Putra & Putri)</span>
+                <span>Rincian Komponen Biaya SPMB (Perbandingan Putra & Putri)</span>
               </h3>
               <p className="text-xs text-slate-300">
                 Tabel perbedaan biaya antara siswa Laki-laki dengan Perempuan sesuai kebutuhan seragam & atribut madrasah.
@@ -959,7 +959,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
                                   setIsModalHasilRincianOpen(true);
                                 }}
                                 className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold text-[11px] rounded-lg transition-all flex items-center gap-1"
-                                title="Cetak Formulir Daftar Ulang & Rincian Biaya PPDB"
+                                title="Cetak Formulir Daftar Ulang & Rincian Biaya SPMB"
                               >
                                 <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
                                 <span>Daftar Ulang</span>
@@ -995,7 +995,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
-              <span>Rekapitulasi Keuangan PPDB Berdasarkan Gender (Putra vs Putri)</span>
+              <span>Rekapitulasi Keuangan SPMB Berdasarkan Gender (Putra vs Putri)</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
@@ -1520,7 +1520,7 @@ export const PembayaranView: React.FC<PembayaranViewProps> = ({
         </div>
       )}
 
-      {/* MODAL 5: TAMPILAN HASIL RINCIAN BIAYA PPDB RESMI */}
+      {/* MODAL 5: TAMPILAN HASIL RINCIAN BIAYA SPMB RESMI */}
       {isModalHasilRincianOpen && (
         <ModalHasilRincian
           itemBiayaList={itemBiayaList}

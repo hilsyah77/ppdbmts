@@ -53,7 +53,7 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
     jenisSekolahAsal: 'MI Negeri' as Pendaftar['jenisSekolahAsal'],
     npsnSekolahAsal: '',
     status: 'Belum Diverifikasi' as StatusPendaftar,
-    catatanVerifikasi: 'Diinput langsung oleh Panitia PPDB.',
+    catatanVerifikasi: 'Diinput langsung oleh Panitia SPMB.',
     alamatSiswa: '',
     rtRw: '001/001',
     kelurahan: '',
@@ -129,7 +129,7 @@ export const ModalTambahPendaftar: React.FC<ModalTambahProps> = ({
             <div>
               <h3 className="text-sm font-bold">Penginputan Pendaftar Baru (Panitia Piket)</h3>
               <p className="text-[11px] text-slate-400">
-                Formulir pendaftaran luring/offline untuk calon peserta didik baru MTs
+                Formulir pendaftaran luring/offline untuk calon murid baru MTs
               </p>
             </div>
           </div>

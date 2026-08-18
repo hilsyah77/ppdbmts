@@ -8,7 +8,7 @@ interface ModalBayarProps {
   onSavePayment: (
     pendaftarId: string,
     jumlah: number,
-    metode: 'Tunai / Kasir PPDB' | 'Transfer Bank' | 'QRIS' | 'Lainnya',
+    metode: 'Tunai / Kasir SPMB' | 'Transfer Bank' | 'QRIS' | 'Lainnya',
     catatan: string,
     penerima: string,
     diskonBaru?: number,
@@ -43,7 +43,7 @@ export const ModalBayar: React.FC<ModalBayarProps> = ({
 
   // Form states for new payment
   const [jumlah, setJumlah] = useState<number>(remainingObligation);
-  const [metode, setMetode] = useState<'Tunai / Kasir PPDB' | 'Transfer Bank' | 'QRIS' | 'Lainnya'>('Tunai / Kasir PPDB');
+  const [metode, setMetode] = useState<'Tunai / Kasir SPMB' | 'Transfer Bank' | 'QRIS' | 'Lainnya'>('Tunai / Kasir SPMB');
   const [penerima, setPenerima] = useState<string>('Hj. Siti Aminah, S.Pd (Bendahara)');
   const [catatan, setCatatan] = useState<string>('');
 
@@ -58,7 +58,7 @@ export const ModalBayar: React.FC<ModalBayarProps> = ({
       pendaftar.id,
       jumlah,
       metode,
-      catatan || (jumlah >= remainingObligation ? `Pelunasan Biaya PPDB ${isPutra ? 'Putra' : 'Putri'}` : `Pembayaran Angsuran Biaya PPDB ${isPutra ? 'Putra' : 'Putri'}`),
+      catatan || (jumlah >= remainingObligation ? `Pelunasan Biaya SPMB ${isPutra ? 'Putra' : 'Putri'}` : `Pembayaran Angsuran Biaya SPMB ${isPutra ? 'Putra' : 'Putri'}`),
       penerima,
       diskon,
       ketDiskon
@@ -76,7 +76,7 @@ export const ModalBayar: React.FC<ModalBayarProps> = ({
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-black text-sm">Input & Transaksi Pembayaran PPDB</h3>
+              <h3 className="font-black text-sm">Input & Transaksi Pembayaran SPMB</h3>
               <p className="text-[11px] text-emerald-100">
                 {pendaftar.namaLengkap} ({pendaftar.noRegistrasi})
               </p>
@@ -242,7 +242,7 @@ export const ModalBayar: React.FC<ModalBayarProps> = ({
                   onChange={(e: any) => setMetode(e.target.value)}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium"
                 >
-                  <option value="Tunai / Kasir PPDB">Tunai / Kasir PPDB</option>
+                  <option value="Tunai / Kasir SPMB">Tunai / Kasir SPMB</option>
                   <option value="Transfer Bank">Transfer Bank (BSI / Mandiri)</option>
                   <option value="QRIS">QRIS Kasir</option>
                   <option value="Lainnya">Lainnya</option>
@@ -253,7 +253,7 @@ export const ModalBayar: React.FC<ModalBayarProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Nama Penerima / Kasir PPDB
+                  Nama Penerima / Kasir SPMB
                 </label>
                 <input
                   type="text"

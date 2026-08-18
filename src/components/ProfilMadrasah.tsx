@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { ProfilMadrasahData } from '../types';
 import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
+import { showNotification } from '../utils/notification';
 import {
   School,
   Building,
@@ -180,6 +181,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
     e.preventDefault();
     onSave(formData);
     setSaveSuccess(true);
+    showNotification('Profil Madrasah Berhasil Disimpan', 'Data identitas, logo, kop surat, dan informasi madrasah telah diperbarui.', 'success');
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
@@ -427,7 +429,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
                     </span>
                   </div>
                   <p className="text-xs text-slate-600">
-                    Gambar Kop Surat resmi ini akan otomatis dicantumkan di bagian atas saat mencetak <strong>Formulir Pendaftaran PPDB</strong> dan <strong>Kuitansi Pembayaran</strong>.
+                    Gambar Kop Surat resmi ini akan otomatis dicantumkan di bagian atas saat mencetak <strong>Formulir Pendaftaran SPMB</strong> dan <strong>Kuitansi Pembayaran</strong>.
                   </p>
                 </div>
               </div>
@@ -810,7 +812,7 @@ export const ProfilMadrasah: React.FC<ProfilMadrasahProps> = ({ profil, onSave }
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                WhatsApp Center PPDB
+                WhatsApp Center SPMB
               </label>
               <input
                 type="text"

@@ -93,11 +93,11 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
       badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
       icon: ShieldCheck,
       iconColor: 'text-emerald-400',
-      desc: 'Kelola pendaftar, verifikasi berkas, keuangan, profil madrasah, pengaturan PPDB & manajemen user.'
+      desc: 'Kelola pendaftar, verifikasi berkas, keuangan, profil madrasah, pengaturan SPMB & manajemen user.'
     },
     {
       role: 'panitia' as UserRole,
-      title: 'Panitia PPDB',
+      title: 'Panitia SPMB',
       badge: 'Verifikasi & Berkas',
       badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
       icon: Users,
@@ -144,7 +144,7 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
                   {namaMadrasah}
                 </h2>
                 <p className="text-xs text-emerald-400 font-medium">
-                  Sistem PPDB TA {tahunAjaran}
+                  Sistem SPMB TA {tahunAjaran}
                 </p>
               </div>
             </div>
@@ -155,7 +155,7 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
                 <span>Modul Autentikasi Multi-Pengguna</span>
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Sistem dilengkapi dengan pembagian hak akses (Role-Based Access Control) untuk menjaga keamanan dan ketertiban pengelolaan data PPDB.
+                Sistem dilengkapi dengan pembagian hak akses (Role-Based Access Control) untuk menjaga keamanan dan ketertiban pengelolaan data SPMB.
               </p>
             </div>
 
@@ -196,7 +196,7 @@ export const ModalLogin: React.FC<ModalLoginProps> = ({
           </div>
 
           <div className="mt-5 pt-3 border-t border-slate-800/60 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>PPDB Online Madrasah</span>
+            <span>SPMB Online Madrasah</span>
             <span className="text-emerald-500 font-semibold">v2.5 Role-Based</span>
           </div>
         </div>

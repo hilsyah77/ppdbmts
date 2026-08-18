@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pendaftar, ProfilMadrasahData, PengaturanPPDBData, ItemBiayaPembayaran, RiwayatPembayaranItem } from '../types';
+import { Pendaftar, ProfilMadrasahData, PengaturanSPMBData, ItemBiayaPembayaran, RiwayatPembayaranItem } from '../types';
 import { Printer, X, CheckCircle2, DollarSign, FileText, Share2 } from 'lucide-react';
 
 interface ModalKuitansiProps {
@@ -7,7 +7,7 @@ interface ModalKuitansiProps {
   riwayatItem: RiwayatPembayaranItem;
   itemBiayaList: ItemBiayaPembayaran[];
   profil: ProfilMadrasahData;
-  pengaturan: PengaturanPPDBData;
+  pengaturan: PengaturanSPMBData;
   onClose: () => void;
 }
 
@@ -77,7 +77,7 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
               <FileText className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-sm">Kuitansi Resmi Pembayaran PPDB</h3>
+              <h3 className="font-bold text-sm">Kuitansi Resmi Pembayaran SPMB</h3>
               <p className="text-[11px] text-slate-400">No. Kuitansi: {riwayatItem.noKuitansi}</p>
             </div>
           </div>
@@ -132,7 +132,7 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
                 </p>
               </div>
               <div className="w-16 h-16 border border-slate-200 rounded-xl p-1 bg-slate-50 flex flex-col items-center justify-center text-[10px] text-center font-bold text-slate-700 shrink-0">
-                <span>PPDB</span>
+                <span>SPMB</span>
                 <span className="text-emerald-700">{pengaturan.tahunAjaran}</span>
               </div>
             </div>
@@ -145,7 +145,7 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
                 BUKTI PEMBAYARAN RESMI
               </span>
               <h3 className="text-base font-black text-emerald-950">
-                KUITANSI PEMBAYARAN PPDB
+                KUITANSI PEMBAYARAN SPMB
               </h3>
             </div>
             <div className="text-right text-xs">
@@ -179,7 +179,7 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
                 <span className="font-bold text-slate-900 uppercase">: {pendaftar.namaLengkap}</span>
               </div>
               <div className="flex">
-                <span className="w-32 text-slate-500 font-medium">Jalur PPDB</span>
+                <span className="w-32 text-slate-500 font-medium">Jalur SPMB</span>
                 <span className="font-bold text-emerald-700">: {pendaftar.jalur}</span>
               </div>
               <div className="flex">
@@ -202,7 +202,7 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
 
             <div className="p-3 space-y-2">
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-600">Total Biaya Standar PPDB ({isPutra ? 'Kategori Putra' : 'Kategori Putri'})</span>
+                <span className="text-slate-600">Total Biaya Standar SPMB ({isPutra ? 'Kategori Putra' : 'Kategori Putri'})</span>
                 <span className="font-mono font-bold text-slate-800">Rp {totalMandatory.toLocaleString('id-ID')}</span>
               </div>
 
@@ -270,7 +270,7 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
             <div className="space-y-12">
               <p className="text-slate-600">
                 {profil.kabKota.replace('Kabupaten ', '').replace('Kota ', '')}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br />
-                <span className="font-bold text-slate-800">Bendahara / Kasir PPDB</span>
+                <span className="font-bold text-slate-800">Bendahara / Kasir SPMB</span>
               </p>
               <div>
                 <p className="font-bold underline text-slate-900">
@@ -283,7 +283,7 @@ export const ModalKuitansi: React.FC<ModalKuitansiProps> = ({
 
           {/* Footnote */}
           <div className="pt-4 border-t border-slate-200 text-[10px] text-slate-400 text-center italic">
-            * Kuitansi ini dicetak secara komputerisasi dari Sistem PPDB Online {profil.namaMadrasah} dan merupakan bukti pembayaran yang sah.
+            * Kuitansi ini dicetak secara komputerisasi dari Sistem SPMB Online {profil.namaMadrasah} dan merupakan bukti pembayaran yang sah.
           </div>
 
         </div>

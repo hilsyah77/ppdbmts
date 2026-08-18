@@ -196,7 +196,7 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
     const timeStamp = new Date().toISOString().slice(0, 10);
-    link.setAttribute('download', `DATA_PENDAFTAR_PPDB_MTS_${timeStamp}.csv`);
+    link.setAttribute('download', `DATA_PENDAFTAR_SPMB_MTS_${timeStamp}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -213,7 +213,7 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Data Pendaftar PPDB MTs</h2>
+              <h2 className="text-lg font-bold text-slate-900">Data Pendaftar SPMB MTs</h2>
               <p className="text-xs text-slate-500">
                 Kelola data calon siswa, verifikasi berkas, cetak formulir resmi, dan ekspor CSV.
               </p>
@@ -226,7 +226,7 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
           <button
             onClick={() => onOpenCetakDaftarUlang?.()}
             className="px-3.5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-bold rounded-xl text-xs transition-colors shadow-sm flex items-center gap-2"
-            title="Cetak Format Resmi Formulir Daftar Ulang & Rincian Biaya PPDB"
+            title="Cetak Format Resmi Formulir Daftar Ulang & Rincian Biaya SPMB"
           >
             <FileCheck className="w-4 h-4 text-indigo-600" />
             <span>Formulir Daftar Ulang</span>
@@ -467,7 +467,7 @@ export const DataPendaftar: React.FC<DataPendaftarProps> = ({
                           <button
                             onClick={() => onOpenCetakDaftarUlang?.(pendaftar)}
                             className="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg font-semibold transition-colors flex items-center gap-1 text-[11px] border border-indigo-200"
-                            title="Cetak Formulir Daftar Ulang & Rincian Biaya PPDB"
+                            title="Cetak Formulir Daftar Ulang & Rincian Biaya SPMB"
                           >
                             <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
                             <span className="hidden sm:inline">Daftar Ulang</span>

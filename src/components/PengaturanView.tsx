@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { PengaturanPPDBData, JalurPPDB, JadwalPiket, UserAccount, UserRole } from '../types';
+import { PengaturanSPMBData, JalurPPDB, JadwalPiket, UserAccount, UserRole } from '../types';
 import { ConfirmDialog, ConfirmDialogState } from './ConfirmDialog';
+import { showNotification } from '../utils/notification';
 import {
   Settings,
   Calendar,
@@ -27,12 +28,12 @@ import {
 } from 'lucide-react';
 
 interface PengaturanViewProps {
-  pengaturan: PengaturanPPDBData;
+  pengaturan: PengaturanSPMBData;
   jalurList: JalurPPDB[];
   jadwalPiketList?: JadwalPiket[];
   usersList?: UserAccount[];
   currentUser?: UserAccount | null;
-  onSavePengaturan: (newPengaturan: PengaturanPPDBData) => void;
+  onSavePengaturan: (newPengaturan: PengaturanSPMBData) => void;
   onSaveJalurList: (newJalurList: JalurPPDB[]) => void;
   onSaveUsersList?: (newUsersList: UserAccount[]) => void;
   onResetDatabase?: () => void;
@@ -51,7 +52,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
   onResetDatabase,
   onClearPendaftarDatabase
 }) => {
-  const [formData, setFormData] = useState<PengaturanPPDBData>(pengaturan);
+  const [formData, setFormData] = useState<PengaturanSPMBData>(pengaturan);
   const [jalurs, setJalurs] = useState<JalurPPDB[]>(jalurList);
   const [users, setUsers] = useState<UserAccount[]>(usersList);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -157,7 +158,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       namaJalur: newJalurNameInput.trim(),
       kuota: 25,
       terisi: 0,
-      deskripsi: 'Jalur khusus sesuai juknis panitia PPDB.',
+      deskripsi: 'Jalur khusus sesuai juknis panitia SPMB.',
       persyaratan: ['Persyaratan berkas sesuai ketentuan panitia'],
       warnaBadge: 'bg-indigo-100 text-indigo-800 border-indigo-300'
     };
@@ -169,7 +170,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
   const handleDeleteJalur = (id: string, nama: string) => {
     setConfirmDialog({
       isOpen: true,
-      title: 'Hapus Jalur PPDB',
+      title: 'Hapus Jalur SPMB',
       message: `Apakah Anda yakin ingin menghapus jalur pendaftaran "${nama}" dari sistem?`,
       subMessage: 'Pendaftar yang telah terdaftar pada jalur ini tidak akan otomatis terhapus.',
       type: 'danger',
@@ -189,6 +190,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       onSaveUsersList(users);
     }
     setSaveSuccess(true);
+    showNotification('Pengaturan Berhasil Disimpan', 'Seluruh konfigurasi SPMB, kuota jalur, dan akun pengguna telah diperbarui.', 'success');
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
@@ -200,7 +202,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       email: '',
       role: 'panitia',
       password: '123',
-      jabatan: 'Petugas Panitia PPDB',
+      jabatan: 'Petugas Panitia SPMB',
       noHp: '',
       isAktif: true
     });
@@ -291,7 +293,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       setConfirmDialog({
         isOpen: true,
         title: 'Tidak Dapat Menghapus Akun',
-        message: 'Sistem PPDB harus memiliki minimal 1 akun pengguna aktif.',
+        message: 'Sistem SPMB harus memiliki minimal 1 akun pengguna aktif.',
         type: 'warning',
         isAlertOnly: true,
         confirmText: 'Mengerti',
@@ -303,7 +305,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       isOpen: true,
       title: 'Hapus Akun Pengguna',
       message: `Apakah Anda yakin ingin menghapus akun pengguna "${username}" dari sistem?`,
-      subMessage: 'Pengguna ini tidak akan lagi dapat masuk/login ke dalam panel PPDB.',
+      subMessage: 'Pengguna ini tidak akan lagi dapat masuk/login ke dalam panel SPMB.',
       type: 'danger',
       confirmText: 'Ya, Hapus Akun',
       cancelText: 'Batal',
@@ -327,7 +329,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
             <Settings className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Pengaturan Utama PPDB MTs</h2>
+            <h2 className="text-lg font-bold text-slate-900">Pengaturan Utama SPMB MTs</h2>
             <p className="text-xs text-slate-500">
               Konfigurasi tahun ajaran, gelombang pendaftaran, alokasi kuota per jalur, dan format kop surat cetak.
             </p>
@@ -346,7 +348,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       {saveSuccess && (
         <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-800 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
           <CheckCircle className="w-5 h-5 text-emerald-600" />
-          <span>Seluruh pengaturan PPDB dan kuota jalur berhasil diperbarui!</span>
+          <span>Seluruh pengaturan SPMB dan kuota jalur berhasil diperbarui!</span>
         </div>
       )}
 
@@ -356,7 +358,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100">
             <Calendar className="w-4 h-4 text-emerald-600" />
-            <span>1. Jadwal & Gelombang Pendaftaran PPDB</span>
+            <span>1. Jadwal & Gelombang Pendaftaran SPMB</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
@@ -503,7 +505,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Panitia PPDB (Penandatangan)
+                  Panitia SPMB (Penandatangan)
                 </label>
                 <select
                   name="panitiaKetua"
@@ -511,7 +513,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium text-slate-800 text-xs bg-white"
                 >
-                  <option value="">-- Pilih Panitia PPDB (Petugas Piket) --</option>
+                  <option value="">-- Pilih Panitia SPMB (Petugas Piket) --</option>
                   {formData.panitiaKetua &&
                     !jadwalPiketList.some((j) => j.petugas.includes(formData.panitiaKetua)) && (
                       <option value={formData.panitiaKetua}>
@@ -541,7 +543,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Sekretaris Panitia PPDB</label>
+                <label className="block font-bold text-slate-700 mb-1">Sekretaris Panitia SPMB</label>
                 <input
                   type="text"
                   name="panitiaSekretaris"
@@ -614,7 +616,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                         }`}
                       >
                         {u.role === 'admin' && 'Administrator'}
-                        {u.role === 'panitia' && 'Panitia PPDB'}
+                        {u.role === 'panitia' && 'Panitia SPMB'}
                         {u.role === 'bendahara' && 'Bendahara'}
                         {u.role === 'siswa' && 'Calon Siswa / Wali'}
                       </span>
@@ -676,12 +678,12 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
           </div>
         </div>
 
-        {/* Section 5: Hapus & Reset Database PPDB (Danger Zone) */}
+        {/* Section 5: Hapus & Reset Database SPMB (Danger Zone) */}
         <div className="bg-white rounded-2xl p-6 border-2 border-rose-200 shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-rose-100">
             <h3 className="text-sm font-bold text-rose-800 uppercase tracking-wider flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-rose-600" />
-              <span>5. Manajemen Keamanan & Hapus Database PPDB</span>
+              <span>5. Manajemen Keamanan & Hapus Database SPMB</span>
             </h3>
             <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold border border-rose-200 uppercase tracking-wider">
               Danger Zone
@@ -689,7 +691,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            Fitur pembersihan dan penghapusan database PPDB. Gunakan opsi di bawah ini saat hendak membuka pendaftaran tahun ajaran baru atau mengembalikan sistem ke kondisi awal.
+            Fitur pembersihan dan penghapusan database SPMB. Gunakan opsi di bawah ini saat hendak membuka pendaftaran tahun ajaran baru atau mengembalikan sistem ke kondisi awal.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -898,7 +900,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                     className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-900 bg-white"
                   >
                     <option value="admin">Administrator (Akses Penuh)</option>
-                    <option value="panitia">Panitia & Verifikator PPDB</option>
+                    <option value="panitia">Panitia & Verifikator SPMB</option>
                     <option value="bendahara">Bendahara Keuangan</option>
                     <option value="siswa">Calon Siswa / Wali Murid</option>
                   </select>
@@ -973,7 +975,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         </div>
       )}
 
-      {/* MODAL: TAMBAH JALUR PPDB BARU */}
+      {/* MODAL: TAMBAH JALUR SPMB BARU */}
       {showAddJalurModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-scale-up">
@@ -982,7 +984,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                 <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                   <Layers className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-black text-slate-800">Tambah Jalur PPDB Baru</h3>
+                <h3 className="text-base font-black text-slate-800">Tambah Jalur SPMB Baru</h3>
               </div>
               <button
                 type="button"

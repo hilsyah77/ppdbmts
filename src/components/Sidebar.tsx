@@ -33,7 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'dashboard' as ActiveTab,
       label: role === 'siswa' ? 'Portal Calon Siswa' : 'Dashboard Utama',
-      sublabel: role === 'siswa' ? 'Status & Ringkasan PPDB' : 'Jalur, Statistik & Piket',
+      sublabel: role === 'siswa' ? 'Status & Ringkasan SPMB' : 'Jalur, Statistik & Piket',
       icon: LayoutDashboard,
       badge: null,
       allowedRoles: ['admin', 'panitia', 'bendahara', 'siswa']
@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'pembayaran' as ActiveTab,
-      label: 'Pembayaran PPDB',
+      label: 'Pembayaran SPMB',
       sublabel: 'Kasir, Biaya & Kuitansi',
       icon: Receipt,
       badge: 'Keuangan',
@@ -96,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
             <span className="text-xs font-bold text-emerald-400 uppercase">
               {role === 'admin' && 'Administrator'}
-              {role === 'panitia' && 'Panitia PPDB'}
+              {role === 'panitia' && 'Panitia SPMB'}
               {role === 'bendahara' && 'Bendahara'}
               {role === 'siswa' && 'Calon Siswa / Wali'}
             </span>

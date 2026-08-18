@@ -96,10 +96,10 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
           body * {
             visibility: hidden !important;
           }
-          #printable-formulir-ppdb, #printable-formulir-ppdb * {
+          #printable-formulir-spmb, #printable-formulir-spmb * {
             visibility: visible !important;
           }
-          #printable-formulir-ppdb {
+          #printable-formulir-spmb {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
@@ -131,7 +131,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold">Cetak Formulir Pendaftaran PPDB</h3>
+                <h3 className="text-sm font-bold">Cetak Formulir Pendaftaran SPMB</h3>
                 <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   Kertas A4 &bull; Margin: Atas 1cm &bull; Kiri/Kanan/Bawah 1.5cm
@@ -259,7 +259,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
         <div className="bg-slate-200/70 p-3 sm:p-5 flex justify-center print:bg-white print:p-0 print:m-0">
           {/* Printable Paper Area (Exact A4 specifications: Margin 2.5cm Top/Bottom, 3cm Left/Right, Font 12, Spacing 1.5) */}
           <div
-            id="printable-formulir-ppdb"
+            id="printable-formulir-spmb"
             ref={printRef}
             className="w-full max-w-2xl bg-white text-slate-950 shadow-xl border border-slate-300 print:border-none print:shadow-none p-6 sm:p-8 font-sans text-[12px] print:p-0"
             style={{ boxSizing: 'border-box', lineHeight: '1.5' }}
@@ -288,7 +288,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
 
                 <div className="px-14 space-y-0.5">
                   <h1 className="text-[13.5px] sm:text-[14.5px] font-black uppercase tracking-tight text-slate-950 leading-tight">
-                    {pengaturan.kopHeaderLine3 || `PENERIMAAN PESERTA DIDIK BARU (PPDB) ${profil.namaMadrasah.toUpperCase()}`}
+                    {pengaturan.kopHeaderLine3 || `SISTEM PENERIMAAN MURID BARU (SPMB) ${profil.namaMadrasah.toUpperCase()}`}
                   </h1>
                   <p className="text-[9.5px] text-slate-700 leading-tight">
                     {profil.alamat}, {profil.kelurahan}, {profil.kecamatan}, {profil.kabKota}, {profil.provinsi} {profil.kodePos}
@@ -303,7 +303,7 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
             {/* 2. Judul Formulir & Ringkasan Registrasi */}
             <div className="text-center mb-2" style={{ lineHeight: '1.3' }}>
               <h2 className="text-[12.5px] font-bold uppercase tracking-wider underline decoration-2 text-slate-950 leading-tight">
-                FORMULIR PENDAFTARAN PESERTA DIDIK BARU (PPDB)
+                FORMULIR PENDAFTARAN SISTEM PENERIMAAN MURID BARU (SPMB)
               </h2>
               <p className="text-[10.5px] font-bold text-slate-800 mt-0.5">
                 TAHUN AJARAN {pengaturan.tahunAjaran} &bull; {pengaturan.gelombangActive.toUpperCase()}
@@ -543,25 +543,25 @@ export const ModalCetakFormulir: React.FC<ModalCetakProps> = ({
                   </div>
                 </div>
 
-                {/* Tanda Tangan Panitia PPDB */}
+                {/* Tanda Tangan Panitia SPMB */}
                 <div className="flex flex-col justify-between h-22 py-0.5">
                   <div>
                     <p className="text-slate-600 text-[10.5px]">
                       {profil.kabKota.replace('Kota ', '').replace('Kab. ', '')}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
-                    <p className="font-bold text-slate-900 text-[10.5px]">Panitia PPDB {profil.namaMadrasah}</p>
+                    <p className="font-bold text-slate-900 text-[10.5px]">Panitia SPMB {profil.namaMadrasah}</p>
                   </div>
                   <div>
                     <p className="font-bold underline uppercase text-slate-950 text-[11.5px]">{penandatangan || pengaturan.panitiaKetua}</p>
-                    <p className="text-[9px] text-slate-500">Panitia PPDB (Penandatangan)</p>
+                    <p className="text-[9px] text-slate-500">Panitia SPMB (Penandatangan)</p>
                   </div>
                 </div>
               </div>
 
               {/* 5. PRINT FOOTER CATATAN RESMI */}
               <div className="pt-1 border-t border-slate-300 text-[8px] text-slate-500 flex justify-between items-center" style={{ lineHeight: '1.2' }}>
-                <span>&bull; Bukti Pendaftaran Resmi PPDB {profil.namaMadrasah} TA {pengaturan.tahunAjaran} &bull; Dicetak pada: {new Date().toLocaleString('id-ID')}</span>
-                <span className="font-mono font-semibold">1 Halaman Dokumen Resmi PPDB</span>
+                <span>&bull; Bukti Pendaftaran Resmi SPMB {profil.namaMadrasah} TA {pengaturan.tahunAjaran} &bull; Dicetak pada: {new Date().toLocaleString('id-ID')}</span>
+                <span className="font-mono font-semibold">1 Halaman Dokumen Resmi SPMB</span>
               </div>
 
             </div>

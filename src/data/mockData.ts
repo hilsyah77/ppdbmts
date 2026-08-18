@@ -1,4 +1,4 @@
-import { Pendaftar, JalurPPDB, JadwalPiket, ProfilMadrasahData, PengaturanPPDBData, ItemBiayaPembayaran } from '../types';
+import { Pendaftar, JalurSPMB, JalurPPDB, JadwalPiket, ProfilMadrasahData, PengaturanSPMBData, PengaturanPPDBData, ItemBiayaPembayaran } from '../types';
 
 export const initialProfilMadrasah: ProfilMadrasahData = {
   namaMadrasah: 'MTs NEGERI 1 MODEL KOTA ADILUHUR',
@@ -17,7 +17,7 @@ export const initialProfilMadrasah: ProfilMadrasahData = {
   kodePos: '12430',
   telepon: '(021) 765-4321',
   whatsappCenter: '0812-9876-5432',
-  email: 'ppdb@mtsn1model.sch.id',
+  email: 'spmb@mtsn1model.sch.id',
   website: 'https://mtsn1model.sch.id',
   slogan: 'Unggul Dalam Prestasi, Anggun Dalam Akhlak, Berwawasan Global',
   visi: 'Terwujudnya Generasi Islam yang Berakhlaqul Karimah, Unggul Dalam Sains & Teknologi, Berwawasan Lingkungan, dan Berdaya Saing Global.',
@@ -33,7 +33,7 @@ export const initialProfilMadrasah: ProfilMadrasahData = {
   kopSuratUrl: ''
 };
 
-export const initialJalurPPDB: JalurPPDB[] = [
+export const initialJalurSPMB: JalurSPMB[] = [
   {
     id: 'j1',
     namaJalur: 'Jalur Reguler',
@@ -57,7 +57,7 @@ export const initialJalurPPDB: JalurPPDB[] = [
     namaJalur: 'Jalur Tahfizh Al-Qur\'an',
     kuota: 30,
     terisi: 24,
-    deskripsi: 'Jalur khusus calon peserta didik yang memiliki hafalan Al-Qur\'an minimal 2 Juz dibuktikan dengan tes munaqosyah.',
+    deskripsi: 'Jalur khusus calon murid baru yang memiliki hafalan Al-Qur\'an minimal 2 Juz dibuktikan dengan tes munaqosyah.',
     persyaratan: ['Sertifikat Tahfizh atau Surat Keterangan dari Rumah Tahfizh/Sekolah', 'Lulus tes hafalan oleh tim penguji madrasah'],
     warnaBadge: 'bg-amber-100 text-amber-800 border-amber-300'
   },
@@ -71,6 +71,7 @@ export const initialJalurPPDB: JalurPPDB[] = [
     warnaBadge: 'bg-purple-100 text-purple-800 border-purple-300'
   }
 ];
+export const initialJalurPPDB = initialJalurSPMB;
 
 export const initialJadwalPiket: JadwalPiket[] = [
   {
@@ -80,7 +81,7 @@ export const initialJadwalPiket: JadwalPiket[] = [
     shift: 'Pagi (07.30 - 12.00)',
     petugas: ['Ust. M. Ridwan, S.Pd.I.', 'Ibu Rahmawati, S.SE.', 'Bpk. Hendra Wijaya, S.Kom.'],
     noKontak: '0813-1122-3344',
-    lokasi: 'Ruang Panitia PPDB (Gedung Utama Lt. 1)',
+    lokasi: 'Ruang Panitia SPMB (Gedung Utama Lt. 1)',
     status: 'Piket Hari Ini'
   },
   {
@@ -90,7 +91,7 @@ export const initialJadwalPiket: JadwalPiket[] = [
     shift: 'Siang (12.00 - 15.30)',
     petugas: ['Ust. H. Syarifuddin, M.Ag.', 'Ibu Nurul Hidayah, S.Pd.'],
     noKontak: '0812-3344-5566',
-    lokasi: 'Ruang Panitia PPDB (Gedung Utama Lt. 1)',
+    lokasi: 'Ruang Panitia SPMB (Gedung Utama Lt. 1)',
     status: 'Piket Hari Ini'
   },
   {
@@ -100,7 +101,7 @@ export const initialJadwalPiket: JadwalPiket[] = [
     shift: 'Pagi (07.30 - 12.00)',
     petugas: ['Bpk. Agus Prasetyo, S.Pd.', 'Ibu Siti Khadijah, M.Pd.'],
     noKontak: '0857-7788-9900',
-    lokasi: 'Ruang Panitia PPDB (Gedung Utama Lt. 1)',
+    lokasi: 'Ruang Panitia SPMB (Gedung Utama Lt. 1)',
     status: 'Akan Datang'
   },
   {
@@ -110,7 +111,7 @@ export const initialJadwalPiket: JadwalPiket[] = [
     shift: 'Siang (12.00 - 15.30)',
     petugas: ['Ust. Amirullah, S.Th.I.', 'Ibu Tri Sundari, A.Md.'],
     noKontak: '0819-2233-4455',
-    lokasi: 'Ruang Panitia PPDB (Gedung Utama Lt. 1)',
+    lokasi: 'Ruang Panitia SPMB (Gedung Utama Lt. 1)',
     status: 'Akan Datang'
   },
   {
@@ -120,12 +121,12 @@ export const initialJadwalPiket: JadwalPiket[] = [
     shift: 'Pagi (07.30 - 12.00)',
     petugas: ['Bpk. Dedi Kurniawan, M.Kom.', 'Ibu Yulia Pratiwi, S.Pd.'],
     noKontak: '0821-4455-6677',
-    lokasi: 'Ruang Panitia PPDB (Gedung Utama Lt. 1)',
+    lokasi: 'Ruang Panitia SPMB (Gedung Utama Lt. 1)',
     status: 'Akan Datang'
   }
 ];
 
-export const initialPengaturan: PengaturanPPDBData = {
+export const initialPengaturan: PengaturanSPMBData = {
   tahunAjaran: '2026/2027',
   gelombangActive: 'Gelombang 1 Utama',
   tanggalMulai: '2026-06-01',
@@ -135,7 +136,7 @@ export const initialPengaturan: PengaturanPPDBData = {
   kopHeaderLine2: 'KANTOR KEMENTERIAN AGAMA KOTA ADILUHUR',
   kopHeaderLine3: 'MADRASAH TSANAWIYAH NEGERI 1 MODEL KOTA ADILUHUR',
   biariaPendaftaran: 'Gratis (Rp 0,-)',
-  nomorSuratKonfirmasi: 'MTs.01/PPDB/SK/VIII/2026',
+  nomorSuratKonfirmasi: 'MTs.01/SPMB/SK/VIII/2026',
   panitiaKetua: 'Drs. H. M. Badruddin, M.Ag.',
   panitiaSekretaris: 'Ahmad Muzakki, S.Pd.I.'
 };
@@ -811,7 +812,7 @@ export const initialUsers = [
     id: 'user-2',
     username: 'panitia',
     namaLengkap: 'Ahmad Syafii, S.Pd.I.',
-    email: 'syafii.ppdb@madrasah.sch.id',
+    email: 'syafii.spmb@madrasah.sch.id',
     role: 'panitia' as const,
     password: '123',
     jabatan: 'Ketua Panitia & Verifikator Berkas',
@@ -822,10 +823,10 @@ export const initialUsers = [
     id: 'user-3',
     username: 'bendahara',
     namaLengkap: 'Siti Aminah, S.E.',
-    email: 'keuangan.ppdb@madrasah.sch.id',
+    email: 'keuangan.spmb@madrasah.sch.id',
     role: 'bendahara' as const,
     password: '123',
-    jabatan: 'Bendahara Keuangan PPDB',
+    jabatan: 'Bendahara Keuangan SPMB',
     noHp: '085712348765',
     isAktif: true
   },
@@ -836,7 +837,7 @@ export const initialUsers = [
     email: 'rizky.siswa@gmail.com',
     role: 'siswa' as const,
     password: '123',
-    jabatan: 'Calon Peserta Didik Baru',
+    jabatan: 'Calon Murid Baru',
     noHp: '081299887766',
     isAktif: true,
     nisnNik: '3201123456780001'

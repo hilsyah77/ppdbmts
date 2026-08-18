@@ -339,7 +339,7 @@ export const ModalDetailPendaftar: React.FC<ModalDetailProps> = ({
                   <button
                     onClick={() => onOpenCetakDaftarUlang(formData)}
                     className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
-                    title="Cetak Formulir Daftar Ulang & Rincian Biaya PPDB"
+                    title="Cetak Formulir Daftar Ulang & Rincian Biaya SPMB"
                   >
                     <FileCheck className="w-3.5 h-3.5" />
                     <span>Cetak Daftar Ulang & Rincian</span>

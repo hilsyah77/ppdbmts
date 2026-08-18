@@ -173,12 +173,12 @@ export interface RiwayatPembayaranItem {
   noKuitansi: string;
   tanggal: string;
   jumlah: number;
-  metode: 'Tunai / Kasir PPDB' | 'Transfer Bank' | 'QRIS' | 'Lainnya';
+  metode: 'Tunai / Kasir SPMB' | 'Transfer Bank' | 'QRIS' | 'Lainnya';
   penerima: string;
   catatan?: string;
 }
 
-export interface JalurPPDB {
+export interface JalurSPMB {
   id: string;
   namaJalur: string;
   kuota: number;
@@ -187,6 +187,7 @@ export interface JalurPPDB {
   persyaratan: string[];
   warnaBadge: string;
 }
+export type JalurPPDB = JalurSPMB;
 
 export interface StatistikSekolah {
   namaSekolah: string;
@@ -233,7 +234,7 @@ export interface ProfilMadrasahData {
   kopSuratUrl?: string;
 }
 
-export interface PengaturanPPDBData {
+export interface PengaturanSPMBData {
   tahunAjaran: string;
   gelombangActive: string;
   tanggalMulai: string;
@@ -247,6 +248,7 @@ export interface PengaturanPPDBData {
   panitiaKetua: string;
   panitiaSekretaris: string;
 }
+export type PengaturanPPDBData = PengaturanSPMBData;
 
 export type UserRole = 'admin' | 'panitia' | 'bendahara' | 'siswa';
 

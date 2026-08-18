@@ -30,7 +30,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
   const [newShift, setNewShift] = useState<'Pagi (07.30 - 12.00)' | 'Siang (12.00 - 15.30)'>('Pagi (07.30 - 12.00)');
   const [newPetugasInput, setNewPetugasInput] = useState('');
   const [newNoKontak, setNewNoKontak] = useState('0812-9988-7766');
-  const [newLokasi, setNewLokasi] = useState('Ruang Panitia PPDB (Gedung Utama Lt. 1)');
+  const [newLokasi, setNewLokasi] = useState('Ruang Panitia SPMB (Gedung Utama Lt. 1)');
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
     isOpen: false,
     title: '',
@@ -44,7 +44,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
       setConfirmDialog({
         isOpen: true,
         title: 'Nama Petugas Wajib Diisi',
-        message: 'Harap masukkan minimal satu nama petugas piket PPDB untuk menyimpan jadwal.',
+        message: 'Harap masukkan minimal satu nama petugas piket SPMB untuk menyimpan jadwal.',
         type: 'warning',
         isAlertOnly: true,
         confirmText: 'Mengerti',
@@ -119,7 +119,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
             <CalendarCheck className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Jadwal Piket Panitia Penginputan PPDB</h2>
+            <h2 className="text-lg font-bold text-slate-900">Jadwal Piket Panitia Penginputan SPMB</h2>
             <p className="text-xs text-slate-500">
               Pengaturan jadwal jaga panitia penerimaan siswa baru offline, verifikasi berkas luring, dan layanan informasi.
             </p>

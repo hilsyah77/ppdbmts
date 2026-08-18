@@ -9,7 +9,7 @@ import {
   JalurPPDB,
   JadwalPiket,
   ProfilMadrasahData,
-  PengaturanPPDBData,
+  PengaturanSPMBData,
   StatusPendaftar,
   ItemBiayaPembayaran,
   UserAccount
@@ -44,6 +44,8 @@ import { ModalTambahPendaftar } from './components/ModalTambahPendaftar';
 import { ModalLogin } from './components/ModalLogin';
 import { ModalHasilRincian } from './components/ModalHasilRincian';
 import { ConfirmDialog, ConfirmDialogState } from './components/ConfirmDialog';
+import { ToastNotification, ToastMessage } from './components/ToastNotification';
+import { subscribeNotification } from './utils/notification';
 
 export default function App() {
   // Navigation State
@@ -87,7 +89,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : initialProfilMadrasah;
   });
 
-  const [pengaturan, setPengaturan] = useState<PengaturanPPDBData>(() => {
+  const [pengaturan, setPengaturan] = useState<PengaturanSPMBData>(() => {
     const saved = localStorage.getItem('ppdb_mts_pengaturan');
     return saved ? JSON.parse(saved) : initialPengaturan;
   });
@@ -112,6 +114,24 @@ export default function App() {
     message: '',
     onConfirm: () => {}
   });
+
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeNotification((newToast) => {
+      setToasts((prev) => [...prev, newToast]);
+      if (newToast.duration && newToast.duration > 0) {
+        setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== newToast.id));
+        }, newToast.duration);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleDismissToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   // Sync Users to LocalStorage
   useEffect(() => {
@@ -450,6 +470,12 @@ export default function App() {
       <ConfirmDialog
         dialog={confirmDialog}
         onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      {/* Global Modern Bottom-Center CSS Floating Toast Notifications */}
+      <ToastNotification
+        toasts={toasts}
+        onDismiss={handleDismissToast}
       />
 
     </div>

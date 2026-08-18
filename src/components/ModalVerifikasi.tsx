@@ -64,7 +64,7 @@ export const ModalVerifikasi: React.FC<ModalVerifikasiProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-bold">Verifikasi Pendaftar PPDB</h3>
+              <h3 className="text-sm font-bold">Verifikasi Pendaftar SPMB</h3>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
               {pendaftar.namaLengkap} ({pendaftar.noRegistrasi})

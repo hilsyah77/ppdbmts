@@ -1,10 +1,10 @@
 import React from 'react';
 import { School, Calendar, Users, CheckCircle2, Clock, ShieldCheck, User, LogOut, KeyRound } from 'lucide-react';
-import { ProfilMadrasahData, PengaturanPPDBData, UserAccount } from '../types';
+import { ProfilMadrasahData, PengaturanSPMBData, UserAccount } from '../types';
 
 interface HeaderProps {
   profil: ProfilMadrasahData;
-  pengaturan: PengaturanPPDBData;
+  pengaturan: PengaturanSPMBData;
   totalPendaftar: number;
   totalTerverifikasi: number;
   totalPending: number;
@@ -43,14 +43,14 @@ export const Header: React.FC<HeaderProps> = ({
                   {profil.namaMadrasah}
                 </h1>
                 <span className="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  PPDB TA {pengaturan.tahunAjaran}
+                  SPMB TA {pengaturan.tahunAjaran}
                 </span>
                 <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   {pengaturan.gelombangActive}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Sistem Informasi Penerimaan Peserta Didik Baru (Sistem Multi-Pengguna)
+                Sistem Informasi Sistem Penerimaan Murid Baru (Sistem Multi-Pengguna)
               </p>
             </div>
           </div>
